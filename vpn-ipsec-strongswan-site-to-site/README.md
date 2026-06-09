@@ -5,169 +5,208 @@ A VPN allows you to create a virtual connection between two different local netw
 
 <h1> Overview </h1>
 This project consists of designing and deploying a secure IPsec IKEv2 Site-to-Site VPN tunnel between two remote LAN networks over the public Internet using strongSwan on VM Ubuntu (Linux) gateways.
+
 The infrastructure was deployed in a real-world environment where both VPN gateways were located behind NAT devices and connected through public Internet access (Home LAN ↔ 4G Mobile Network).
+
 The objective of this project was to securely interconnect two distant private networks while ensuring encrypted LAN-to-LAN communications through IPsec ESP tunnels.
-________________________________________
+
 <h1> Project Scenario </h1>
 A secure communication channel was required between 2 isolated private networks connected through the Internet:
-•	Home LAN network
-•	Remote LAN connected through a 4G mobile network
+<ul> 
+    <li> Home LAN network </li>
+    <li> Remote LAN connected through a 4G mobile network </li>
+</ul>
+
 
 Both sites were located behind NAT-enabled Internet gateways, introducing additional routing and IPsec NAT Traversal (NAT-T) constraints.
 
 The project focused on:
-•	secure inter-site connectivity
-•	encrypted traffic transport
-•	routing between distant LANs
-________________________________________
+<ul> 
+    <li> secure inter-site connectivity </li>
+    <li> encrypted traffic transport </li>
+    <li> routing between distant LANs </li>
+</ul>
+
+
 <h1> Solution </h1>
 The following technologies and mechanisms were implemented:
-•	Deployment of an IPsec IKEv2 Site-to-Site VPN using strongSwan
-•	Ubuntu (Linux) gateways used as VPN routers
-•	Configuration of ESP encryption using AES256-GCM
-•	NAT Traversal (NAT-T) implementation for VPN communication through NAT devices
-•	LAN-to-LAN routing between remote private subnets
-•	Initial authentication using Pre-Shared Key (PSK)
-•	Migration to a PKI-based authentication model using X.509 certificates
-•	Traffic analysis and troubleshooting using:
-    o	tcpdump
-    o	Wireshark
-    o	ip xfrm
-    o	ipsec status
-•	Verification of Security Associations (SA)
-•	Validation of encrypted traffic over public Internet
-________________________________________
+
+<ul>
+    <li>Deployment of an IPsec IKEv2 Site-to-Site VPN iso,g strongswan </li>
+    <li>Ubuntu gateways used as VPN routers</li>
+    <li>ESP encryption using AES256-GCM</li>
+    <li>NAT Traversal (NAT-T) implementation for VPN communication through NAT devices</li>
+    <li>LAN-to-LAN routing g between remote private subnets </li>
+    <li>Initial PSK authentication</li>
+    <li>Migration to PKI/X.509 authentication</li>
+    <li>Traffic analysis tools</li>
+    <ul>
+        <li>tcpdump</li>
+        <li>Wireshark</li>
+        <li>ip xfrm</li>
+        <li>ipsec status</li>
+    </ul>
+    <li>Security Association verification</li>
+    <li>Validation of encrypted traffic over public Internet</li>
+</ul>
 
 <h1> Network Architecture </h1>
 
 **Main Components** :
-• Linux Ubuntu VPN Gateway = GW-A (Site A)
-    o	VM on VirtualBox / VMware
-    o	Connetece to the home local router/box  (behind a NAT)
-    o	LAN local : 192.168.1.0/24 
-    o	Private IP (GW-A) : 192.168.1.167 
-    o	Public IP (box IP) : 82.X.Y.Z 
-•	Linux Ubuntu VPN Gateway = GW-B (Site B)
-    o	VM on VirtualBox /VMware
-    o	Connected to a 4G mobile network (behind a NAT)
-    o	LAN local : 172.20.10.0/28
-    o	Private IP (GW-A) : 172.20.10.8
-    o	Public IP (box IP) : 37.A.B.C
-•	Home LAN network (behind my local home router where i have access on it)
-•	Remote LAN over 4G mobile access (not access to the local router)
-•	NAT-enabled Internet gateways
-•	Public Internet connectivity
-________________________________________
-<h1> Key Features </h1> 
-•	IPsec IKEv2 VPN
-•	ESP tunnel encryption
-•	NAT Traversal (NAT-T)
-•	Secure LAN-to-LAN communication
-•	Linux networking and routing
-•	PKI / X.509 certificate authentication
-•	Real-world deployment over public Internet
-•	Advanced network troubleshooting
-________________________________________
-Troubleshooting & Challenges
-Several networking and security challenges were encountered and resolved during the deployment:
-•	NAT preventing ESP traffic forwarding
-•	Routing asymmetry issues
-•	Missing ICMP replies between LANs
-•	Incorrect subnet routing propagation
-•	Security Association establishment failures
-•	MTU and encapsulation considerations
+<ul>
+<li>Linux Ubuntu VPN Gateway = GW-A (Site A)</li>
+<ul>
+    <li>VM on VirtualBox / VMware</li>
+    <li>Connetece to the home local router/box  (behind a NAT)</li>
+    <li>LAN local : 192.168.1.0/24</li>
+    <li>Private IP (GW-A) : 192.168.1.167</li>
+    <li>Public IP (box IP) : 82.X.Y.Z</li>
+</ul>
+<li>Linux Ubuntu VPN Gateway = GW-B (Site B)</li>
+<ul>
+    <li>Connected to a 4G mobile network (behind a NAT)</li>
+    <li>LAN local : 172.20.10.0/28</li>
+    <li>Private IP (GW-A) : 172.20.10.8</li>
+    <li>Public IP (box IP) : 37.A.B.C</li>
+</ul>
+<li>Home LAN network (behind my local home router where i have access on it)</li>
+<li>Remote LAN over 4G mobile access (not access to the local router)</li>
+<li>NAT-enabled Internet gateways</li>
+<li>Public Internet connectivity</li>
+</ul>
 
-<h1> Diagnostic tools used: </h1>
-•	tcpdump
-•	Wireshark
-•	ip route
-•	ipsec statusall 
-•	ip xfrm state 
-•	ip xfrm policy 
-•	journalctl & strongSwan logs
-________________________________________
+
+<h1> Key Features </h1> 
+<ul>
+<li>IPsec IKEv2 VPN</li>
+<li>ESP tunnel encryption</li>
+<li>NAT Traversal (NAT-T)</li>
+<li>Secure LAN-to-LAN communication</li>
+<li>PKI / X.509 certificate authentication</li>
+<li>Real-world deployment over public Internet</li>
+<li>Advanced network troubleshooting</li>
+</ul>
+
+<h1> Verification tools used: </h1>
+<ul>
+<li>tcpdump</li>
+<li>Wireshark</li>
+<li>ip route</li>
+<li>ipsec statusall</li>
+<li>ip xfrm state</li>
+<li>ip xfrm policy</li>
+<li>journalctl & strongSwan logs</li>
+</ul>
+
 <h1> Technologies Used </h1>
-•	Linux Ubuntu
-•	strongSwan
-•	IPsec features
-o	IKEv2
-o	ESP
-o	NAT Traversal (NAT-T) 
-•	PKI & X.509 certificats
-•	IP forwarding 
-•	Virtualization (VirtualBox)
-•	tcpdump
-•	Wireshark
+<ul>
+<li>Linux Ubuntu</li>
+<li>strongSwan</li>
+<li>IPsec features</li>
+<ul> 
+    <li>IKEv2</li>
+    <li>ESP</li>
+    <li>NAT Traversal (NAT-T)</li>
+</ul>
+<li>PKI & X.509 certificats</li>
+<li>IP forwarding</li>
+<li>Virtualization (VirtualBox)</li>
+<li>tcpdump</li>
+<li>Wireshark</li>
+</ul>
 
 <h1> Features Implementation </h1>
 
-<h2> 1. VPN Site-to-Site IPsec IKEv2 </h2>
+<h3> 1. VPN Site-to-Site IPsec IKEv2 </h3>
+
 Deployment of an IPsec ESP VPN tunnel in tunnel mode, enabling secure interconnection of two remote LANs over the public internet.
 
 **Features**:
-•	IKEv2
-•	Encrypted ESP
-•	NAT Traversal enabled
-•	UDP 4500 encapsulation
-•	AES256-GCM encryption
-•	IKE fragmentation
 
-<h2> 2. NAT and NAT-T Management </h2>
+<ul>
+<li>IKEv2</li>
+<li>Encrypted ESP</li>
+<li>NAT Traversal enabled</li>
+<li>UDP 4500 encapsulation</li>
+<li>AES256-GCM encryption</li>
+<li>IKE fragmentation</li>
+</ul>
+
+<h3> 2. NAT and NAT-T Management </h3>
+
 The project included a complex real-world scenario:
-•	GW-B behind a 4G carrier NAT
-•	Lack of port forwarding control on the mobile side
+<ul>
+<li>GW-B behind a 4G carrier NAT</li>
+<li>Lack of port forwarding control on the mobile side</li>
+</ul>
 
 **Implemented solutions**:
-•	Use of `forceencaps=yes`
-•	ESP encapsulation in UDP/4500
-________________________________________
-<h2> 3. Inter-network Routing </h2>
+<ul>
+<li>Use of forceencaps=yes</li>
+<li>ESP encapsulation in UDP/4500</li>
+</ul>
+
+<h3> 3. Inter-network Routing </h3>
+
 Routing configuration between:
-•	192.168.1.0/24
-•	172.20.10.0/28
+<ul>
+<li>192.168.1.0/24</li>
+<li>172.20.10.0/28</li>
+</ul>
 
 **Tasks performed**:
-•	Enabling IPv4 forwarding
-•	Configuring ufw rules
-•	Validating LAN ↔ LAN traffic
+<ul>
+<li>Enabling IPv4 forwarding</li>
+<li>Configuring ufw rules</li>
+<li>Validating LAN to LAN traffic</li>
+</ul>
 
 
-<h2> 5. PSK Authentification </h2>
+<h3> 4. PSK Authentification </h3>
+
 First implementation with:
-•	Pre-shared key (PSK)
-•	IKEv2 negotiation
-•	Security Association validation
-________________________________________
+<ul>
+<li>Pre-shared key (PSK)</li>
+<li>IKEv2 negotiation</li>
+<li>Security Association validation</li>
+</ul>
 
-<h2> 6. Certificats X.509 Authentification </h2>
+<h3> 5. Certificats X.509 Authentification </h3>
+
 Migration of the VPN to a full PKI architecture.
 
 **Achievements**:
-• Generate a Certificate Authority (CA)
-• Generate 4096-bit RSA keys
-• Issue of X.509 certificates for each gateway
-• Configure  strongSwan in authby=pubkey mode
-• Manage  IKEv2 identities (leftid/rightid)
-• Advanced troubleshooting of the certificate ↔ private key mapping
+<ul>
+<li>Generate a Certificate Authority (CA) </li>
+<li>Generate 4096-bit RSA keys</li>
+<li>Issue X.509 certificates for each gateway </li>
+<li>Configure strongSwan mode :  authby=pubkey</li>
+<li>Manage IKEv2 identities (leftid/rightid) </li>
+<li>Troubleshoot certificate to certificate ↔ private key mapping </li>
+</ul>
 
 **PKI tools used** :
-•	ipsec pki 
-•	OpenSSL 
-•	certificats PEM 
-•	SAN / CN 
+<ul>
+<li>ipsec pki</li>
+<li>OpenSSL</li>
+<li>PEM certificates</li>
+<li>SAN and CN fields</li>
+</ul>
 
-________________________________________
 <h1> Project Objectives </h1>
-•	Understand IPsec and IKEv2 mechanisms
-•	Deploy secure VPN communications over the Internet
-•	Implement NAT Traversal
-•	Configure Linux routing for inter-site communication
-•	Simulate real enterprise VPN deployment scenarios
-________________________________________
+<ul>
+<li>Understand IPsec and IKEv2</li>
+<li>Deploy secure VPN communications over the Internet</li>
+<li>Implement NAT Traversal</li>
+<li>Simulate real enterprise VPN deployment scenarios </li>
+</ul>
+
 <h1> Requirements </h1>
 To reproduce this project, the following environment is required:
-•	Linux Ubuntu VM installed on Virtualbox on physical hosts (for example, 2 computers)
-•	strongSwan installed on both gateways
-•	Internet connectivity
-•	1 NAT-enabled router (at minimum)
-•	Two distinct LAN networks
+<ul>
+<li>Linux Ubuntu VM on VirtualBox</li>
+<li>strongSwan installed on both gateways</li>
+<li>Internet connectivity</li>
+<li> NAT-enabled router management (1 at minimum) </li>
+<li>Two distinct LAN networks</li>
+</ul>
