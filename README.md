@@ -9,9 +9,9 @@ Portfolio of personal projets :
 - Routing & switching
 - Security architecture
 -->
+<h2>Project 1 - <a href="https://github.com/afshyna/networking-projects/tree/main/vpn-ipsec-strongswan-site-to-site"> IPsec Site-to-site VPN with strongSwan </a> </h2>
 
-<h1> Project 1 - IPsec Site-to-site VPN with strongSwan </h1>
-This project is about the design and deployment of an IPsec VPN tunnel to interconnect two distant LANs  over the public Internet, located behind NAT. All transmitted data is authenticated and encrypted to ensure strict Confidentiality, Integrity, and Availability (CIA triad).
+This project is about the design and deployment of an IPsec VPN tunnel to interconnect two distant LANs  over the public Internet, located behind NAT, in a secure way.
 
 **Technical Configuration & Architecture:**
 * **VPN Type:** IPsec Tunnel Mode (LAN-to-LAN)
@@ -23,10 +23,9 @@ This project is about the design and deployment of an IPsec VPN tunnel to interc
 * **IP Addressing Scheme:** Internet Protocol Version 4 (IPv4) 
 
 <!-- This is commented out. 
-### 
-<h1> Project 2 - IPsec  using Cisco IOS </h1>
+<h2> Project 2 - IPsec  using Cisco IOS </h2>
 This project is about the simulation of an LAN-to-LAN IPsec VPN tunnel between two Cisco routers, using the design network simulator GNS3
 
-### OpenVPN & WireGuard solutions
+<h2> OpenVPN & WireGuard solutions </h2> 
 This micro-project is about the design and deployment of  VPN SSL tunnel / multi-sites architecture with failover & nomade clients.
 -->
