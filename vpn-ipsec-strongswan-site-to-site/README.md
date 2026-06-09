@@ -182,15 +182,9 @@ Migration of the VPN to a full PKI architecture.
 <li>Issue X.509 certificates for each gateway </li>
 <li>Configure strongSwan mode :  authby=pubkey</li>
 <li>Manage IKEv2 identities (leftid/rightid) </li>
-<li>Troubleshoot certificate to certificate ↔ private key mapping </li>
 </ul>
 
-**PKI tools used** :
-<ul>
-<li>ipsec pki</li>
-<li>PEM certificates</li>
-<li>SAN and CN fields</li>
-</ul>
+**PKI tools used** : ipsec pki
 
 <h1> Project Objectives </h1>
 <ul>
