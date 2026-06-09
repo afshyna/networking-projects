@@ -1,9 +1,11 @@
 # IPsec VPN Site-to-Site with strongSwan behind NAT
 
 <h1>Introduction to VPN </h1>
+
 A VPN allows you to create a virtual connection between two different local networks. It creates a logical interconnection between local networks over a shared network (whether public, such as the Internet, or private, such as a corporate intranet or a carrier’s backbone) using a traffic segmentation mechanism or a tunnelling protocol. Encryption is possible but not always used.
 
 <h1> Overview </h1>
+
 This project consists of designing and deploying a secure IPsec IKEv2 Site-to-Site VPN tunnel between two remote LAN networks over the public Internet using strongSwan on VM Ubuntu (Linux) gateways.
 
 The infrastructure was deployed in a real-world environment where both VPN gateways were located behind NAT devices and connected through public Internet access (Home LAN ↔ 4G Mobile Network).
@@ -19,6 +21,9 @@ A secure communication channel was required between 2 isolated private networks 
 
 
 Both sites were located behind NAT-enabled Internet gateways, introducing additional routing and IPsec NAT Traversal (NAT-T) constraints.
+
+<img src="VPN-IPsec-site-to-site-strongswan-NAT.png"></img>
+
 
 The project focused on:
 <ul> 
