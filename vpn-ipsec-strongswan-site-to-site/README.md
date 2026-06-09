@@ -82,7 +82,6 @@ The following technologies and mechanisms were implemented:
 <li>Secure LAN-to-LAN communication</li>
 <li>PKI / X.509 certificate authentication</li>
 <li>Real-world deployment over public Internet</li>
-<li>Advanced network troubleshooting</li>
 </ul>
 
 <h1> Verification tools used: </h1>
