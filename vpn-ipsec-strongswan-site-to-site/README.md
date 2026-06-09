@@ -22,7 +22,7 @@ A secure communication channel was required between 2 isolated private networks 
 
 Both sites were located behind NAT-enabled Internet gateways, introducing additional routing and IPsec NAT Traversal (NAT-T) constraints.
 
-<img src="VPN-IPsec-site-to-site-strongswan-NAT.png"></img>
+<img src="VPN-IPsec-site-to-site-Strongswan-NAT.png"></img>
 
 
 The project focused on:
