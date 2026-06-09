@@ -188,7 +188,6 @@ Migration of the VPN to a full PKI architecture.
 **PKI tools used** :
 <ul>
 <li>ipsec pki</li>
-<li>OpenSSL</li>
 <li>PEM certificates</li>
 <li>SAN and CN fields</li>
 </ul>
