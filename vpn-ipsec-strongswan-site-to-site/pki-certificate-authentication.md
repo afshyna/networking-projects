@@ -32,9 +32,8 @@ ipsec pki --issue \
 --lifetime 1825 \
 --cacert ca-cert.pem \
 --cakey ca-key.pem \
---dn "C=FR, O=My Org, CN=IP_public_GW-A" \
---san @IP_public_GW-A \
---san IP_public_GW-A \
+--dn "C=FR, O=My Org, CN=gwA.vpn.local" \
+--san gwA.vpn.local \
 --flag serverAuth \
 --flag ikeIntermediate \
 --outform pem > gwA-cert.pem</code></pre>
@@ -53,9 +52,8 @@ ipsec pki --issue \
 --lifetime 1825 \
 --cacert ca-cert.pem \
 --cakey ca-key.pem \
---dn "C=FR, O=My Org, CN=IP_public_GW-B" \
---san @IP_public_GW-B \
---san IP_public_GW-B \
+--dn "C=FR, O=My Org, CN=gwB.vpn.local" \
+--san gwB.vpn.local \
 --flag serverAuth \
 --flag ikeIntermediate \
 --outform pem > gwB-cert.pem</code></pre>
