@@ -189,12 +189,17 @@ net.ipv4.ip_forward=1
 Validate the tunnel using:
 - `ipsec statusall`
 
-![IPSec tunnel status - SA up](assets/verifs/ipsec_statusall_gwA.png)
-![IPSec tunnel status - SA up](assets/verifs/ipsec_statusall_gwA.png)](assets/verifs/ipsec_statusall_gwB.png)
+![IPSec tunnel status (GW-A)](assets/verifs/ipsec_statusall_gwA.png)
+
+![IPSec tunnel status (GW-B) ](assets/verifs/ipsec_statusall_gwB.png)
 
 - `ip xfrm state`
+
+![IPSec tunnel - XFRM_framework_](assets/verifs/ip_xfrm_state_gwA.png)
+
 - `ip xfrm policy`
-- journalctl for strongSwan logs
+
+![IPSec tunnel - SA State](assets/verifs/ip_xfrm_policy_gwA.png)
 
 
 ### Connectivity Verification
