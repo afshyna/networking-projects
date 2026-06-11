@@ -1,0 +1,33 @@
+! Configuration du VPN IPsec sur R2
+! ----------------------------------
+
+! === Interfaces ===
+interface FastEthernet0/0
+ ip address 30.0.0.254 255.0.0.0
+!
+interface Serial1/0
+ ip address 102.0.0.253 255.0.0.0
+ crypto map CARTEVPN
+
+! === Routing ===
+ip route 0.0.0.0 0.0.0.0 102.0.0.254
+
+! === IKE Phase 1 ===
+crypto isakmp policy 10
+ encr aes
+ authentication pre-share
+ group 2
+crypto isakmp key SECRETKEY address 101.0.0.253
+
+! === ACL Crypto ===
+ip access-list extended VPN_LAN2_LAN1
+ permit ip 30.0.0.0 0.0.0.255 10.0.0.0 0.0.0.255
+
+! === IKE Phase 2 ===
+crypto ipsec transform-set TRANSFORM1 esp-aes esp-sha-hmac
+
+! === Crypto Map ===
+crypto map CARTEVPN 10 ipsec-isakmp
+ set peer 101.0.0.253
+ set transform-set TRANSFORM1
+ match address VPN_LAN2_LAN1
