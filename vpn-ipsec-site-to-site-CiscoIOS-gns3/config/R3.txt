@@ -1,0 +1,19 @@
+! Configuration of R3
+! ----------------------------------
+!
+! === Interfaces ===
+!
+interface Serial1/0
+ ip address 101.0.0.254 255.0.0.0
+ serial restart-delay 0
+ clock rate 2016000
+!
+interface Serial1/1
+ ip address 102.0.0.254 255.0.0.0
+ serial restart-delay 0
+ clock rate 2016000
+!
+! === Routing ===
+ip route 10.0.0.0 255.0.0.0 101.0.0.253
+ip route 30.0.0.0 255.0.0.0 102.0.0.253
+
