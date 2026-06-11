@@ -100,12 +100,20 @@ Commands used:
 <h1> Analysis via Wireshark </h1>
 
 <h3> Before the activation of IPsec  </h3>
-When capturing traffic on R3 (Internet transit network) interfaces, the analysis of a ping shows the packet traveling completely transparently:
-
+When capturing traffic on R3 (Internet transit network) interfaces, the analysis of a ping shows the packet traveling completely transparently.
 <ins> Observation </ins> : Internal private addresses are exposed to everyone, and the application data (ICMP payload) is readable in plain text.
+
+![ICMP traffic en clair](assets/before_ipsec_icmp_pc1_pc2_lan.png)
+
+![ICMP traffic en clair](assets/before_ipsec_icmp_pc1_pc2_lan.png)
 
 <h3> After the activation of IPsec  </h3>
 When the second successful ping is sent, the network capture highlights the structural changes to the frame that shows the key Points of ESP Encapsulation:
+The screenshots below show ESP encapsulation in action:
+
+![ICMP traffic en clair](assets/after_ipsec_icmp_pc1-r1-ping_pc1_pc2.png)
+![ESP traffic encrypted](assets/after_ipsec_esp_r1-r3-ping_pc1_pc2.png)
+
 
 **Complete Obfuscation**:
   - The real host addresses (10.0.0.1 and 30.0.0.1) and the traffic type (ICMP) are encapsulated in the encrypted payload (ESP). So, private addresses are hidden.
