@@ -86,22 +86,23 @@ First, enable ISAKMP and configure the global security policy for Phase 1 on the
 
   1. Defining the "interesting traffic" (Crypto ACL)
 
-The ACL allows you to specify exactly which networks (<=> traffic) should be allowed to enter the tunnel.
+The ACL allows you to specify exactly which networks should be allowed to enter the tunnel.
   
   2. Creating the `transform Set`
 
-Le `transform-set` définit les algorithmes de chiffrement et d'intégrité appliqués aux données. 
+The `transform-set` defines the encryption and integrity algorithms applied to the data. 
   
   3. Creating and defining the `crypto map`
 
-La `crypto map` lie l'ensemble des éléments (ACL, Pair, Transform-set).
+The `crypto map` links all the elements (ACL, Peer, `transform-set`).
 
+<h3> Step 3: Applying the Crypto Map to the external interface (WAN) </h3>
 
-<h3> Step 3: Applying the `Crypto Map` to the external interface (WAN) </h3>
-
-C'est l'application de la `crypto map` sur l'interface de sortie qui active l'écoute et le traitement IPsec du trafic.
+Applying the `crypto map` to the outgoing interface enables IPsec listening and traffic processing.
 
 <h1>  Verification of the IPsec tunnel configuration </h1>
+
+When PC1 ping PC2, interesting traffic is sent to the IPsec tunnel. 
 
 - `show crypto isakmp policy` : view all the security policy implemented for the IKE Phase 1 
 
@@ -113,19 +114,19 @@ C'est l'application de la `crypto map` sur l'interface de sortie qui active l'é
   
 - `show crypto isakmp sa` :  Check the status of the control link. The status should show QM_IDLE (Phase 1 active and pending) when traffic is sent to the tunnel.
 
-**Before tunnel:**  
+**Before ping :**  
 ![ISAKMP SA before](verifs/show_crypto_isakmp_sa_R1_before.png)  
 
-**After tunnel:**  
+**After ping :**  
 ![ISAKMP SA after](verifs/show_crypto_isakmp_sa_R1_after.png)
   
   
 - `show crypto ipsec sa` : View encryption counters, the Phase 2 (ESP) status, and local and remote SPIs
 
-**Before tunnel:**  
+**Before ping :**  
 ![IPsec SA before](verifs/show_crypto_ipsec_sa_R1_before.png)  
 
-**After tunnel:**  
+**After ping :**  
 ![IPsec SA after](verifs/show_crypto_ipsec_sa_R1_after.png)
   
 <h1> Analysis via Wireshark </h1>
