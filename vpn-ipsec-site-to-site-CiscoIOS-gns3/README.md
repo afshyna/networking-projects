@@ -1,5 +1,7 @@
 # IPsec VPN Site-to-Site between 2 Cisco routers
 This lab, conducted in the **GNS3** simulation environment, is an  example of deploying a traditional site-to-site IPsec VPN of the “router-to-router” type. 
+**Exemple de sortie pour `show crypto ipsec sa` :**
+
 
 It represents the network and security architecture that has been extensively and historically proven in traditional enterprise environments using Cisco IOS equipment.
 This project illustrates the fundamental mechanisms of IPsec on Cisco IOS.
@@ -101,12 +103,31 @@ C'est l'application de la `crypto map` sur l'interface de sortie qui active l'é
 
 <h1>  Verification of the IPsec tunnel configuration </h1>
 
-Commands used: 
-- `show crypto isakmp policy` : Voir la bonne application de la politique d'échange de clés de Phase 1
-- `show crypto map` : : Voir la liaison entre l'ACL, l'adresse de l'homologue et l'interface physique d'application
-- `show crypto isakmp sa` : Voir l'état de la liaison de contrôle. L'état doit indiquer QM_IDLE (Phase 1 active et en attente)
-- `show crypto ipsec sa` : Voir les compteurs de chiffrement, l'état de la Phase 2 (ESP) ainsi que les SPIs locaux et distants
+- `show crypto isakmp policy` : view all the security policy implemented for the IKE Phase 1 
 
+![ISAKMP Policy](verifs/show_crypto_isakmp_policy_R1.png)
+  
+- `show crypto map` :View the connection between the ACL, the peer's address, and the physical interface where the crypto map is applicated
+
+![Crypto Map](verifs/show_crypto_map_R1.png)
+  
+- `show crypto isakmp sa` :  Check the status of the control link. The status should show QM_IDLE (Phase 1 active and pending) when traffic is sent to the tunnel.
+
+**Before tunnel:**  
+![ISAKMP SA before](verifs/show_crypto_isakmp_sa_R1_before.png)  
+
+**After tunnel:**  
+![ISAKMP SA after](verifs/show_crypto_isakmp_sa_R1_after.png)
+  
+  
+- `show crypto ipsec sa` : View encryption counters, the Phase 2 (ESP) status, and local and remote SPIs
+
+**Before tunnel:**  
+![IPsec SA before](verifs/show_crypto_ipsec_sa_R1_before.png)  
+
+**After tunnel:**  
+![IPsec SA after](verifs/show_crypto_ipsec_sa_R1_after.png)
+  
 <h1> Analysis via Wireshark </h1>
 
 <h3> Before the activation of IPsec  </h3>
