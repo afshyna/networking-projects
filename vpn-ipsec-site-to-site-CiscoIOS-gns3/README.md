@@ -133,7 +133,10 @@ Each direction of communication has its own independent set of encryption keys
  
 <h1> Requirements </h1>
 To reproduce this project, you will require to have the following environments :
-<ul>
-<li> GNS3 </li>
-<li> An image of a Cisco router with IPsec features </li>
-</ul>
+
+- Network simulator *GNS3* 
+- Cisco IOS Images : Images Cisco IOS compatible with IPsec/IKEv1 (e.g., c7200 ou c3745), configured in *GNS3*.
+- A functional **GNS3 topology** including:
+  - 3 Cisco routers (R1, R2, R3)
+  - 2 end-hosts (PC1, PC2) : Appliances "VPCS" (Virtual PC Simulator) integrated to *GNS3* for realizing the ping tests.
+- *Wireshark* for capturing packets
