@@ -107,38 +107,38 @@ When PC1 ping PC2, interesting traffic is sent to the IPsec tunnel.
 
 - `show crypto isakmp policy` : view all the security policy implemented for the IKE Phase 1 
 
-![ISAKMP Policy](verifs/show_crypto_isakmp_policy_R1.png)
+![ISAKMP Policy](assets/verifs/show_crypto_isakmp_policy_R1.png)
   
 - `show crypto map` :View the connection between the ACL, the peer's address, and the physical interface where the crypto map is applicated
 
-![Crypto Map](verifs/show_crypto_map_R1.png)
+![Crypto Map](assets/verifs/show_crypto_map_R1.png)
   
 - `show crypto isakmp sa` :  Check the status of the control link. The status should show QM_IDLE (Phase 1 active and pending) when traffic is sent to the tunnel.
 
 **Before ping :**  
-![ISAKMP SA before](verifs/show_crypto_isakmp_sa_R1_before.png)  
+![ISAKMP SA before](assets/verifs/show_crypto_isakmp_sa_R1_before.png)  
 
 **After ping :**  
-![ISAKMP SA after](verifs/show_crypto_isakmp_sa_R1_after.png)
+![ISAKMP SA after](assets/verifs/show_crypto_isakmp_sa_R1_after.png)
   
   
 - `show crypto ipsec sa` : View encryption counters, the Phase 2 (ESP) status, and local and remote SPIs
 
 **Before ping :**  
-![IPsec SA before](verifs/show_crypto_ipsec_sa_R1_before.png)  
+![IPsec SA before](assets/verifs/show_crypto_ipsec_sa_R1_before.png)  
 
 **After ping :**  
-![IPsec SA after](verifs/show_crypto_ipsec_sa_R1_after.png)
+![IPsec SA after](assets/verifs/show_crypto_ipsec_sa_R1_after.png)
   
 <h1> Analysis via Wireshark </h1>
 
 <h3> Before the activation of IPsec  </h3>
 
 When capturing traffic on PC1-R1 (LAN network) interfaces, the analysis of the ping shows the packet traveling completely transparently. 
-![ICMP traffic en clair](assets/before_ipsec_icmp_pc1-r1-ping_pc1_pc2.png)
+![ICMP traffic en clair](assets/wireshark/before_ipsec_icmp_pc1-r1-ping_pc1_pc2.png)
 
 When capturing traffic on WAN interfaces (Internet transit network), the analysis of the ping shows the packet traveling completely transparently. 
-![ICMP traffic en clair](assets/before_ipsec_icmp_r1-r3-ping_pc1_pc2.png)
+![ICMP traffic en clair](assets/wireshark/before_ipsec_icmp_r1-r3-ping_pc1_pc2.png)
 
 <ins> Observation </ins> : The traffic is transmitted in clear text and the gateway (R1) has no encryption settings. Internal private addresses  (`10.0.0.1` / `30.0.0.1`) are exposed to everyone, and the application data (ICMP payload) is visible to any intermediate device located along the transit path (R3). 
 
@@ -148,11 +148,11 @@ The screenshots below show ESP encapsulation in action:
 
 - When capturing traffic on PC1-R1 (LAN network) interfaces, the packet remains unchanged. The PC communicates with its gateway as usual.
 
-![ICMP traffic en clair](assets/after_ipsec_icmp_pc1-r1-ping_pc1_pc2.png)
+![ICMP traffic en clair](assets/wireshark/after_ipsec_icmp_pc1-r1-ping_pc1_pc2.png)
 
 - When capturing traffic on WAN interfaces (Internet transit network), the analysis of the ping shows an ESP packet traveling with no ICMP packet visible :  The ICMP packet is encapsulated & the original IP header is hidden.
 
-![ESP traffic encrypted : ICMP traffic hidden](assets/after_ipsec_esp_r1-r3-ping_pc1_pc2.png) 
+![ESP traffic encrypted : ICMP traffic hidden](assets/wireshark/after_ipsec_esp_r1-r3-ping_pc1_pc2.png) 
 
 *You can find the raw capture files (.pcapng) in the [captures/](captures/) folder for detailed analysis using your own copy of Wireshark.*
 
