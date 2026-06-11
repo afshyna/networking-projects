@@ -163,8 +163,8 @@ Since GW‑A is behind a home NAT, the router must forward IPsec traffic to the 
 
 On the router’s admin interface (`192.168.1.254`),  configure a port redirection for each type of traffic : 
 
-![Port Forwarding Rule IKE on GW-A Box](assets/port-redirection-configuration-home-router-IKE.png)
-![Port Forwarding Rule NAT-T on GW-A Box](assets/port-redirection-configuration-home-router-NAT-T.png)
+![Port Forwarding Rule IKE on GW-A Box](config/port-redirection-configuration-home-router-IKE.png)
+![Port Forwarding Rule NAT-T on GW-A Box](config/port-redirection-configuration-home-router-NAT-T.png)
 
 
 <h2> Inter-network Routing </h2>
@@ -184,30 +184,56 @@ net.ipv4.ip_forward=1
 # sysctl -p
 ```
 
-<h1>  Validation </h1>
+<h1>  Validation   </h1>
+
+<h2> Connectivity of the IPsec tunnel  </h2>
 
 Validate the tunnel using:
 - `ipsec statusall`
 
+![IPSec tunnel status (GW-A)](assets/verifs/ipsec_statusall_gwA.png)
 
+![IPSec tunnel status (GW-B) ](assets/verifs/ipsec_statusall_gwB.png)
 
+- `ip xfrm state`
 
-### Connectivity Verification
+![IPSec tunnel - XFRM_framework_](assets/verifs/ip_xfrm_state_gwA.png)
 
-Connectivity Tests
+- `ip xfrm policy`
+
+![IPSec tunnel - SA State](assets/verifs/ip_xfrm_policy_gwA.png)
+
+<h2> Connectivity Verification by ping between LANs </h2>
+
 - Ping between gateways
+
+![Ping OK GW-A vers GW-B](assets/verifs/ping_OK_gwA-gwB.png)
+
+![Ping OK GW-B vers GW-A](assets/verifs/ping_OK_gwB-gwA.png)
+
+
 - Ping between LAN hosts
-- Route insertion in table 220
-To verify the routing and the tunnel, we analyze the XFRM policies:
-```bash
-$ sudo ip route list table 220
-```
+
+No connectivity...
+
 - **Routing:** Policy-based IPsec with automatic routing injection in table `220`.
 
-- NAT rules for LAN‑to‑LAN communication
+To verify the routing and the tunnel, we analyze the XFRM policies:
+```console
+# ip route list table 220
+```
+![XFRM policies (GW-A)](assets/verifs/ip_route_list_table_220_GW-A.png)
 
-<h1> Connectivity & Troubleshooting </h1>
-During testing, hosts from LAN B (172.20.10.0/28), of which GW-B, could not reach hosts in LAN A (192.168.1.0/24), even though the IPsec tunnel was fully established and GW-B ping GW-A.
+We can also view the routing table to the GW-B LAN directly with 
+```console
+# ip route  get 172.20.10.8
+```
+![Routing table to the GW-B LAN (GW-A)](assets/verifs/ip_route+ip_route_get_172.20.10.8_gwA.png)
+
+
+<h2>  Troubleshooting </h2>
+
+During testing, hosts from LAN B (`172.20.10.0/28`), of which GW-B, could not reach hosts in LAN A (`192.168.1.0/24`), even though the IPsec tunnel was fully established and GW-B ping GW-A.
 
 <h3>  Root Cause </h3>
 GW‑A was not performing NAT on traffic coming from LAN B and exiting through its WAN interface (enp0s3).
@@ -220,7 +246,7 @@ When traffic from the LAN-B reaches the local machine, the machine may not have 
 ``` console
 # iptables -t nat -A POSTROUTING -s 172.20.10.0/28 -o enp0s3 -j MASQUERADE
 ```
-Meaning : “Any packet coming from LAN B (172.20.10.0/28) and leaving GW‑A through enp0s3 will have its source IP replaced by GW‑A’s own IP.”
+Meaning : “Any packet coming from LAN B (`172.20.10.0/28`) and leaving GW‑A through enp0s3 will have its source IP replaced by GW‑A’s own IP. (`192.168.1.167`)
 
 This ensures that:
 - return traffic from LAN A is correctly routed back to GW‑A
@@ -228,33 +254,27 @@ This ensures that:
 
 <h3> Verification </h3>
 After applying this rule:
-- LAN B → LAN A communication works
+
 - LAN A → LAN B communication works
+
+![Ping OK GW-A to the local gateway/router of LAN-B](assets/verifs/ping_OK_gwA-to-gateway_router_LAN-B.png)
+
+- LAN B → LAN A communication works
+
+![Ping OK GW-B to the physical computer of LAN-A](assets/verifs/ping_OK_gwB-to-PC-physique-LAN-A.png)
+
+![Ping OK GW-B to the home router of LAN-A](assets/verifs/ping_OK_gwB-to-home-router-LAN-A.png)
+
 
 The tunnel behaves as a full site‑to‑site VPN
 
-# Monitor traffic leaving the gateway interface
-sudo tcpdump -ni enp0s3 icmp
-    
 <h1> Traffic analysis via Wireshark </h1>
-Using Wireshark, we observed the transition from plain-text ICMP to encrypted ESP packets crossing the public Internet.
 
-![ESP Encapsulation](assets/esp-capture.png)
+Capturing traffic on WAN interface, in a ping from GW-A (`192.168.1.167`) to GW-B (`172.20.10.8`), we observe the encrypted ESP packets crossing the public Internet, with hidden ICMP and IP header. 
 
-**Before IPsec (cleartext ICMP)**
-LAN capture:
-before_ipsec_icmp_gwA-lan.png
+![ESP Encapsulation (depuis GW-A WAN interface)](assets/wireshark/ipsec_esp_ping-gwA-to-gwB_captured_on_gwA-wan.png)
 
-WAN capture:
-before_ipsec_icmp_gwA-wan.png
-
-**After IPsec (ESP encrypted)**
-
-WAN capture:
-after_ipsec_esp_gwA-wan.png
-
-LAN capture (still cleartext):
-after_ipsec_icmp_gwA-lan.png
+![ESP Encapsulation (depuis GW-B WAN interface)](assets/wireshark//ipsec_esp_ping-gwA-to-gwB_captured_on_gwB-wan.png)
 
 <h1> Achivements & Proven skills  </h1>
 <ul>
