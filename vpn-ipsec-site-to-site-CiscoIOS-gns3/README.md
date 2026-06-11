@@ -15,11 +15,11 @@ The IPsec tunnel will protect :
 - ICMP data
 - internal IP packets
 
-<h1> Network Architecture </h1>
+<h1>  Project Scenario & Network Architecture </h1>
 
 <img src="topology-ipsec-lan-to-lan-CiscoIOS-routers-gns3.png"></img>
 
-<h3> Functions of the équipments </h3>
+**Main Components** :
 
 - R1 : Gateway VPN of the LAN A
     - Serial 1/0 represent the “OUTSIDE” security zone (simulation of the public Internet connection with R3).
@@ -30,11 +30,12 @@ The IPsec tunnel will protect :
 - R3 : Router that simulate “Internet”  (zone OUTSIDE)
 - PC1 / PC2 : machines internes (zone INSIDE)
 
-<h3> Goal  </h3>
-Enable PC1 (10.0.0.0/8) and PC2 (30.0.0.0/8) to communicate end-to-end in a transparent and highly secure manner by establishing a ipsec tunnel between the Cisco gateways R1 and R2.
+**Goal**
+Enable PC1 (`10.0.0.0/8`) and PC2 (`30.0.0.0/8`) to communicate end-to-end in a transparent and highly secure manner by establishing a ipsec tunnel between the Cisco gateways R1 and R2.
 
 <h1> How IPsec VPN Works  (theorically) </h1>
-When a connection is initiated (e.g., PC1 pings PC2, 10.0.0.1 → 30.0.0.1), the IPsec process is activated on the Cisco gateway (e.g, R1):
+
+When a connection is initiated (e.g., PC1 pings PC2, `10.0.0.1` → `30.0.0.1`), the IPsec process is activated on the Cisco gateway (e.g, R1):
 
 - **Detection of “Interesting Traffic”**: The router checks whether the packet matches the Crypto ACL.
 - **Application of the Crypto Map**: If the traffic matches, the security policy is activated.
@@ -139,7 +140,7 @@ When capturing traffic on PC1-R1 (LAN network) interfaces, the analysis of the p
 When capturing traffic on WAN interfaces (Internet transit network), the analysis of the ping shows the packet traveling completely transparently. 
 ![ICMP traffic en clair](assets/before_ipsec_icmp_r1-r3-ping_pc1_pc2.png)
 
-<ins> Observation </ins> : The traffic is transmitted in clear text and the gateway (R1) has no encryption settings. Internal private addresses  (10.0.0.1 / 30.0.0.1) are exposed to everyone, and the application data (ICMP payload) is visible to any intermediate device located along the transit path (R3). 
+<ins> Observation </ins> : The traffic is transmitted in clear text and the gateway (R1) has no encryption settings. Internal private addresses  (`10.0.0.1` / `30.0.0.1`) are exposed to everyone, and the application data (ICMP payload) is visible to any intermediate device located along the transit path (R3). 
 
 <h3> After the activation of IPsec  </h3>
 When the second successful ping is sent, the network capture highlights the structural changes to the frame that shows the key Points of ESP Encapsulation:
@@ -156,8 +157,8 @@ The screenshots below show ESP encapsulation in action:
 *You can find the raw capture files (.pcapng) in the [captures/](captures/) folder for detailed analysis using your own copy of Wireshark.*
 
 **Complete Obfuscation**:
-  - The real host addresses (10.0.0.1 and 30.0.0.1) and the traffic type (ICMP) are encapsulated in the encrypted payload (ESP). So, private addresses are hidden.
-  - Only the public VPN endpoints (101.0.0.253 and 102.0.0.253) are visible. 
+  - The real host addresses (`10.0.0.1` and `30.0.0.1`) and the traffic type (ICMP) are encapsulated in the encrypted payload (ESP). So, private addresses are hidden.
+  - Only the public VPN endpoints (`101.0.0.253` and `102.0.0.253`) are visible. 
   - Anti-Replay Security:  `show crypto ipsec sa` shows that the `replay detection support` attribute is enabled: A unique sequence number is associated with each ESP header to prevent the injection or malicious re-transmission of captured packets.
 
 **Full-Duplex Architecture**:
@@ -186,11 +187,20 @@ Each direction of communication has its own independent set of encryption keys
 <h1> Requirements </h1>
 To reproduce this project, you will require to have the following environments :
 
-- Network simulator *GNS3* 
-- Cisco IOS Images :
+- **Network simulator tool :** *GNS3* 
+- **Cisco IOS Images** :
     - Images Cisco IOS compatible with IPsec/IKEv1 (e.g., c7200), configured in *GNS3*.
     - Exact name of the IOS image used in this GNS3 project : `c7200-adventerprisek9-mz.124-24.T5.image`
-- A functional **GNS3 topology** including:
+- A functional GNS3 topology including:
   - 3 Cisco routers (R1, R2, R3)
   - 2 end-hosts (PC1, PC2) : Appliances "VPCS" (Virtual PC Simulator) integrated to *GNS3* for realizing the ping tests.
-- *Wireshark* for capturing packets
+- **Networking Tools:** : Wireshark
+
+
+<h1> 📚 Resources & Useful Links </h1>
+
+Here are the community resources that served as the basis for the design and troubleshooting of this architecture:
+
+* **Articles & Tutoriels de Référence :**
+  * [Cisco ASA Site-to-Site IKEv1 IPsec VPN](https://networklessons.com/cisco/asa-firewall/cisco-asa-site-site-ikev1-ipsec-vpn)
+  * [Site-to-Site IPSEC VPN between Two Cisco ASA 5520](https://blog.router-switch.com/2013/03/site-to-site-ipsec-vpn-between-two-cisco-asa-5520/)
