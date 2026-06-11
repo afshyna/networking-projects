@@ -100,19 +100,24 @@ Commands used:
 <h1> Analysis via Wireshark </h1>
 
 <h3> Before the activation of IPsec  </h3>
-When capturing traffic on R3 (Internet transit network) interfaces, the analysis of a ping shows the packet traveling completely transparently.
-<ins> Observation </ins> : Internal private addresses are exposed to everyone, and the application data (ICMP payload) is readable in plain text.
 
-![ICMP traffic en clair](assets/before_ipsec_icmp_pc1_pc2_lan.png)
+When capturing traffic on PC1-R1 (LAN network) interfaces, the analysis of a ping shows the packet traveling completely transparently. (it is normal : the LAN traffic must be visible for LAN devices)
+![ICMP traffic en clair](assets/before_ipsec_icmp_pc1-r1-ping_pc1_pc2.png)
 
-![ICMP traffic en clair](assets/before_ipsec_icmp_pc1_pc2_lan.png)
+When capturing traffic on WAN interfaces (Internet transit network), the analysis of a ping shows the packet traveling completely transparently. The traffic is transmitted in clear text and the gateway (R1) has no encryption settings.
+![ICMP traffic en clair](assets/before_ipsec_icmp_r1-r3-ping_pc1_pc2.png)
+
+<ins> Observation </ins> : Internal private addresses  (10.0.0.1 / 30.0.0.1) are exposed to everyone, and the application data (ICMP payload) is visible to any intermediate device located along the transit path (R3). 
 
 <h3> After the activation of IPsec  </h3>
 When the second successful ping is sent, the network capture highlights the structural changes to the frame that shows the key Points of ESP Encapsulation:
 The screenshots below show ESP encapsulation in action:
 
+- When capturing traffic on PC1-R1 (LAN network) interfaces, the packet remains unchanged. The PC communicates with its gateway as usual.
 ![ICMP traffic en clair](assets/after_ipsec_icmp_pc1-r1-ping_pc1_pc2.png)
-![ESP traffic encrypted](assets/after_ipsec_esp_r1-r3-ping_pc1_pc2.png)
+
+- When capturing traffic on WAN interfaces (Internet transit network), the analysis of the ping shows an ESP packet traveling with no ICMP packet visible :  The ICMP packet is encapsulated & the original IP header is hidden.
+![ESP traffic encrypted : ICMP traffic hidden](assets/after_ipsec_esp_r1-r3-ping_pc1_pc2.png) 
 
 
 **Complete Obfuscation**:
@@ -149,7 +154,7 @@ To reproduce this project, you will require to have the following environments :
 - Network simulator *GNS3* 
 - Cisco IOS Images :
     - Images Cisco IOS compatible with IPsec/IKEv1 (e.g., c7200), configured in *GNS3*.
-    - nom exact de l'image IOS utilisé dans mon projet GNS3 : `c7200-adventerprisek9-mz.124-24.T5.image`
+    - Exact name of the IOS image used in this GNS3 project : `c7200-adventerprisek9-mz.124-24.T5.image`
 - A functional **GNS3 topology** including:
   - 3 Cisco routers (R1, R2, R3)
   - 2 end-hosts (PC1, PC2) : Appliances "VPCS" (Virtual PC Simulator) integrated to *GNS3* for realizing the ping tests.
