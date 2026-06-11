@@ -176,7 +176,7 @@ Each direction of communication has its own independent set of encryption keys
 - Visible ESP on R3 (WAN)
 - SAs established in both directions
     
-<h1> Achivements / Compétences démontrées  </h1>
+<h1> Achivements & Proven Skills  </h1>
 
 - Configuring IPsec on Cisco IOS
 - Understanding the IKE phases (Main Mode + Quick Mode) & ESP encryption
@@ -199,8 +199,6 @@ To reproduce this project, you will require to have the following environments :
 
 <h1> 📚 Resources & Useful Links </h1>
 
-Here are the community resources that served as the basis for the design and troubleshooting of this architecture:
-
-* **Articles & Tutoriels de Référence :**
+Here are the community resources (articles & reference tutorial) that served as the basis for the design and troubleshooting of this architecture:
   * [Cisco ASA Site-to-Site IKEv1 IPsec VPN](https://networklessons.com/cisco/asa-firewall/cisco-asa-site-site-ikev1-ipsec-vpn)
   * [Site-to-Site IPSEC VPN between Two Cisco ASA 5520](https://blog.router-switch.com/2013/03/site-to-site-ipsec-vpn-between-two-cisco-asa-5520/)
