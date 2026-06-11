@@ -188,3 +188,13 @@ To reproduce this project, you will require to have the following environments :
 <li> NAT-enabled router management (1 at minimum) </li>
 <li>Two distinct LAN networks</li>
 </ul>
+
+<h1> 📚 Resources & Useful Links </h1>
+
+Here are the official documentation and community resources that served as the basis for the design and troubleshooting of this architecture:
+
+* **Articles & Tutoriels de Référence :**
+  * [Setup a Site to Site IPsec VPN with Strongswan and PreShared Key Authentication](https://ruan.dev/blog/2018/02/11/setup-a-site-to-site-ipsec-vpn-with-strongswan-and-preshared-key-authentication)
+  * [Configuring Site-to-Site IPSec VPN on Ubuntu using Strongswan](https://gist.github.com/Horat1us/38b712d65fd11abdab23347eca41b9fb) 
+  * [Décortiquer IPsec avec strongSwan sur Debian](https://www.thibautprobst.fr/posts/ipsec/) – Understanding the Theoretical Workings of IPsec and NAT-T + Practical Example
+  * [How to Install and Configure IPsec VPN with StrongSwan on Ubuntu 22.04](https://wiki.crowncloud.net/?How_to_Install_and_Configure_IPsec_VPN_with_StrongSwan_on_Ubuntu_22_04) – Command references for generating certificates and key pairs
