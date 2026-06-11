@@ -65,6 +65,16 @@ Configured elements:
 *strongSwan equivalent of IPsec settings: 
 `esp=aes256-sha256`*
 
+
+<h3> ⚙️ Configuration Details (R1 & R2) </h3>
+
+Each VPN gateway has been configured to establish the tunnel securely. Below are the configuration files associated with each router:
+
+[Router R1 Configuration (Gateway A)](config/R1.txt): ISAKMP, Transform-Set, and Crypto-Map settings.
+
+[Router R2 Configuration (Gateway B)](config/R2.txt): Mirror of the R1 configuration with reversed access policies.
+
+
 <h1> Configuration Steps on Cisco IOS </h1>
 
 <h3>Step 1: Configuring the IKE Phase 1 Policy (ISAKMP) </h3>
@@ -101,24 +111,27 @@ Commands used:
 
 <h3> Before the activation of IPsec  </h3>
 
-When capturing traffic on PC1-R1 (LAN network) interfaces, the analysis of a ping shows the packet traveling completely transparently. (it is normal : the LAN traffic must be visible for LAN devices)
+When capturing traffic on PC1-R1 (LAN network) interfaces, the analysis of the ping shows the packet traveling completely transparently. 
 ![ICMP traffic en clair](assets/before_ipsec_icmp_pc1-r1-ping_pc1_pc2.png)
 
-When capturing traffic on WAN interfaces (Internet transit network), the analysis of a ping shows the packet traveling completely transparently. The traffic is transmitted in clear text and the gateway (R1) has no encryption settings.
+When capturing traffic on WAN interfaces (Internet transit network), the analysis of the ping shows the packet traveling completely transparently. 
 ![ICMP traffic en clair](assets/before_ipsec_icmp_r1-r3-ping_pc1_pc2.png)
 
-<ins> Observation </ins> : Internal private addresses  (10.0.0.1 / 30.0.0.1) are exposed to everyone, and the application data (ICMP payload) is visible to any intermediate device located along the transit path (R3). 
+<ins> Observation </ins> : The traffic is transmitted in clear text and the gateway (R1) has no encryption settings. Internal private addresses  (10.0.0.1 / 30.0.0.1) are exposed to everyone, and the application data (ICMP payload) is visible to any intermediate device located along the transit path (R3). 
 
 <h3> After the activation of IPsec  </h3>
 When the second successful ping is sent, the network capture highlights the structural changes to the frame that shows the key Points of ESP Encapsulation:
 The screenshots below show ESP encapsulation in action:
 
 - When capturing traffic on PC1-R1 (LAN network) interfaces, the packet remains unchanged. The PC communicates with its gateway as usual.
+
 ![ICMP traffic en clair](assets/after_ipsec_icmp_pc1-r1-ping_pc1_pc2.png)
 
 - When capturing traffic on WAN interfaces (Internet transit network), the analysis of the ping shows an ESP packet traveling with no ICMP packet visible :  The ICMP packet is encapsulated & the original IP header is hidden.
+
 ![ESP traffic encrypted : ICMP traffic hidden](assets/after_ipsec_esp_r1-r3-ping_pc1_pc2.png) 
 
+*You can find the raw capture files (.pcapng) in the [captures/](captures/) folder for detailed analysis using your own copy of Wireshark.*
 
 **Complete Obfuscation**:
   - The real host addresses (10.0.0.1 and 30.0.0.1) and the traffic type (ICMP) are encapsulated in the encrypted payload (ESP). So, private addresses are hidden.
