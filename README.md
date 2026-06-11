@@ -33,8 +33,8 @@ It demonstrates how legacy Cisco routers implement secure LAN-to-LAN connectivit
 - **IPsec Phases**:
 - Phase 1 (ISAKMP/IKE SA): Authentication, DH key exchange, protection of the control channel
 - Phase 2 (IPsec/ESP SA): Creation of the encrypted data tunnel
-- **Encryption & Integrity: AES‑256 for confidentiality, SHA‑256 for integrity, DH Group 14 for key exchange
--** Authentication Scheme**: Pre‑Shared Key (PSK) between both Cisco routers
+- **Encryption & Integrity**: AES‑256 for confidentiality, SHA‑256 for integrity, DH Group 14 for key exchange
+- **Authentication Scheme**: Pre‑Shared Key (PSK) between both Cisco routers
 - **Security Policy**: Implementation of "Interesting Traffic" via Extended Access Control Lists (ACLs)
 - **Verification & Troubleshooting:** analysis of Security Associations (SA) and SPIs using Cisco IOS diagnostic commands
 <!-- NAT Management: NAT‑Traversal (NAT‑T) support for encapsulating ESP over UDP/4500 when routers are behind NAT 
