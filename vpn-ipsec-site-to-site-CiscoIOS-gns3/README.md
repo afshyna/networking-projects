@@ -15,17 +15,21 @@ The IPsec tunnel will protect :
 
 <h1> Network Architecture </h1>
 
-**Functions of the équipments**
+<img src="topology-ipsec-lan-to-lan-CiscoIOS-routers-gns3.png"></img>
+
+<h3> Functions of the équipments </h3>
+
 - R1 : Gateway VPN of the LAN A
+    - Serial 1/0 represent the “OUTSIDE” security zone (simulation of the public Internet connection with R3).
+    - Fa0/0 is connected to the “INSIDE” zone, LAN 1
 - R2 : Gateway VPN of the LAN B
-- R3 : Router that simumlate “Internet”  (zone OUTSIDE)
+    - Serial 1/0 represent the “OUTSIDE” security zone (simulation of the public Internet connection with R3).
+    - Fa0/0 is connected to the “INSIDE” zone, LAN 2
+- R3 : Router that simulate “Internet”  (zone OUTSIDE)
 - PC1 / PC2 : machines internes (zone INSIDE)
 
-R1 (Serial 1/0) and R2 (Serial 1/0) represent the “OUTSIDE” security zone (simulation of the public Internet connection).
-
-The FastEthernet 0/0 interface on each router is connected to the “INSIDE” zone (LAN 1 / LAN 2).
-
-<ins> Goal </ins> : Enable PC1 (10.0.0.0/8) and PC2 (30.0.0.0/8) to communicate end-to-end in a transparent and highly secure manner by establishing a ipsec tunnel between the Cisco gateways R1 and R2.
+<h3> Goal  </h3>
+Enable PC1 (10.0.0.0/8) and PC2 (30.0.0.0/8) to communicate end-to-end in a transparent and highly secure manner by establishing a ipsec tunnel between the Cisco gateways R1 and R2.
 
 <h1> How IPsec VPN Works  (theorically) </h1>
 When a connection is initiated (e.g., PC1 pings PC2, 10.0.0.1 → 30.0.0.1), the IPsec process is activated on the Cisco gateway (e.g, R1):
@@ -135,7 +139,9 @@ Each direction of communication has its own independent set of encryption keys
 To reproduce this project, you will require to have the following environments :
 
 - Network simulator *GNS3* 
-- Cisco IOS Images : Images Cisco IOS compatible with IPsec/IKEv1 (e.g., c7200 ou c3745), configured in *GNS3*.
+- Cisco IOS Images :
+    - Images Cisco IOS compatible with IPsec/IKEv1 (e.g., c7200), configured in *GNS3*.
+    - nom exact de l'image IOS utilisé dans mon projet GNS3 : `c7200-adventerprisek9-mz.124-24.T5.image`
 - A functional **GNS3 topology** including:
   - 3 Cisco routers (R1, R2, R3)
   - 2 end-hosts (PC1, PC2) : Appliances "VPCS" (Virtual PC Simulator) integrated to *GNS3* for realizing the ping tests.
