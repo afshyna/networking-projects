@@ -1,5 +1,13 @@
 <h1> How to Set Up site-to-site IPsec Authentication using X.509 Certificates ? </h1>
 
+<h2> Review : Trust Hierarchy </h2>
+
+Every gateway holds:
+
+- CA Certificate (`cacert.pem`): The root of trust that validates the identity of the peer.
+- Local Certificate (`gwX-cert.pem`): The unique identity card of the gateway.
+- Private Key (`gwX-key.pem`): Used to sign authentication challenges.
+    
 <h2> Step 1 : Create a CA certificat  </h2>
 
 On a Linux machine (GW-A for example) :
@@ -60,6 +68,14 @@ ipsec pki --issue \
 </li>
 </ul>
 
+
+Note :
+In strongswan, for authentication to succeed between peers, it is critical that the **IKE ID of the peer** (`leftid`/`rightid`) match EXACTLY the **Common Name (CN) / SAN inside the peer certificate**.
+
+So if strongswan configuration of GW-A has `rightid=gwB.vpn.local` and `leftid=gwA.vpn.local`, then the peer's certificate (gwB-cert.pem) must contain: `SAN=gwB.vpn.local` and `CN=gwB.vpn.local` and the local certificate (gwA-cert.pem) must contain: `SAN=gwA.vpn.local` and `CN=gwA.vpn.local`
+
+
+
 <h2> Step 3 : Install the certificates </h2>
 
 On GW-A :
@@ -87,3 +103,8 @@ On GW-B: (use scp to copy certificates from GW-A to GW-B)
 <pre><code>cp gwB-key.pem /etc/ipsec.d/private/</code></pre>
 </li>
 </ul>
+
+<h1> Achievements</h1>
+- Generate a (root) Certificate Authority (CA)
+- Generate private RSA keys for each gateway 
+- Issue X.509 certificates for each gateway
