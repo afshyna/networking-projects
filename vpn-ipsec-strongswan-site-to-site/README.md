@@ -161,7 +161,11 @@ On both GW-A and GW-B, we must allow IKE and NAT-Traversal traffic.
 Because the gateways are behind a NAT device (Home router), incoming VPN packets ( IKE and NAT‑T packets) from the Internet must be forwarded to the internal IP of the gateway VM.
 Since GW‑A is behind a home NAT, the router must forward IPsec traffic to the Ubuntu gateway. 
 
-On the router’s admin interface (`192.168.1.254`),  configure : 
+On the router’s admin interface (`192.168.1.254`),  configure a port redirection for each type of traffic : 
+
+![Port Forwarding Rule IKE on GW-A Box](assets/port-redirection-configuration-home-router-IKE.png)
+![Port Forwarding Rule NAT-T on GW-A Box](assets/port-redirection-configuration-home-router-NAT-T.png)
+
 
 <h2> Inter-network Routing </h2>
 By default, Linux kernels are configured as end-hosts and do not forward packets between interfaces. To function as a VPN Gateway, we must enable IP forwarding and disable ICMP redirects to enhance security and stability. 
@@ -180,10 +184,14 @@ net.ipv4.ip_forward=1
 # sysctl -p
 ```
 
-<h1>  Validation & Troubleshooting </h1>
+<h1>  Validation </h1>
 
 Validate the tunnel using:
 - `ipsec statusall`
+
+![IPSec tunnel status - SA up](assets/verifs/ipsec_statusall_gwA.png)
+![IPSec tunnel status - SA up](assets/verifs/ipsec_statusall_gwA.png)](assets/verifs/ipsec_statusall_gwB.png)
+
 - `ip xfrm state`
 - `ip xfrm policy`
 - journalctl for strongSwan logs
@@ -202,8 +210,37 @@ $ sudo ip route list table 220
 - **Routing:** Policy-based IPsec with automatic routing injection in table `220`.
 
 - NAT rules for LAN‑to‑LAN communication
-    
 
+<h1> Connectivity & Troubleshooting </h1>
+During testing, hosts from LAN B (172.20.10.0/28), of which GW-B, could not reach hosts in LAN A (192.168.1.0/24), even though the IPsec tunnel was fully established and GW-B ping GW-A.
+
+<h3>  Root Cause </h3>
+GW‑A was not performing NAT on traffic coming from LAN B and exiting through its WAN interface (enp0s3).
+Because of this, return traffic from LAN A had no route back to the original LAN B host.
+
+When traffic from the LAN-B reaches the local machine, the machine may not have a route back to the source network. We use iptables to perform source NAT (Masquerading), making the traffic appear as if it originates from the gateway itself.
+
+<h3> Fix: Add a MASQUERADE Rule on GW‑A </h3>
+
+``` console
+# iptables -t nat -A POSTROUTING -s 172.20.10.0/28 -o enp0s3 -j MASQUERADE
+```
+Meaning : “Any packet coming from LAN B (172.20.10.0/28) and leaving GW‑A through enp0s3 will have its source IP replaced by GW‑A’s own IP.”
+
+This ensures that:
+- return traffic from LAN A is correctly routed back to GW‑A
+- GW‑A can then forward it through the IPsec tunnel to LAN B
+
+<h3> Verification </h3>
+After applying this rule:
+- LAN B → LAN A communication works
+- LAN A → LAN B communication works
+
+The tunnel behaves as a full site‑to‑site VPN
+
+# Monitor traffic leaving the gateway interface
+sudo tcpdump -ni enp0s3 icmp
+    
 <h1> Traffic analysis via Wireshark </h1>
 Using Wireshark, we observed the transition from plain-text ICMP to encrypted ESP packets crossing the public Internet.
 
