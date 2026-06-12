@@ -1,6 +1,8 @@
 
 # Networking Projects
-Welcome to the "Networking Projects" repository! This repertory is a collection of network architectures &amp; solutions, that showcase comprehensive network setups about different networking concepts.
+Welcome to the "Networking Projects" repository dedicated to **advanced networking projects** ! 
+
+This repertory is a collection of network architectures &amp; solutions, that showcase comprehensive network setups, including VPN setup with site-to-site and remote-access architectures  with automatic failover solutions.
 
 **Portfolio of personal projets**:
 - Network engineering
@@ -40,8 +42,11 @@ It demonstrates how legacy Cisco routers implement secure LAN-to-LAN connectivit
 <!-- NAT Management: NAT‑Traversal (NAT‑T) support for encapsulating ESP over UDP/4500 when routers are behind NAT 
     NAT Integration: Policy-based routing and crypto-map application on WAN interfaces
 -->
-
-<!-- 
+ 
 <h2> OpenVPN & WireGuard solutions </h2> 
-This micro-project is about the design and deployment of  VPN SSL tunnel / multi-sites architecture with failover & nomade clients.
--->
+This micro-project is about the design and deployment of VPN SSL tunnels with OpenVPN and multi-sites architecture with failover & deployment of VPN remote-acess with Wireguard for connecting nomade clients to the VPN server.
+
+
+
+
+
