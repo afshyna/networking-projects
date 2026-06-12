@@ -1,29 +1,29 @@
-# 🛠️ **Fichier central** pour les problèmes GENERAUX (ex : conflits IP, pare-feu, etc.)  /  Troubleshooting & Lessons Learned
-# Troubleshooting – Micro Projet VPN OpenVPN & WireGuard
+# 🛠️  Troubleshooting (Difficulties encountered) & Solutions
 
+This is a central file for general problems (ex : conflits IP, pare-feu, etc.). 
 
+For each problem, it describe the **issue**, the **diagnostic method** ued, the possible **cause** & finally the **solution** to resolve it with a proof capture.
+
+<!--
 STRUCTURE :
 Issue/Symptômes: [Description courte du problème, ex: "Ping fails between Tokyo and Paris"]
-
 Diagnostic Methods : [Quelle commande t'a permis d'isoler la panne ? ex: tcpdump -ni tun0 ou ip route get ...]
-
 Causes possibles/Analyse : 
-
 Solution(s): [Quelle modification as-tu apportée ? ex: "Ajout de la route dans le fichier ccd"]
-
 Wireshark Analysis: [Lien vers la capture .pcap dans assets/captures-wireshark/ qui prouve que le problème est réglé].
-       
+-->
 
-################ 2. Problèmes de routage inter-sites
-Tu dois inclure :
+## I. Problèmes de routage inter-sites
+<!--Tu dois inclure :
     Routes manquantes
     Mauvais iroute dans ccd/
     Sous‑réseaux non annoncés
     Asymétrie de routage
     Pas de push "route …"
     Mauvaise table de routage Linux
-  
-# -------------- TROUBLESHOOTING 1 
+-->
+
+### Troubleshooting 1
 Issue  : Au sprint 0, le ping Tokyo → Paris-IP-LAN-privé ne passait pas. 
 
 Analyse : 
@@ -31,10 +31,12 @@ Analyse :
 🛠️ Solution : 
 • Le serveur doit "poussé" la route du LAN au client Tokyo. En effet, sans le “push”, il n’y pas de route vers 192.168.1.0/24 depuis Tokyo.
 
+---
 
-# -------------- TROUBLESHOOTING 2 
+###  Troubleshooting 2 
 Issue : Au sprint 0, Le ping Tokyo → Aubervillier (192.168.100.210) ne passait pas. 
-
+Les paquets à destination du site central étaient bloqués.
+     
 Analyse : route manquante dans CCD. 
 
 🛠️ Solution : 
@@ -44,8 +46,12 @@ push "route 192.168.100.0 255.255.255.0"
 
 •On ajouter une route statique sur le serveur Aubervilliers  pour lui dire : "Pour répondre à Tokyo, repasse par l'interface locale de Paris".
 ajout de iroute 172.20.10.0/28.
- 
-# -------------- TROUBLESHOOTING 3
+
+Ajout d'une clause iroute dans le CCD OpenVPN pour déclarer les sous-réseaux route système.
+
+---
+
+###   Troubleshooting 3
 Issue : Au sprint 0, le ping 2. PING  depuis Paris Montrouge vers l’adresse Tokyo (172.20.10.3) ne passait pas!
 
 🛠️ Solution : 
@@ -53,8 +59,11 @@ Issue : Au sprint 0, le ping 2. PING  depuis Paris Montrouge vers l’adresse To
 
 •On doit créer et activer les entrées ccd. 
 
-# -------------- TROUBLESHOOTING 4 
-# SPRINT 0: ING depuis la machine Site de Secours (192.168.100.210/192.168.1.160) vers Tokyo (172.20.10.3)  ne passe pas;
+---
+
+###  Troubleshooting 4 
+
+SPRINT 0: ING depuis la machine Site de Secours (192.168.100.210/192.168.1.160) vers Tokyo (172.20.10.3)  ne passe pas
 
 🛠️ Solution : 
 1.Tu dois ajouter une route statique sur l'OS d'Aubervilliers pour lui dire : "Pour répondre à Tokyo, repasse par l'interface locale de Paris"
@@ -63,9 +72,10 @@ Issue : Au sprint 0, le ping 2. PING  depuis Paris Montrouge vers l’adresse To
 
 3.Ajouter une iroute sur le serveur de paris pour indiquer à OpenVPN de router le paquet vers le réseau LAN de Tokyo.  (fait précédemment lors du ping du serveur paris vers 172.20.10.3 = tokyo)
 
-# -------------- TROUBLESHOOTING 5 
-Issue : Au sprint 0, depuis Tokyo une requete HTTP vers le serveur web de secours aubervillier wget http://192.168.100.210 ne passe pas
+---
 
+###  Troubleshooting 5 
+Issue : Au sprint 0, depuis Tokyo une requete HTTP vers le serveur web de secours aubervillier wget http://192.168.100.210 ne passe pas
 
 Analyse : 
 OU FORWARD iptables bloqué
@@ -75,7 +85,10 @@ FORWARD policy DROP
 autoriser le forwarding VPN → LAN
 Sur Paris :  iptables -A FORWARD -i tun0 -o enp0s8 -j ACCEPT
 
-# -------------- TROUBLESHOOTING 6
+---
+
+### Troubleshooting 6
+
 Issue : Au sprint 1, il y a conflit de routes identiques lorsqu'on test le serveur auber uniquement.
 LOrsqu'on veut tester le serveur auber uniquement, on oublie pas de retirer les routes statiques configurés sur auber au sprint 0 pour tester le serveur paris, car sinon il y aura un 
 
@@ -91,8 +104,17 @@ Conseil pour la recette : Comme je veux tester spécifiquement le Sprint 1 (Aube
 @srv-aub:/etc/openvpn/ccd$ sudo ip route del 10.9.1.0/24 via 192.168.100.200 dev enp0s8  
 @srv-aub:/etc/openvpn/ccd$ sudo ip route del 172.20.10.0/28 via 192.168.100.200 dev enp0s8
 
+---
 
-# -------------- TROUBLESHOOTING 7
+###  Troubleshooting 6.5
+Lors du Sprint 1, les paquets à destination du site de secours étaient bloqués.
+
+Solution : 
+Ajout d'une clause iroute dans le CCD OpenVPN pour déclarer les sous-réseaux route système.
+
+---
+
+###  Troubleshooting 7
 Issue : Au sprint 4, le Ping de nomade vers Aubervillier (192.168.X.Y : 192.168.100.210/192.168.1.160) ne passe pas
 
 Analyse : PC nomade n’a pas de route vers les réseaux 192.168.X.Y. WireGuard ne route pas les réseaux physiques par défaut. Il ne transporte que les réseaux déclarés dans AllowedIPs.
@@ -101,7 +123,9 @@ Analyse : PC nomade n’a pas de route vers les réseaux 192.168.X.Y. WireGuard 
 - Depuis le fichier de conf wg0.conf de pc-nomade (client), on ajoute le réseau 192.168.0.0/26 dans « Allowed IPs »  AllowedIPs=10.9.3.1, 192.168.0.0/16
 - J’ajoute une route depuis auber vers le réseau de wireguard
 
-# -------------- TROUBLESHOOTING 8 
+---
+
+### Troubleshooting 8 
 Issue : Au sprint 4, le ping de nomade vers Aubervilliers (10.9.2.1) passe pas
 
 Problème/Analyse: PC nomade n’a pas de route vers le réseau VPN de secours 10.9.2.0/24
@@ -110,7 +134,9 @@ Problème/Analyse: PC nomade n’a pas de route vers le réseau VPN de secours 1
 🛠️Solution : 
 Depuis le fichier de conf wg0.conf de pc-nomade (client), on ajoute l’IP VPN de secours côté auber dans « Allowed IPs »  AllowedIPs=10.9.3.1, 192.168.0.0/16, 10.9.2.0/24
 
-# -------------- TROUBLESHOOTING 9 
+---
+
+###  Troubleshooting 9 
 Issue : Au sprint 4, le ping de nomade vers Tokyo (172.20.10.3)   passe pas
 
 Problème: 
@@ -126,10 +152,10 @@ oMéthode2 : on rajoute la route directement dans le fichier de conf openvpn d�
 
 
 
-## 1. Problèmes de connectivité VPN?
+## II. Problèmes de connectivité VPN?
 
 
-# -------------- TROUBLESHOOTING 10 
+### Troubleshooting 10 
 Issue : Au sprint 2, LOrsqu'on doit stoppe le service openvpn côte serveur paris, service redevient up peu de temps après 
  l'interface tun0 réaparrait avec son IP virtuelle ; 
 
