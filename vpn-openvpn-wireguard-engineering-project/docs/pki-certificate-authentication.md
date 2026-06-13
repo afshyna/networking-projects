@@ -1,4 +1,4 @@
-<h1> How to Set Up site-to-site IPsec Authentication using X.509 Certificates ? </h1>
+<h1> Set Up OpenVPN Authentication using X.509 Certificates </h1>
 
 
 <!--
