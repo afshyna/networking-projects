@@ -4,11 +4,10 @@ Micro-project reproducing a realistic enterprise VPN architecture.
 
 ##  Introduction
 
-Pitch : Contexte de prestation de service pour interconnecter des agences distantes (Tokyo, New York) à un cœur de réseau résilient (Paris Montrouge, Aubervilliers) et sécuriser les accès des collaborateurs itinérants (Nomades).
-
-<h3>  Project summary  </h3>
+Service delivery context for connecting remote offices (Tokyo, New York) to a resilient network core (Paris, Aubervilliers) and securing access for mobile staff (Nomads).
 
 <h3> Technologies used:  </h3>
+
 - OpenVPN (site-to-site) Robustesse/Routage complexe)
 - WireGuard (remote access) (Performance Nomade
 - TLS / X.509 PKI
@@ -21,17 +20,17 @@ Pitch : Contexte de prestation de service pour interconnecter des agences distan
 
 ##  Global Objectives  
 
-**Objective 1. Build  Site-to-Site tunnels with OpenVPN**:
-   - Connecter les agences **Tokyo** et **New York** aux sites centraux **Paris-Montrouge** et **Aubervilliers**.
-   - Implement secure TLS authentication by using  **certificats SSL/TLS** 
-   - Route traffic between remote agencies  / Configure **routes statiques** et **iroute** pour le routage entre réseaux locaux.
-   - - Configure a disaster recovery site via a **Bascule automatique** vers Aubervilliers si Paris tombe.
+**Objective 1. Build Site-to-Site tunnels with OpenVPN**:
+   - Connect the **Tokyo** and **New York** branches to the central sites in **Paris-Montrouge** and **Aubervilliers**.
+   - Implement secure TLS authentication using **SSL/TLS certificates** 
+   - Route traffic between remote offices  / Configure **static routes** and **iroute** for routing between local networks.
+   - - Configure a disaster recovery site via **automatic failover** to Aubervilliers if Paris goes down.
 
-**Objective 2. Deploy a remote access (nomade) VPN with Wireguard** :
-   - Permettre à un **PC nomade** ou un **smartphone** de se connecter aux serveurs centraux.
-   - Utiliser des **clés publiques/privées** pour une connexion légère et rapide.
-   - Configurer le **NAT** et le **forwarding** pour accéder à Internet via le VPN.
-     Implement VPN failover
+**Objective 2. Deploy a remote access (mobile) VPN with WireGuard**:
+   - Enable a **mobile PC** or a **smartphone** to connect to the central servers.
+   - Use **public/private keys** for a lightweight and fast connection.
+   - Configure **NAT** and **forwarding** to access the Internet via the VPN.
+- Implement VPN failover
 
 ##  Architecture 
 Hybride On-Premise : Simulation réaliste derrière une Box Internet. Gestion du NAT/PAT, redirection de ports asymétriques (32768 -> 1194 et 32769 -> 1195).
@@ -41,35 +40,29 @@ Hybride On-Premise : Simulation réaliste derrière une Box Internet. Gestion du
 ## Directory Structure
 Brief description of the main folders.
 
- Un fichier README.md par script, qui servira de Cahier de Recette / Rapport de Test pour valider les opérations.
-openvpn-wireguard-site2site-nomad/
+├── docs/       #  sprints with a README.md file/sprint, which will serve as a recipe book / test report to validate the procedures.
+│   ├── 01-sprint0-openvpn-site-to-site-paris.md  # Détail step 1 - 
+│   ├── 02-sprint1-backup-openvpn-site-auber.md   # Détail step 2 - 
+│   ├── 03-sprint2-failover-automation.md         # Détail step 3 - Gestion des incidents (pkill)
+│   └── 04-sprint3-wireguard-nomade.md            # Détail step 4 - VPN nomade
 
-├── 00-documentation/          # Schémas, exigences, topologie
-
-├── 01-setup-environment/     # Scripts pour VirtualBox/Oracle Cloud
-
-├── 02-openvpn-site2site/     # Certificats + configs OpenVPN
-
-├── 03-wireguard-nomad/       # Clés + configs WireGuard
-
-├── 04-scripts/               # Failover, tests, monitoring
-
-├── 05-tests-and-results/     # Résultats des tests (Wireshark, pings)
-
-└── 06-extras/                # Sécurité avancée, optimisations
-
-List of files provided in `deliverables/`: Word report, Wireshark traces, config files (SAMPLE), scripts.
-
-## Reproducing the Environment
-Quick steps to provision the VMs (reference to `infra/`), ports to forward (32768 -> 1194, 32769 -> 1194), basic connectivity tests.
+├── configs/    #  files .conf of OpenVPN and Wireguard + files ccd
+├── diagrams/   # Schemas, exigences, topologies
+├── assets/     # Test results (Wireshark, pings)
+│   ├── captures-wireshark/      # Captures des analyses de paquets sur Wireshark
+│   └── verifs/     # Captures des tests de ping/http
+├── scripts/   # Failover, tests, monitoring
 
 
 ## Procédure de déploiement (How-to)
 <!--
 Donne les commandes clés pour que quelqu'un puisse reproduire ton infrastructure :
     Activer le packet forwarding IP.
+    ports to forward (32768 -> 1194, 32769 -> 1194)
+
     Générer les configurations serveurs/clients.
     Lancer le script de pare-feu.
+
 -->
 
 
