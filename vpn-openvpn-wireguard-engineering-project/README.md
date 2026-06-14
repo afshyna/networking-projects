@@ -39,20 +39,18 @@ Hybride On-Premise : Simulation réaliste derrière une Box Internet. Gestion du
 
 ## Directory Structure
 Brief description of the main folders.
+-  `docs/` : sprints with a README.md file/sprint, which will serve as a recipe book / test report to validate the procedures.
+- `01-sprint0-openvpn-site-to-site-paris.md`  : Détail step 1 - 
+- `02-sprint1-backup-openvpn-site-auber.md`  :Détail step 2 - 
+- `03-sprint2-failover-automation.md`:  Détail step 3 - Gestion des incidents (pkill)
+- `04-sprint3-wireguard-nomade.md`  : Détail step 4 - VPN nomade
 
-├── docs/       #  sprints with a README.md file/sprint, which will serve as a recipe book / test report to validate the procedures.
-│   ├── 01-sprint0-openvpn-site-to-site-paris.md  # Détail step 1 - 
-│   ├── 02-sprint1-backup-openvpn-site-auber.md   # Détail step 2 - 
-│   ├── 03-sprint2-failover-automation.md         # Détail step 3 - Gestion des incidents (pkill)
-│   └── 04-sprint3-wireguard-nomade.md            # Détail step 4 - VPN nomade
-
-├── configs/    #  files .conf of OpenVPN and Wireguard + files ccd
-├── diagrams/   # Schemas, exigences, topologies
-├── assets/     # Test results (Wireshark, pings)
-│   ├── captures-wireshark/      # Captures des analyses de paquets sur Wireshark
-│   └── verifs/     # Captures des tests de ping/http
-├── scripts/   # Failover, tests, monitoring
-
+- `configs/` : files .conf of OpenVPN and Wireguard + files ccd
+- `diagrams/` : Schemas, exigences, topologies
+- `assets/` : Test results (Wireshark, pings)
+   - `captures-wireshark/` :  Captures des analyses de paquets sur Wireshark
+   - `verifs/` :  Captures des tests de ping/http
+- `scripts/`:  Failover, tests, monitoring
 
 ## Procédure de déploiement (How-to)
 <!--
@@ -64,7 +62,6 @@ Donne les commandes clés pour que quelqu'un puisse reproduire ton infrastructur
     Lancer le script de pare-feu.
 
 -->
-
 
 
 ## Security & Implémentation du Hardening Réseau
