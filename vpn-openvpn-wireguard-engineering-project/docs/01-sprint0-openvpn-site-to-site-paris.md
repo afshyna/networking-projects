@@ -81,11 +81,8 @@ Goal : Server receive the system route `172.20.10.0/255.255.255.240 dev tun0`
 
 ### Routing on Auber
 
-Contient la route de retour 10.9.1.0/24 via 192.168.100.200 dev enp0s8.
-Static route to Tokyo
-Static route to NY
-    Why Auber must know 10.9.1.0/24
-
+Contains the return route 10.9.1.0/24 via 192.168.100.200 on interface enp0s8.
+[Know Why Auber must know 10.9.1.0/24](##7.Troubleshooting-&-Fixes) 
     
 ## 4. NAT and Perimeter Security
 To enable remote offices (Client Tokyo and NY) to initiate a connection to the central server located behind a home router, a port forwarding rule and local firewall settings have been configured on Paris site.
@@ -120,31 +117,45 @@ systemctl start openvpn@client-NY-parismont
 <!-- Copie-colle le résultat du ping réussi sur la liaison inter-serveurs (192.168.100.200 <-> 192.168.100.210) et les pings des clients vers internet.
 Le tableau suivant fait office de procès-verbal de validation de bon fonctionnement pour le livrable du Sprint 0 ?
 -->
-- Ping Paris VPN IP  ↔ → Tokyo/New York
-- Ping Tokyo LAN → 10.9.1.1
-- Ping New York LAN → 10.9.1.1
 
-### Ping Tests
-    Tokyo → Paris (10.9.1.1)
-    Tokyo → Paris LAN (192.168.1.197)
-    Tokyo → Auber (192.168.100.210)
-    Paris → Tokyo (172.20.10.3)
-    NY → Paris
-    NY → Auber
-    Auber → Tokyo
-    Auber → NY
+### Ping Tests - Tunnel Connectivity ✅
+- Tokyo → VPN Server Paris (@IP `10.9.1.1`)
+[Ping_OK_Tokyo-Paris-VPN](../assets/verifs/ping-tokyo-to-paris-VPN.png)
+[Wireshark-tokyo-Paris-VPN](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png)
 
-### Traceroute Tests
-    NY → Tokyo
-    Tokyo → NY
-    NY → Auber
-    Tokyo → Auber
+Here is a summary of the process that happen : 
+1. When Tokyo sends a ping to `10.9.1.1`, OpenVPN encapsulates it in an encrypted tunnel and sends it to the WAN IP of VPN Paris Server (`88.162.141.79:32768`).
+3. The Paris home router forwards the packet to the Paris VPN server on the LAN (`192.168.1.197:1194`).
+4. The Paris VPN server decrypts the packet & responds to the ping. The response is encapsulated in OpenVPN to return to Tokyo.
 
-### HTTP Test / HTTP connectivity  via tunnel
-    wget/curl from Tokyo → Paris
-    wget/curl from NY → Paris
-    wget/curl from Tokyo → Auber
-    wget/curl from NY → Auber
+• ICMP Echo Request/Reply packets encapsulated within OpenVPN packets (UDP/1194) are observed between `37.174.64.197` (IP WAN Tokyo) and `88.162.141.79` (IP WAN Paris).
+• Once decrypted, the ICMP packets appear between `10.9.1.2` (Tokyo) and `10.9.1.1` (Montrouge) inside the tunnel interface.
+
+- Paris → Tokyo (`10.9.1.2`)
+- Backup site Auber → Tokyo (`10.9.1.2`) 
+
+---
+
+### Ping Tests - LAN Access (Paris/Auber) ✅
+- Tokyo → Server Paris LAN (@IP `192.168.1.197`)
+[Ping_OK_Tokyo-Paris-LAN](../assets/verifs/ping-tokyo-paris-lan-ok.png)
+[Wireshark-tokyo-Paris-LAN](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-LAN.png)
+
+- Tokyo → Backup site (intrnal @IP `192.168.100.210`)
+[Ping_OK_Tokyo-Paris-VPN](../assets/verifs/ping-tokyo-internal-lan-auber-ok.png) <!--  => A AJOUTER!-->
+ <!-- traceroute that confirm the utilization of the VPN tunnel as gw-->
+- Server Paris → Tokyo (`172.20.10.3`)  
+- Backup site Auber → Tokyo (`172.20.10.3`) 
+
+---
+
+### HTTP Test / HTTP connectivity  via tunnel for Validation Applicative  & Franchissement Filtrage ✅
+    wget from Tokyo → Paris
+    wget from NY → Paris
+    wget from Tokyo → Auber
+    wget from NY → Auber
+
+---
 
 ### Wireshark Captures
     Before tunnel
@@ -160,74 +171,83 @@ Le tableau suivant fait office de procès-verbal de validation de bon fonctionne
 10.9.1.0/24
 -->
 
-## 7. Troubleshooting & Fixes
+##7.Troubleshooting & Fixes
 During the acceptance testing phase, several issues of ping were identified and resolved.
 
-### ❌ Incident A - Ping Fails to LAN Paris
-    Missing push route
-    Fix: push "route 192.168.1.0/24"
+---
 
-### ❌Incident B - Ping Fails to Auber / Rupture de flux entre les agences distantes et le Site de Secours (192.168.100.210)
+### ❌ Incident A - Ping fails Tokyo → LAN Paris (192.168.1.197)
+- **Symptom**: The tunnel is working (ping `10.9.1.1` OK), but the server’s physical interface cannot be reached.
 
-    Symptôme : Le ping depuis Tokyo ou New York vers l'interface inter-site d'Aubervilliers échoue.
-    Causes multiples identifiées :
-        Aubervilliers ne sait pas par où répondre au réseau VPN 10.9.1.0/24.
-        Le forwarding IP du noyau Linux n'était pas actif sur Paris.
-    Résolution :
-        Activation définitive du forwarding système sur Paris (net.ipv4.ip_forward=1).
-        Injection de la route LAN vers le client distants via le serveur Paris : push "route 192.168.100.0 255.255.255.0".
-        Ajout d'une route statique sur l'OS d'Aubervilliers pour lui ordonner de repasser par Paris pour joindre le réseau des tunnels :
-        Bash
-        ip route add 10.9.1.0/24 via 192.168.100.200 dev enp0s8
-
-    Missing route on Auber
-    Missing push route
-    Missing iroute
-    Fixes:
-        ip route add 10.9.1.0/24 via 192.168.100.200
-        push route
-        iroute in CCD
-
-### ❌ Incident C - Paris → Tokyo Fails / Drop Silencieux d'OpenVPN lors du Ping Paris ➔ LAN Tokyo (172.20.10.3)
-    Wrong target IP (physical IP instead of VPN IP)
-    Missing iroute
-    Fix: route + iroute
-    
-    Symptôme : Le noyau Linux de Paris possède bien la route système (route 172.20.10.0...), tcpdump montre le paquet entrer dans l'interface tun0, mais le paquet n'atteint jamais la VM Tokyo.
-    Analyse & Concept Clé : OpenVPN en mode multi-client gère sa propre architecture de commutation logicielle. Le noyau Linux transmet le paquet à OpenVPN via tun0, mais l'application OpenVPN ignore à quel tunnel chiffré (à quel certificat client) est rattaché le sous-réseau 172.20.10.0/28. L'absence de cartographie logicielle engendre un Drop Silencieux.
-    Résolution : Déclaration de la directive iroute dans l'entrée CCD spécifique de chaque client sur le serveur Paris :
-        Dans /etc/openvpn/ccd/client-tokyo ➔ iroute 172.20.10.3 255.255.255.255
-        Dans /etc/openvpn/ccd/client-NY ➔ iroute 172.20.10.4 255.255.255.255
-
-
-    
-### ❌ Incident A : Échec du Ping depuis Tokyo vers le LAN Physique de Paris (192.168.1.197)
-    Symptôme : Le tunnel fonctionne (ping 10.9.1.1 OK), mais impossible de joindre l'interface physique du serveur.
-
-    Cause : La table de routage du système d'exploitation de Tokyo ne connaît pas l'existence du sous-réseau derrière Paris (192.168.1.0/24) et envoie les paquets vers sa passerelle Internet par défaut.
-
-    Résolution : Ajout d'une clause d'injection dynamique de route dans la configuration du serveur OpenVPN Paris :
-    Ini, TOML
-
-    push "route 192.168.1.0 255.255.255.0"
-
-
-    
-### ❌ Incident D - HTTP Fails to Auber / Requête HTTP bloquée par la politique Netfilter (FORWARD) de Paris
-    Symptôme : Les pings vers le serveur Web d'Aubervilliers (192.168.100.210) fonctionnent, mais les requêtes HTTP (curl/wget) s'exécutent en boucle (Timeout).
-    Cause : La politique par défaut du pare-feu Linux sur Paris est configurée sur FORWARD DROP. Les paquets ICMP passaient via des exceptions UFW, mais le trafic TCP (port 80) routé entre l'interface virtuelle tun0 et l'interface physique enp0s8 était rejeté par Netfilter.
-    Résolution : Ajout d'une règle IPTables explicite sur le serveur de Paris pour lier les zones de confiance :
-    Bash
-    iptables -A FORWARD -i tun0 -o enp0s8 -j ACCEPT
+- **Cause**: The routing table on the Tokyo OS is not aware of the subnet behind Paris (`192.168.1.0/24`) and is sending packets to its default internet gateway.
  
-    FORWARD chain DROP
-    Fix:
-        iptables -A FORWARD -i tun0 -o enp0s8 -j ACCEPT
+- **Solution** : Addition of the route injection directive to the OpenVPN Paris server configuration:
+`push "route 192.168.1.0 255.255.255.0"`
 
-### ❌ Incident E - OpenVPN Drops Packets Silently
-    Missing iroute
-    Explanation of OpenVPN routing logic
-    
+Routing is working with the push route directive. On Tokyo, a route has been added to the Paris LAN via the tunnel.
+[Routing Table Tokyo](../assets/verifs/routing-table-tokyo-sprint0.png)
+
+
+---
+
+### ❌Incident B - Ping fails Tokyo → Auber (192.168.100.210)
+
+- **Symptom**: Ping requests from Tokyo to the Aubervilliers inter-site interface fail.
+
+- **Causes**:
+    - Linux kernel IP forwarding was not enabled in Paris.
+    - The OS routing table on the Tokyo is not aware of the subnet behind Paris (`192.168.100.0/24`) and is sending packets to its default internet gateway.
+    - Aubervilliers does not know where to route responses to the `10.9.1.0/24` VPN network. Its routing table is not aware of this VPN network and is sending packets to its default internet gateway.
+      
+- **Solutions**:
+   - Permanent activation of system forwarding on the Paris server (```net.ipv4.ip_forward=1```).
+   - Injection of the LAN route to remote clients via the Paris server: `push ‘route 192.168.100.0 255.255.255.0’`
+   - Addition of a static route on the Aubervilliers table routing to instruct it to route via Paris to reach the tunnel network:
+   ```bash
+   ip route add 10.9.1.0/24 via 192.168.100.200 dev enp0s8
+   ```
+
+**Proof/Result** : 
+On Tokyo, a route has been added to the Internal LAN Paris-Auber  via the tunnel.
+[Routing Table Tokyo](../assets/verifs/routing-table-tokyo-sprint0.png)
+
+On Auber, a route has been added to the VPN network via the internal interface Auber-Paris.
+[Routing Table Auber](../assets/verifs/routing-table-auber-sprint0.png)
+
+
+---
+
+### ❌ Incident C - Ping fails Paris → Tokyo (172.20.10.3)  Fails 
+
+- **Symptom**: The Linux kernel in Paris does indeed have the system route (`route 172.20.10.0...`), and wireshark shows the packet entering the tun0 interface, but the packet never reaches the Tokyo VM.
+
+- **Causes** :
+   - *Analysis & Key Concept of OpenVPN*: OpenVPN in multi-client mode manages its own software switching architecture. The Linux kernel forwards the packet to OpenVPN via tun0, but the OpenVPN application does not know which encrypted tunnel (which client certificate) the `172.20.10.0/28` subnet is attached to. The lack of software mapping results that OpenVPN silently drop the paquet.
+   So, there exist a general routing via the kernel Linux and an internal routing via OpenVPN.
+   - Paris does not know where to route responses to the `172.20.10.0/24` LAN network (not route to this network in its table routing) so it is sending packets to its default internet gateway.
+
+- **Solutions**: Declare the iroute directive in the specific CCD entry for each client on the Paris server:
+   - In `/etc/openvpn/ccd/client-tokyo` ➔ `iroute 172.20.10.3 255.255.255.255`
+   - In `/etc/openvpn/ccd/client-NY` ➔ `iroute 172.20.10.4 255.255.255.255`
+   
+   - Declare a dynamic route on Paris to instruct it to route via the VPN tunnel to reach the LAN network of Tokyo:
+   ```route 172.20.10.0 255.255.255.240```
+
+---
+
+### ❌ Incident D - HTTP Request fails Tokyo → Auber  (`192.168.100.210`)
+- **Symptom**: Pings to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests (curl/wget) get stuck in a loop (timeout).
+
+- **Cause**: The default policy for the Linux firewall in Paris is set to FORWARD DROP. ICMP packets were passing through UFW exceptions, but TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris.
+
+- **Solution**
+```bash
+iptables -A FORWARD -i tun0 -o enp0s8 -j ACCEPT
+```
+
+
+*Note  : the anomalies are the same between Tokyo client and NY client so the troubleshooting is similar. (just replace the VPN/LAN IP of Tokyo IPs by the VPN/LAN IP of NY IPs on the configuration)*
+
 <!-- 
 Puis tu racontes :
 problème de routage
