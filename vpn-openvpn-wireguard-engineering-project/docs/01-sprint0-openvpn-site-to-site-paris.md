@@ -173,16 +173,21 @@ Here is a summary of the process that happen :
 ### Ping Tests - LAN Access (Paris/Auber) ✅
 - Tokyo → Server Paris LAN (@IP `192.168.1.197`)
 [Ping_OK_Tokyo-Paris-LAN](../assets/verifs/ping-tokyo-paris-lan-ok.png)
-[Wireshark-tokyo-Paris-LAN](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-LAN.png)
+[Capture-Wireshark-tokyo-Paris-LAN](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-LAN.png)
 
 - Tokyo → Backup site (intrnal @IP `192.168.100.210`)
-[Ping_OK_Tokyo-Paris-VPN](../assets/verifs/ping-tokyo-internal-lan-auber-ok.png) <!--  => A AJOUTER!-->
- <!-- traceroute that confirm the utilization of the VPN tunnel as gw-->
-- Server Paris → Tokyo (`172.20.10.3`)  
-- Backup site Auber → Tokyo (`172.20.10.3`) 
+[Ping_OK_Tokyo-Paris-VPN](../assets/verifs/ping-tokyo-internal-lan-auber-ok.png)
+[Capture-Wireshark-tokyo-to-auber-internal-LAN](../assets/wireshark/openvpn_icmp_ping-tokyo-to-auber-internal-IP-192.168.100.210.png)
 
+ 
+- Server Paris → Tokyo (`172.20.10.3`)
+ [Ping_OK_Paris-Tokyo-LAN](../assets/verifs/ping-paris-tokyo-lan-ok.png)
+
+- Backup site Auber → Tokyo (`172.20.10.3`)
+[Ping_OK_Auber-Tokyo-LAN](../assets/verifs/ping-auber-tokyo-lan-ok.png)
+[Capture-Wireshark-auber-to-tokyo-vpn](../assets/wireshark/openvpn_icmp_ping-auber-to-tokyo-VPN.png)
 ---
-
+ <!--
 ### HTTP Test / HTTP connectivity  via tunnel for Validation Applicative  & Franchissement Filtrage ✅
     wget from Tokyo → Paris
     wget from NY → Paris
@@ -197,9 +202,6 @@ Here is a summary of the process that happen :
     Encapsulation analysis
     UDP/1194
     ICMP inside OpenVP
-
-<!--
-## Captures Wireshark
 ➡️ [Capture-wireshark-connectivity-script0](assets/wireshark)
 
 10.9.1.0/24
@@ -218,7 +220,8 @@ During the acceptance testing phase, several issues of ping were identified and 
 - **Solution** : Addition of the route injection directive to the OpenVPN Paris server configuration:
 `push "route 192.168.1.0 255.255.255.0"`
 
-Routing is working with the push route directive. On Tokyo, a route has been added to the Paris LAN via the tunnel.
+**Proof/Result** : 
+On Tokyo, a route has been added to the Paris LAN via the tunnel.
 [Routing Table Tokyo](../assets/verifs/routing-table-tokyo-sprint0.png)
 
 
@@ -245,6 +248,9 @@ Routing is working with the push route directive. On Tokyo, a route has been add
 On Tokyo, a route has been added to the Internal LAN Paris-Auber  via the tunnel.
 [Routing Table Tokyo](../assets/verifs/routing-table-tokyo-sprint0.png)
 
+A traceroute to the Auber internal LAN confirms also the utilization of the VPN tunnel as gw :
+[Traceroute-tokyo-to-auber-internal-LAN](../assets/verifs/traceroute-tokyo_auber-internal-lan.png)
+
 On Auber, a route has been added to the VPN network via the internal interface Auber-Paris.
 [Routing Table Auber](../assets/verifs/routing-table-auber-sprint0.png)
 
@@ -265,6 +271,10 @@ On Auber, a route has been added to the VPN network via the internal interface A
    
    - Declare a dynamic route on Paris to instruct it to route via the VPN tunnel to reach the LAN network of Tokyo:
    ```route 172.20.10.0 255.255.255.240```
+
+**Proof/Result** : 
+On Paris, a route has been added to the Tokyo LAN via the tunnel.
+[Routing Table Paris](../assets/verifs/routing-table-paris-sprint0.png)
 
 ---
 
