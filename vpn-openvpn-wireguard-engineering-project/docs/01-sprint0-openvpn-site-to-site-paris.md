@@ -57,6 +57,7 @@ Only the directives relevant to the architecture are documented here:
   Allows VPN clients to communicate with each other.
 
 ---
+
 ### Key OpenVPN Directives (Clients)
 
 - `remote 88.162.141.79 32768`  
@@ -67,6 +68,8 @@ Only the directives relevant to the architecture are documented here:
   
 - `ca`, `cert`, `key`, `tls-client`
   Client TLS authentication using the PKI created in this sprint.
+
+---
 
 ### Static VPN IP Assignment (CCD)
 
@@ -79,7 +82,7 @@ To ensure the persistence of routing rules, each client is assigned a static IP 
     File `/etc/openvpn/ccd/client-NY`: `ifconfig-push 10.9.1.3 255.255.255.0`
 
 
-##  Routing Configuration
+## 4. Routing Configuration
 
 ###  Server Push Routes
 ```
@@ -115,7 +118,7 @@ See the [Troubleshooting – Missing iroute](##troubleshooting--missing-iroute) 
 ### Routing on Auber
 Contains the return route 10.9.1.0/24 via 192.168.100.200 on interface enp0s8.
     
-## 4. NAT and Perimeter Security
+## 5. NAT and Perimeter Security
 To enable remote offices (Client Tokyo and NY) to initiate a connection to the central server located behind a home router, a port forwarding rule and local firewall settings have been configured on Paris site.
 
 **Port Forwarding (home router)**
@@ -128,7 +131,7 @@ To enable remote offices (Client Tokyo and NY) to initiate a connection to the c
 ufw allow 1194/udp
 ```
 
-## 5. Starting OpenVPN Services </h2>
+## 6. Starting OpenVPN Services </h2>
 The configuration files are stored in the root folder `configs/openvpn/`. 
 
 They are loaded by:
@@ -143,7 +146,7 @@ systemctl start openvpn@client-tokyo-parismont
 systemctl start openvpn@client-NY-parismont
 ```
 
-## 6. Validation  / Connectivity - Cahier de Recette & Validation Générale (Matrice de Tests)
+## 7. Validation  / Connectivity - Cahier de Recette & Validation Générale (Matrice de Tests)
 
 <!-- Copie-colle le résultat du ping réussi sur la liaison inter-serveurs (192.168.100.200 <-> 192.168.100.210) et les pings des clients vers internet.
 Le tableau suivant fait office de procès-verbal de validation de bon fonctionnement pour le livrable du Sprint 0 ?
@@ -202,7 +205,7 @@ Here is a summary of the process that happen :
 10.9.1.0/24
 -->
 
-##7.Troubleshooting & Fixes
+## 8.Troubleshooting & Fixes
 During the acceptance testing phase, several issues of ping were identified and resolved.
 
 ---
