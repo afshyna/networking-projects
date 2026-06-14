@@ -1,4 +1,4 @@
-<h1> 🏁 Sprint 0 - OpenVPN site-to-site with Paris server and Tokyo/New-York clients </h1>
+<h1> 🏁 Sprint 0 - OpenVPN site-to-site with Paris server and Tokyo/NY clients </h1>
 
 ## Objectives
 
@@ -29,15 +29,44 @@ The full PKI setup (CA creation, key generation, certificate signing, installati
 
 [Authentication via SSL/TLS certificates](pki-certificate-authentication.md)
 
-## 3. OpenVPN Configuration 
+## 🔧 3. OpenVPN Configuration 
 
-### Configuration of VPN Paris Server
+Full configuration files are available in the `configs/openvpn/` directory.
+
+Only the directives relevant to the architecture are documented here:
+
+### Key OpenVPN Directives (Server)
+
+- `server 10.9.1.0 255.255.255.0`  
+  Defines the VPN tunnel network, that will be used by server/client(s)
+
+- `client-config-dir /etc/openvpn/ccd`  
+  Enables per-client static IP assignment and iroute.
+[View more details in the "Static VPN IP Assignment (CCD)" part](####-Static-VPN-IP-Assignment-(CCD)) 
+
+- `push "route 192.168.1.0 255.255.255.0"`  
+  Allows clients to reach the LAN behind Paris.
+
+- `route 172.20.10.0 255.255.255.240`  
+  Ensures Paris routes traffic to the Tokyo/NY LAN via the VPN.
+
+- `ca`, `cert`, `key`, `dh`, `tls-server`  
+  Server TLS authentication using the PKI created in this sprint.
+  
+- `client-to-client`
+  Allows VPN clients to communicate with each other.
 
 ---
+### Key OpenVPN Directives (Clients)
 
-### Configuration of VPN Tokyo/NY Clients  
+- `remote 88.162.141.79 32768`  
+  Connection to the Server (WAN/Public IP and port of Paris VPN server)
 
----
+- `client`
+  Indicates that this configuration is for a OpenVPN client
+  
+- `ca`, `cert`, `key`, `tls-client`
+  Client TLS authentication using the PKI created in this sprint.
 
 ### Static VPN IP Assignment (CCD)
 
@@ -51,38 +80,40 @@ To ensure the persistence of routing rules, each client is assigned a static IP 
 
 
 ##  Routing Configuration
-<!--
-### Local Routes
-    route LAN/MASK via tunX
-    Why local routes are needed
--->
 
 ###  Server Push Routes
-`push "route 192.168.1.0 255.255.255.0"`
+```
+push "route 192.168.1.0 255.255.255.0"
+push "route 192.168.100.0 255.255.255.0"
+push "route 172.20.10.0 255.255.255.240"
+```
 
-`push "route 192.168.100.0 255.255.255.0"`
-
-`push "route 172.20.10.0 255.255.255.240"`
-
-Goal : Clients (Tokyo/NY) dynamically receive the following routes via push the routes : 
-- `192.168.1.0/24`
-- `192.168.100.0/24`
-- `172.20.10.0/24`
+**Goal**: Clients (Tokyo/NY) dynamically receive these routes when connecting to the VPN server.
 
 ### iroute (OpenVPN Internal Routing Table)
-      (Cite the document: “OpenVPN a 2 tables de routage”)
-          Why iroute is mandatory
-          Difference between Linux routing table vs OpenVPN routing table
-          CCD entries:
-              iroute 172.20.10.3 255.255.255.255
-              iroute 172.20.10.4 255.255.255.255
+To ensure that the OpenVPN server correctly forwards traffic to the right client, each remote LAN must be explicitly mapped to the corresponding client certificate using CCD (Client‑Config‑Dir) entries:
+```
+ iroute 172.20.10.3 255.255.255.255
+ iroute 172.20.10.4 255.255.255.255
+```
 
-Goal : Server receive the system route `172.20.10.0/255.255.255.240 dev tun0`
+**Key Concept of OpenVPN**: 
+
+OpenVPN, when operating in multi‑client mode, implements its own software switching layer. This means it uses two routing tables:
+- Linux kernel routing table → decides which interface (tun0) the packet should use
+- OpenVPN internal routing table (iroute) → decides which client the packet must be delivered to
+
+**Why iroute is mandatory**: 
+
+Even if the Linux kernel knows that a client subnet (ex : 172.20.10.0/28) must be sent through tun0, the OpenVPN daemon still needs to know which client owns this subnet.
+Without an iroute entry, Linux forwards the packet to tun0 & OpenVPN receives the packet. But OpenVPN does not know which encrypted tunnel corresponds to the subnet  specified. In result, OpenVPN silently drops the packet 
+This is exactly what happens when Paris tries to ping Tokyo using its LAN IP (172.20.10.3) without iroute.
+See the [Troubleshooting – Missing iroute](##troubleshooting--missing-iroute) section for details.
+
+**Goal** : Server receive the system route `172.20.10.0/28 dev tun0`
 
 ### Routing on Auber
-
 Contains the return route 10.9.1.0/24 via 192.168.100.200 on interface enp0s8.
-[Know Why Auber must know 10.9.1.0/24](##7.Troubleshooting-&-Fixes) 
     
 ## 4. NAT and Perimeter Security
 To enable remote offices (Client Tokyo and NY) to initiate a connection to the central server located behind a home router, a port forwarding rule and local firewall settings have been configured on Paris site.
@@ -223,7 +254,6 @@ On Auber, a route has been added to the VPN network via the internal interface A
 
 - **Causes** :
    - *Analysis & Key Concept of OpenVPN*: OpenVPN in multi-client mode manages its own software switching architecture. The Linux kernel forwards the packet to OpenVPN via tun0, but the OpenVPN application does not know which encrypted tunnel (which client certificate) the `172.20.10.0/28` subnet is attached to. The lack of software mapping results that OpenVPN silently drop the paquet.
-   So, there exist a general routing via the kernel Linux and an internal routing via OpenVPN.
    - Paris does not know where to route responses to the `172.20.10.0/24` LAN network (not route to this network in its table routing) so it is sending packets to its default internet gateway.
 
 - **Solutions**: Declare the iroute directive in the specific CCD entry for each client on the Paris server:
