@@ -91,9 +91,10 @@ Each VPN gateway has been configured to establish the tunnel securely. Below are
 
 <h3> 1. Authentication via PSK   </h3>
 First implementation of IPsec tunnel with pre-shared key (PSK)
+
 - definition the authentication method of strongswan with the option `authby=psk`
 - Definition of the PSK value in the `/etc/ipsec.secrets`
-    Format : `@IP-local-leftid    @IP-local-rightid : PSK "key-value"`
+    Format : `@IP-local-leftid @IP-local-rightid : PSK "key-value"`
 
 <h3> 2. PKI / Certificate‑Based Authentication (recommanded & used here) </h3>
 
@@ -153,8 +154,8 @@ To allow the IKEv2 tunnel to establish across public Internet connections (behin
 
 On both GW-A and GW-B, we must allow IKE and NAT-Traversal traffic. 
 ```console
-# ufw allow 500/udp
-# ufw allow 4500/udp
+ufw allow 500/udp
+ufw allow 4500/udp
 ```
 
 <h3> Port Forwarding (NAT-Traversal) </h3>
