@@ -148,14 +148,13 @@ systemctl start openvpn@client-NY-parismont
 
 ## 6. Validation  / Connectivity - Cahier de Recette & Validation Générale (Matrice de Tests)
 
-<!-- Copie-colle le résultat du ping réussi sur la liaison inter-serveurs (192.168.100.200 <-> 192.168.100.210) et les pings des clients vers internet.
-Le tableau suivant fait office de procès-verbal de validation de bon fonctionnement pour le livrable du Sprint 0 ?
--->
-
+Note : in the wireshark captures, the VPN IP of Tokyo client is seen as `10.9.1.6` but we have changed it after by `10.9.1.2`.
+ le résultat du ping réussi sur la liaison inter-serveurs (192.168.100.200 <-> 192.168.100.210) et les pings des clients vers internet.
+ 
 ### Ping Tests - Tunnel Connectivity ✅
 - Tokyo → VPN Server Paris (@IP `10.9.1.1`)
 [Ping_OK_Tokyo-Paris-VPN](../assets/verifs/ping-tokyo-to-paris-VPN.png)
-[Wireshark-tokyo-Paris-VPN](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png)
+[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png)
 
 Here is a summary of the process that happen : 
 1. When Tokyo sends a ping to `10.9.1.1`, OpenVPN encapsulates it in an encrypted tunnel and sends it to the WAN IP of VPN Paris Server (`88.162.141.79:32768`).
@@ -173,11 +172,11 @@ Here is a summary of the process that happen :
 ### Ping Tests - LAN Access (Paris/Auber) ✅
 - Tokyo → Server Paris LAN (@IP `192.168.1.197`)
 [Ping_OK_Tokyo-Paris-LAN](../assets/verifs/ping-tokyo-paris-lan-ok.png)
-[Capture-Wireshark-tokyo-Paris-LAN](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-LAN.png)
+[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-LAN.png)
 
-- Tokyo → Backup site (intrnal @IP `192.168.100.210`)
-[Ping_OK_Tokyo-Paris-VPN](../assets/verifs/ping-tokyo-internal-lan-auber-ok.png)
-[Capture-Wireshark-tokyo-to-auber-internal-LAN](../assets/wireshark/openvpn_icmp_ping-tokyo-to-auber-internal-IP-192.168.100.210.png)
+- Tokyo → Backup site (internal @IP `192.168.100.210`)
+[Ping_OK_Tokyo-Auber-internal-LAN](../assets/verifs/ping-tokyo-internal-lan-auber-ok.png)
+[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-auber-internal-IP-192.168.100.210.png)
 
  
 - Server Paris → Tokyo (`172.20.10.3`)
@@ -185,7 +184,7 @@ Here is a summary of the process that happen :
 
 - Backup site Auber → Tokyo (`172.20.10.3`)
 [Ping_OK_Auber-Tokyo-LAN](../assets/verifs/ping-auber-tokyo-lan-ok.png)
-[Capture-Wireshark-auber-to-tokyo-vpn](../assets/wireshark/openvpn_icmp_ping-auber-to-tokyo-VPN.png)
+[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-auber-to-tokyo-VPN.png)
 ---
  <!--
 ### HTTP Test / HTTP connectivity  via tunnel for Validation Applicative  & Franchissement Filtrage ✅
