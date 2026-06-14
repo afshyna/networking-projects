@@ -42,7 +42,7 @@ Technical note: The `openssl-vpn.cnf` file has been edited to change the variabl
 Generate a certificate for the CA and self-sign it.
 <pre><code> openssl req -nodes -new -x509 -keyout cakey.pem -out cacert.pem -days 365 -config openssl-vpn.cnf  </code></pre>
 
-(Paramètres renseignés : C=FR, ST=IDF, L=Paris, O=MyVPN-Project, OU=IT-Security, CN=myvpn-ca)
+- CA identity fields (Paramètres renseignés) : `C=FR, ST=IDF, L=Paris, O=MyVPN-Project, OU=IT-Security, CN=myvpn-ca`
 
  <h2> Step 2 - Generation and signing of certificate requests Servers and Clients  </h2>
 
