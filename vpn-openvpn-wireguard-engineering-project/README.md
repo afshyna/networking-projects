@@ -52,6 +52,20 @@ Brief description of the main folders.
    - `verifs/` :  Captures des tests de ping/http
 - `scripts/`:  Failover, tests, monitoring
 
+
+
+## Structure of sprint.md file
+
+The structure of each 0Y-sprintX.md file in /docs is : 
+- Sprint objective
+- Architecture
+- Configurations
+- Tests carried out
+- Results obtained
+- Troubleshooting (local) / Problems encountered in this specific sprint  & Solution implemented
+
+
+
 ## Procédure de déploiement (How-to)
 <!--
 Donne les commandes clés pour que quelqu'un puisse reproduire ton infrastructure :
@@ -78,13 +92,16 @@ Explique précisément comment tu as sécurisé le Cas 3.
 Summary of tests performed (ping, traceroute, HTTP via tunnel), location of traces, and how to reproduce them.
 
 
-<h2>  🛠 Troubleshooting & Debugging </h2>
+##  Troubleshooting & Debugging 
 
-A complete troubleshooting guide (routing issues, NAT, MTU, OpenVPN logs, WireGuard handshake, failover debugging, etc.) is available here:
+A local troubleshooting is available here:
+➡️ [Troubleshooting Sprint 0](docs/01-sprint0-openvpn-site-to-site-paris.md)
+➡️ [Troubleshooting Sprint 1](docs/02-sprint1-backup-openvpn-site-auber.md)
+➡️ [Troubleshooting Sprint 2](docs/03-sprint2-failover-automation.md)
+➡️ [Troubleshooting Sprint 3](docs/04-sprint3-wireguard-nomade.md)
 
+A more general troubleshooting guide (routing issues, NAT, MTU, OpenVPN logs, WireGuard handshake, failover debugging, etc.) is available here:
 ➡️ [Troubleshooting Guide](docs/troubleshooting.md)
-
-
 
 <h2> Achievements & Realizations : </h2>
 
