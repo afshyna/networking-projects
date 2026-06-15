@@ -1,10 +1,8 @@
-<h1> 🏁 Sprint 2 : WireGuard Remote Access VPN with VPN connection from nomade host (PC) to the central site (VPN server Paris)c </h1>
+<h1> 🏁 Sprint 3 : WireGuard Remote Access VPN with VPN connection from nomade host (PC) to the central site (VPN server Paris) </h1>
 
 
-## Sprint Objective
-
+## Sprint Objectives
 - Configurer l’accès distant via WireGuard.
-
 
 ## Configurations
 
