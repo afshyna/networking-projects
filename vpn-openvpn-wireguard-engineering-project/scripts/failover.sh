@@ -7,7 +7,6 @@ TARGET_IP="10.9.2.2"
 ping -c 1 -W 1 $TARGET_IP > /dev/null
 
 if [ $? -eq 0 ]; then
-	# Tunnel VPN de secours est UP : route vers le serveur VPN de secours utilisé
     # Backup tunnel is UP -> Route traffic directly via local tun0 (VPN backup server used)
 	ip route replace 172.20.10.0/28 via 10.9.2.2 dev tun0
 else
