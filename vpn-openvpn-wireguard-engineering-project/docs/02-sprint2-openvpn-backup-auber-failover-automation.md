@@ -69,12 +69,16 @@ push "route 192.168.100.0 255.255.255.0"
 - Declare also a dynamic route on Paris to instruct it  to reach the primary VPN subnet by routing via its internal interface with Paris, when the Paris tunnel VPN will be UP againt
 `route 10.9.1.0 255.255.255.0 192.168.100.200`
 
-### Primary Server Route (OpenVPN file configuration)
-- On Paris, make an adjustment on the dynamic route to the LAN network of Tokyo (configured in Step 1) by adding the VPN as gateway and assigning the route  metric 10.
-`route 172.20.10.0 255.255.255.240` --> `route 172.20.10.0 255.255.255.240  vpn_gateway 10`
+### Paris Server Route 
+- Make an adjustment on the dynamic route to the LAN network of Tokyo (configured in Step 1) by adding the VPN as gateway and assigning the route  metric 10 in the paris server configuration file.
+`route 172.20.10.0 255.255.255.240` --> `route 172.20.10.0 255.255.255.240 vpn_gateway 10`
 
-- Moreover, add a new route to the backup VPN subnet with its internal interface with Auber as gateway.
+- Add the same route with a higher metric, manually on the console.
+`ip route add 172.20.10.0/28 via 192.168.100.210 dev enp0s8 metric 100`
+  
+<!--- Moreover, add a new route to the backup VPN subnet with its internal interface with Auber as gateway.
   `route 10.9.2.0/24 via 192.168.100.210 dev enp0s8`
+-->
 
 ### On Aubervilliers (Backup)
 - Add routes to remote LANs via Paris when primary tunnel is UP.
@@ -149,55 +153,51 @@ sudo crontab -e
 To stop the Paris primary server, terminate the OpenVPN active processes, shut down the system, and prevent any unexpected reboots:
 
 ```console
-# Kill du processus OpenVPN:
+# Kill the OpenVPN process:
 pkill openvpn
 
-# Arrêt du service:
+# Service suspension:
 systemctl stop openvpn@server-parismont
 
-# Désactivation du redémarrage automatique:
+# Disabling automatic restart:
 systemctl disable openvpn@server-parismont
 ```
 ---
 
-### Analyse Post-Panne : Impacts Système & Réseau
-As soon as the main tunnel 10.9.1.0/24 is disconnected, the following network and system changes are triggered transparently.
+### Post-Failure Analysis: System and Network Impacts
+As soon as the main tunnel `10.9.1.0/24` is disconnected, the following network and system changes are triggered transparently.
 
 **Dynamic Behaviour of VPN Clients (Tokyo / NY)**
-- Route Loss: The virtual IP addresses associated with the main tunnel (10.9.1.1 & 10.9.1.2) are immediately flushed from the local tun0 interface.
+- Route Loss: The virtual IP addresses associated with the main tunnel (1`0.9.1.1` & `10.9.1.2`) are immediately flushed from the local tun0 interface.
 - Retry & Failover Algorithm: - The client detects a timeout on port 1194.
   - The multi-remote implementation of the client configuration file is executed.
   - Clients switch to the Aubervilliers failover server (Port 1195).
-  - After approximately 60 seconds, the failover tunnel is established: a new virtual IP from the 10.9.2.0/24 range is assigned to the tun0 interface.
+  - After approximately 60 seconds, the failover tunnel is established: a new virtual IP from the `10.9.2.0/24` range is assigned to the tun0 interface.
 
 📊 Progressive Changes to Routing Tables
-- VPN Clients: The default gateway for the 10.9.1.X tunnel has been replaced by the IP address of the 10.9.2.X failover interface. Clients switch to Auber (10.9.2.1) via port remote 32769.
+- VPN Clients: The default gateway for the `10.9.1.X` tunnel has been replaced by the IP address of the `10.9.2.X` failover interface. Clients switch to Auber (10.9.2.1) via port remote 32769.
 
-- Paris Server: Complete disappearance of dynamic routes linked to the main tunnel (10.9.1.0/24). Manually injected routes remain present.
+- Paris Server: Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24`). Manually injected routes remain present.
 
-- Aubervilliers Server: The backup tunnel 10.9.2.0/24 is fully active so auber updates its route to Tokyo/NY via 10.9.2.0/24.
-💡 Advanced behaviour in Aubervilliers: As soon as the failover tunnel becomes active, the monitoring script (run via crontab) detects the client’s presence. The route to the branch’s LAN subnet (e.g. 172.20.10.0/28) is dynamically rewritten to pass through its own VPN tunnel: 172.20.10.0/28 via 10.9.2.1 metric 20.
+- Aubervilliers Server: The backup tunnel `10.9.2.0/24` is fully active so auber updates its route to Tokyo/NY via `10.9.2.0/24`.
+  As soon as the failover tunnel becomes active, the monitoring script (run via crontab) detects the client’s presence. The route to the Tokyo/NY LAN subnet (e.g. `172.20.10.0/28`) is dynamically rewritten to pass through its own VPN tunnel: `172.20.10.0/28 via 10.9.2.1`
 
 
-##  Validation des flux - Vérification des routes
+##  Flow validation - Route verification
 
-Clients VPN
-Avant :
-192.168.100.0/24 via 10.9.1.1
+**VPN Clients**
+Before : `192.168.100.0/24 via 10.9.1.1` | `192.168.1.0/24 via 10.9.1.1`
+After : `192.168.100.0/24 via 10.9.2.1` | `192.168.1.0/24 via 10.9.2.1`
+[Routing Table Client Tokyo](../assets/verifs/routing-table-tokyo-apres-failover-paris.png)
 
-Après :
-192.168.100.0/24 via 10.9.2.1
+**Serveur Paris**
+The `10.9.1.0/24` network and the subnet `172.20.10.0/28` via the Paris VPN tunnel have disappeared.
+The static routes to the Tokyo subnet  remain in place : `172.20.10.0/28 via 192.168.100.210`
+[Routing Table Paris](../assets/verifs/routing-table-paris-apres-failover-paris.png)
 
-Serveur Paris
-Le réseau 10.9.1.0/2 a disparu.
-Les routes statiques restent présentes.
-
-Serveur Aubervilliers
+**Serveur Aubervilliers**
 Toutes les routes restent présentes.
-
-Après exécution du sript :
-172.20.10.0/28 via 10.9.2.2 remplace 172.20.10.0/28 via 192.168.100.200
-
+[Routing Table Auber](../assets/verifs/routing-table-paris-apres-failover-paris.png)
 
 ### When Paris Comes Back
     Clients reconnect to Paris (first remote).
