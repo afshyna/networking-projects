@@ -17,14 +17,16 @@
 - Primary tunnel: `10.9.1.0/24` (Paris)
 - Backup tunnel: `10.9.2.0/24` (Auber)
 
-## 1. Server Configuration on Aubervilliers site
+## 1. OpenVPN Configuration
+
 Only the directives relevant to the architecture are documented here:
 
-### Key OpenVPN Directives
+### Backup VPN Server (Auber) - Key OpenVPN Directives
 - `server 10.9.9.0 255.255.255.0` - Defines the backup VPN tunnel network, that will be used by server/client(s)
 
 - `client-config-dir /etc/openvpn/ccd` - Enables per-client static IP assignment and iroute.
-[View more details in the "Static VPN IP Assignment (CCD)" part](####-Static-VPN-IP-Assignment-(CCD)) 
+[View more details in the "Static VPN IP Assignment (CCD)" part](###CDD) 
+
 - `client-to-client` - Allows VPN clients to communicate with each other.
 
 - `port 1195` - server listenning port
@@ -32,7 +34,18 @@ Only the directives relevant to the architecture are documented here:
 - `ca`, `cert`, `key`, - `dh`, - `tls-server` : TLS authentication
 
  - `push ...`,  `route add...`
-[View more details in the "Static VPN IP Assignment (CCD)" part](####-Static-VPN-IP-Assignment-(CCD)) 
+[View more details about the routing directives](####3.-Routing-Configuration-&-Adjustements 
+
+### Client Configuration for Multi‑Server Failover - Key OpenVPN Directives
+
+On both clients, add a 2nd directives with remote, for the VPN connection with the backup server
+
+```text
+# Backup Server VPN (Auber)
+remote 88.162.141.79 32769
+```
+
+## 3. Routing Configuration & Adjustements
 
 ### CCD
 OpenVPN must know which client owns which LAN, otherwise packets are dropped.
@@ -41,36 +54,27 @@ To ensure that the Aubervilliers backup server can properly handle routing back 
 > 📑 **Architectural Reference:** The mechanics of OpenVPN's internal routing engine, directory bindings, and the critical role of the `iroute` directive are detailed in the primary site's documentation.
 See [Sprint 0: Paris Routing & CCD Configuration](01-sprint0-openvpn-site-to-site-paris.md#iroute-openvpn-internal-routing-table--static-vpn-ip-assignment-ccd).
 
-### Routing Constraints
-By default, the backup server is unaware of the subnets behind the clients:
-- Tokyo/NY LAN → `172.20.10.0/28`
+###  Backup Server Push Routes  (OpenVPN file configuration)
+Clients (Tokyo/NY) will dynamically receive these routes when connecting to the backup VPN server.
 
-## 3. Paris (Primary) Configuration : Routing Adjustments
-
-To maintain symmetric routing and seamless traffic flow, routing adjustments are required on both primary and backup nodes.
-Modify the dynamic route to reach the LAN network of Tokyo (172.20.10.0/24) (configured in Step 1) and add it the VPN as gateway and assigne the metric 10.
-``` text
-route 172.20.10.0 255.255.255.240 --> route 172.20.10.0 255.255.255.240  vpn_gateway 10
-```
-
-- Metric 10 : 
-
-Add or verify routes
-
-*Method 1 : add dynamically routes in the conf file :*
 ```text
-# Route de secours vers le réseau LAN des clients VPN
-route 172.20.10.0 255.255.255.240 192.168.100.210 100
-
-# Route vers le tunnel VPN de secours
-route 10.9.2.0 255.255.255.0 192.168.100.210
+push "route 192.168.1.0 255.255.255.0"
+push "route 192.168.100.0 255.255.255.0"
 ```
 
-*Method 2 : add routes statically, in command line*
-```console
-ip route add 10.9.2.0/24 via 192.168.100.210 dev enp0s8
-ip route add 172.20.10.0/28 via 192.168.100.210 dev enp0s8 metric 100
-```
+### Backup Server route  (OpenVPN file configuration)
+- Declare a dynamic route on Paris to instruct it  to reach the Tokyo/NY LAN network by routing via the VPN tunnel: 
+`route 172.20.10.0 255.255.255.240`
+
+- Declare also a dynamic route on Paris to instruct it  to reach the primary VPN subnet by routing via its internal interface with Paris, when the Paris tunnel VPN will be UP againt
+`route 10.9.1.0 255.255.255.0 192.168.100.200`
+
+### Primary Server Route (OpenVPN file configuration)
+- On Paris, make an adjustment on the dynamic route to the LAN network of Tokyo (configured in Step 1) by adding the VPN as gateway and assigning the route  metric 10.
+`route 172.20.10.0 255.255.255.240` --> `route 172.20.10.0 255.255.255.240  vpn_gateway 10`
+
+- Moreover, add a new route to the backup VPN subnet with its internal interface with Auber as gateway.
+  `route 10.9.2.0/24 via 192.168.100.210 dev enp0s8`
 
 ### On Aubervilliers (Backup)
 - Add routes to remote LANs via Paris when primary tunnel is UP.
@@ -82,28 +86,13 @@ See [4. Automated Failover Script on Backup Server (Aubervilliers)](##-Automated
 - Required for return traffic when clients are still connected to Paris.
 - See Troubleshooting – Return Path Issues.
 
+### Paris Server  (primary)
+
 ### CCD Files
 
 1. Create CCD entries for both clients (Tokyo & NY).
 2. Add iroute entries to map each remote LAN to the correct client.
 
-## 2. Client Configuration for Multi‑Server Failover
-
-### Configuration Enhancements
-
-Add the following directives to the client configuration :
-
-```text
-# Primary Server VPN (Paris)
-remote 88.162.141.79 32768
-
-# Backup Server VPN (Auber)
-remote 88.162.141.79 32769
-
-# Connection Parameters for Fast Failover**
-- resolv-retry infinite
-- keepalive 5 30
-```
 
 ## Port Forwarding for Backup VPN
 Traffic coming from the public internet through the edge router (home/box router at Paris) is segregated using port-based forwarding:
