@@ -34,7 +34,7 @@ Only the directives relevant to the architecture are documented here:
 - `ca`, `cert`, `key`, - `dh`, - `tls-server` : TLS authentication
 
  - `push ...`,  `route add...`
-[View more details about the routing directives](####3.-Routing-Configuration-&-Adjustements 
+[View more details about the routing directives](####3.-Routing-Configuration-&-Adjustements)
 
 ### Client Configuration for Multi‑Server Failover - Key OpenVPN Directives
 
@@ -168,65 +168,58 @@ systemctl disable openvpn@server-parismont
 As soon as the main tunnel `10.9.1.0/24` is disconnected, the following network and system changes are triggered transparently.
 
 **Dynamic Behaviour of VPN Clients (Tokyo / NY)**
-- Route Loss: The virtual IP addresses associated with the main tunnel (1`0.9.1.1` & `10.9.1.2`) are immediately flushed from the local tun0 interface.
+- Route Loss: The virtual IP addresses associated with the main tunnel (`10.9.1.1` & `10.9.1.2`) are immediately flushed from the local tun0 interface.
 - Retry & Failover Algorithm: - The client detects a timeout on port 1194.
   - The multi-remote implementation of the client configuration file is executed.
   - Clients switch to the Aubervilliers failover server (Port 1195).
   - After approximately 60 seconds, the failover tunnel is established: a new virtual IP from the `10.9.2.0/24` range is assigned to the tun0 interface.
 
-📊 Progressive Changes to Routing Tables
-- VPN Clients: The default gateway for the `10.9.1.X` tunnel has been replaced by the IP address of the `10.9.2.X` failover interface. Clients switch to Auber (10.9.2.1) via port remote 32769.
-
-- Paris Server: Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24`). Manually injected routes remain present.
-
-- Aubervilliers Server: The backup tunnel `10.9.2.0/24` is fully active so auber updates its route to Tokyo/NY via `10.9.2.0/24`.
-  As soon as the failover tunnel becomes active, the monitoring script (run via crontab) detects the client’s presence. The route to the Tokyo/NY LAN subnet (e.g. `172.20.10.0/28`) is dynamically rewritten to pass through its own VPN tunnel: `172.20.10.0/28 via 10.9.2.1`
-
-
-##  Flow validation - Route verification
+##  Progressive Changes to Routing Tables - Flow validation & Route verification
 
 **VPN Clients**
-Before : `192.168.100.0/24 via 10.9.1.1` | `192.168.1.0/24 via 10.9.1.1`
-After : `192.168.100.0/24 via 10.9.2.1` | `192.168.1.0/24 via 10.9.2.1`
-[Routing Table Client Tokyo](../assets/verifs/routing-table-tokyo-apres-failover-paris.png)
+ The default gateway for the `10.9.1.X` tunnel has been replaced by the IP address of the `10.9.2.X` failover interface. Clients switch to Auber (10.9.2.1) via port remote 32769.
+- Before : `192.168.100.0/24 via 10.9.1.1` | `192.168.1.0/24 via 10.9.1.1`
+- After : `192.168.100.0/24 via 10.9.2.1` | `192.168.1.0/24 via 10.9.2.1`
 
-**Serveur Paris**
-The `10.9.1.0/24` network and the subnet `172.20.10.0/28` via the Paris VPN tunnel have disappeared.
-The static routes to the Tokyo subnet  remain in place : `172.20.10.0/28 via 192.168.100.210`
-[Routing Table Paris](../assets/verifs/routing-table-paris-apres-failover-paris.png)
+  [Routing Table Tokyo Before failover](../assets/verifs/routing-table-tokyo-sprint2-before-failover.png)
+  
+  [Routing Table Tokyo After failover](../assets/verifs/routing-table-tokyo-sprint2-after-failover.png)
 
-**Serveur Aubervilliers**
-Toutes les routes restent présentes.
-[Routing Table Auber](../assets/verifs/routing-table-paris-apres-failover-paris.png)
+**Server Paris**
+Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24`).
+- The `10.9.1.0/24` network and the subnet `172.20.10.0/28` via the Paris VPN tunnel have disappeared.
+- The static routes to the Tokyo subnet (that has been manually injected) remain in place : `172.20.10.0/28 via 192.168.100.210`
+
+  [Routing Table Paris Before failover](../assets/verifs/routing-table-paris-sprint2-before-failover.png)
+  
+  [Routing Table Paris After failover](../assets/verifs/routing-table-paris-sprint2-after-failover.png)
+
+**Server Aubervilliers**
+- All roads remain in place.
+- Aubervilliers Server: The backup tunnel `10.9.2.0/24` is fully active so auber updates its route to Tokyo/NY via `10.9.2.0/24`.
+  As soon as the failover tunnel becomes active, the monitoring script (run via crontab) detects the client’s presence. The route to the Tokyo/NY LAN subnet (e.g. `172.20.10.0/28`) is dynamically rewritten to pass through its own VPN tunnel: `172.20.10.0/28 via 10.9.2.1`
+  
+  [Routing Table Auber Before failover](../assets/verifs/routing-table-auber-sprint2-before-failover.png)
+  
+  [Routing Table Auber After failover](../assets/verifs/routing-table-auber-sprint2-after-failover.png)
 
 ### When Paris Comes Back
-    Clients reconnect to Paris (first remote).
-    Auber restores the primary route.
+- Clients reconnect to Paris (first remote).
+- Auber restores the primary route.
 
-### Validation Opération 1 - Analyse du basculement vers Aubervillier
+### Validation of Operation 1 – Analysis of the switch to Aubervillier
+- Ping 	✅ Tokyo → Aubervilliers (192.168.1.160, 192.168.100.210, 10.9.2.1)  
+Traffic is now routed through the backup VPN tunnel.
 
-Tokyo → Aubervilliers
-192.168.1.160	✅
-192.168.100.210	✅
-10.9.2.1	✅
-Le trafic passe désormais par le tunnel VPN de secours.
+- Ping 	✅ Tokyo → Paris (192.168.100.200)
+Analysis: Paris remains accessible via the local link between the two servers.
 
-Tokyo → Paris
-192.168.100.200	✅
-Analyse
-Paris reste joignable via le lien local entre les deux serveurs.
+- Ping 	✅ Aubervilliers → Tokyo (172.20.10.3	✅, 10.9.1.2	❌)
+Explanation: The main VPN network no longer exists.
 
-Aubervilliers → Tokyo
-172.20.10.3	✅
-10.9.1.2	❌
-Explication
-Le réseau VPN principal n'existe plus.
+- Ping 	✅ Paris → Tokyo(172.20.10.3	✅, 10.9.1.2	❌)
+Explanation: The main VPN network no longer exists.
 
-Paris → Tokyo
-172.20.10.3	✅
-10.9.1.2	❌
-Explication
-Le tunnel 10.9.1.0/24 est arrêté.
 
 ## Troubleshooting
 Temps de bascule supérieur à 1 minute
@@ -266,32 +259,9 @@ Wrong route metrics
     See Troubleshooting – Failover Script
 
 -->
-    
-<!--
-Dans le README.md :
-Section de validation de l'Opération 1 & 2 (Pings croisés vers l'infrastructure de secours).
-
-Organize-le par opérations :
-Opération 1 & 2 : Comptes rendus des Pings. 
-Explique le cas technique spécifique : Pourquoi le ping depuis Tokyo vers l'interface ETH2 d'Aubervilliers (192.168.100.210) a nécessité l'activation du forwarding IP et l'ajout de routes spécifiques ou la modification des règles par défaut d'Oracle Cloud.
-
-Opération 3 (Recette technique) : Insère les captures ou les logs textuels des traceroute croisés (NY <-> Tokyo) et les captures de tes requêtes HTTP Apache/Nginx (curl http://10.9.1.1).
-Section Opération 3 : Preuves par curl / wget que les serveurs Web répondent également lorsque les clients interrogent l'IP du tunnel de secours (10.9.2.1).
 
 
-<!-- SIMULATION PANNES OPENVPN PARIS
-Ce dossier est purement axé sur la Cyber-résilience et la gestion des pannes.
-
-Décris le scénario d'attaque ou de panne : Simulation d'un crash de l'infrastructure principale via pkill openvpn sur Paris Montrouge.
-
- Analyse d'impact (Validation Opérations 1, 2, 3) : Documente le comportement des clients. Montre via tes traces Wireshark comment le trafic bascule vers le serveur d'Aubervilliers (10.9.2.1) pour maintenir l'accès aux ressources et aux requêtes HTTP, prouvant l'efficacité de ton plan de secours (PRA).
-
-## Contenu
-Captures Wireshark montrant :
-absence de réponses
-reroutage
-timeouts ICMP
--->
+Conclusion : My captures traces & the routing  table show how traffic is redirected to the Aubervilliers server (10.9.2.1) when paris server is shutdown to maintain access to resources and HTTP requests, demonstrating the effectiveness of my disaster recovery plan.
 
 
 
