@@ -1,4 +1,4 @@
-# 🏁 Sprint 1 :  Secondary OpenVPN Backup Site Deployment & Automated Network Failover 
+# 🏁 Sprint 2 :  Secondary OpenVPN Backup Site Deployment & Automated Network Failover 
 
 ## Sprint Objective
 - Deploy a secondary backup VPN server (Aubervilliers).
