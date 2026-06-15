@@ -83,6 +83,10 @@ push "route 172.20.10.0 255.255.255.240"
 ```
 
 **Goal**: Clients (Tokyo/NY) dynamically receive these routes when connecting to the VPN server.
+ 
+###  Server route 
+Declare a dynamic route on Paris to instruct it to route via the VPN tunnel to reach the LAN network of Tokyo: 
+```route 172.20.10.0 255.255.255.240```
 
 ### iroute (OpenVPN Internal Routing Table) & Static VPN IP Assignment (CCD)
 To ensure that the OpenVPN server correctly forwards traffic to the right client, each remote client  must be explicitly mapped to the corresponding client certificate (based on the Common Name (CN)) using CCD entries & is assigned a static IP address.
