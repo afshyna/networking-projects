@@ -288,6 +288,9 @@ On Paris, a route has been added to the Tokyo LAN via the tunnel.
 iptables -A FORWARD -i tun0 -o enp0s8 -j ACCEPT
 ```
 
+<!--
+---❌    Missing CCD entries
+-->
 
 *Note  : the anomalies are the same between Tokyo client and NY client so the troubleshooting is similar. (just replace the VPN/LAN IP of Tokyo IPs by the VPN/LAN IP of NY IPs on the configuration)*
 
