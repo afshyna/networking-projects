@@ -36,18 +36,18 @@ Only the directives relevant to the architecture are documented here:
 
 ### Key OpenVPN Directives (Server)
 
-- `server 10.9.1.0 255.255.255.0` - Defines the VPN tunnel network, that will be used by server/client(s)
+- `server 10.9.1.0 255.255.255.0` - Defines the primary VPN tunnel network, that will be used by server/client(s)
 
 - `client-config-dir /etc/openvpn/ccd` - Enables per-client static IP assignment and iroute.
 [View more details in the "Static VPN IP Assignment (CCD)" part](####-Static-VPN-IP-Assignment-(CCD)) 
 
-- `push "route 192.168.1.0 255.255.255.0"` - Allows clients to reach the LAN behind Paris.
-
-- `route 172.20.10.0 255.255.255.240` - Ensures Paris routes traffic to the Tokyo/NY LAN via the VPN.
-
 - `client-to-client` - Allows VPN clients to communicate with each other.
 
 - `port 1194` - server listenning port
+
+ - `push ...`
+ - `route add...`
+[View more details about the routing directives](####3.-Routing-Configuration) 
 
 **Server TLS authentication using the PKI created in this sprint.**
 - `ca` -  the CA certificate used to validate the server’s identity.
@@ -79,7 +79,6 @@ Only the directives relevant to the architecture are documented here:
 ```
 push "route 192.168.1.0 255.255.255.0"
 push "route 192.168.100.0 255.255.255.0"
-push "route 172.20.10.0 255.255.255.240"
 ```
 
 **Goal**: Clients (Tokyo/NY) dynamically receive these routes when connecting to the VPN server.
