@@ -41,9 +41,8 @@ Hybride On-Premise : Simulation réaliste derrière une Box Internet. Gestion du
 Brief description of the main folders.
 -  `docs/` : sprints with a README.md file/sprint, which will serve as a recipe book / test report to validate the procedures.
 - `01-sprint0-openvpn-site-to-site-paris.md`  : Détail step 1 - 
-- `02-sprint1-backup-openvpn-site-auber.md`  :Détail step 2 - 
-- `03-sprint2-failover-automation.md`:  Détail step 3 - Gestion des incidents (pkill)
-- `04-sprint3-wireguard-nomade.md`  : Détail step 4 - VPN nomade
+- `02-sprint1-backup-auber-openvpn-failover-automation.md` : Détail step 2 - 
+- `03-sprint3-wireguard-nomade.md`  : Détail step 3 - VPN nomade
 
 - `configs/` : files .conf of OpenVPN and Wireguard + files ccd
 - `diagrams/` : Schemas, exigences, topologies
@@ -58,13 +57,11 @@ Brief description of the main folders.
 
 The structure of each 0Y-sprintX.md file in /docs is : 
 - Sprint objective
-- Architecture
+- Architecture & Overview
 - Configurations
 - Tests carried out
 - Results obtained
-- Troubleshooting (local) / Problems encountered in this specific sprint  & Solution implemented
-
-
+- Troubleshooting : Problems encountered in this specific sprint and solution implemented
 
 ## Procédure de déploiement (How-to)
 <!--
@@ -96,9 +93,8 @@ Summary of tests performed (ping, traceroute, HTTP via tunnel), location of trac
 
 A local troubleshooting is available here:
 ➡️ [Troubleshooting Sprint 0](docs/01-sprint0-openvpn-site-to-site-paris.md)
-➡️ [Troubleshooting Sprint 1](docs/02-sprint1-backup-openvpn-site-auber.md)
-➡️ [Troubleshooting Sprint 2](docs/03-sprint2-failover-automation.md)
-➡️ [Troubleshooting Sprint 3](docs/04-sprint3-wireguard-nomade.md)
+➡️ [Troubleshooting Sprint 1](docs/02-sprint1-backup-auber-openvpn-failover-automation.md)
+➡️ [Troubleshooting Sprint 2](docs/04-sprint3-wireguard-nomade.md)
 
 A more general troubleshooting guide (routing issues, NAT, MTU, OpenVPN logs, WireGuard handshake, failover debugging, etc.) is available here:
 ➡️ [Troubleshooting Guide](docs/troubleshooting.md)
