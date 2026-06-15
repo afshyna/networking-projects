@@ -1,6 +1,6 @@
-<h1> 🏁 Sprint 0 - OpenVPN site-to-site with Paris server and Tokyo/NY clients </h1>
+<h1> 🏁 Sprint 1 - OpenVPN site-to-site with Paris server and Tokyo/NY clients </h1>
 
-## Objectives
+## Sprint Objectives
 
 The aim of this first sprint is to deploy the basic infrastructure for the VPN by setting a site-to-site OpenVPN tunnel between Tokyo/NY clients and the primary site (Paris Montrouge).
 
