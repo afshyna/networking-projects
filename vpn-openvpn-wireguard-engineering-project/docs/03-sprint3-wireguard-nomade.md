@@ -2,6 +2,7 @@
 
 
 ##  Sprint Objective
+
 - Configurer l’accès distant via WireGuard.
 - Deploy a modern, lightweight WireGuard VPN for remote users (nomad PC + smartphone).
 - Allow secure access to internal networks (Paris, Auber, Tokyo, NY).
@@ -13,189 +14,148 @@
 ##  Architecture Overview
 
 ### WireGuard Tunnel Network
-    WireGuard subnet: 10.9.3.0/2
-    Paris server: 10.9.3.1 (UDP/49151)
-    Auber server: 10.9.3.2 (UDP/49150)
-    Nomad PC: 10.9.3.100
-    Smartphone: 10.9.3.200
+- WireGuard subnet: 10.9.3.0/2
+- Paris server: 10.9.3.1 (UDP/49151)
+- Auber server: 10.9.3.2 (UDP/49150)
+-  Nomad PC: 10.9.3.100
+- Iphone : 10.9.3.200
 
 ### Physical Networks
-    Paris LAN: 192.168.1.0/24
-    Auber LAN: 192.168.100.0/24
-    Tokyo LAN: 172.20.10.0/28
-    NY LAN: 172.20.10.4/28
+- Paris LAN: 192.168.1.0/24
+- Auber LAN: 192.168.100.0/24
+- Tokyo/NY LAN: 172.20.10.0/28
 
 ### Remote Access Concept
-
 A “nomad client” is an external device (4G/5G, Wi‑Fi public, home network) with no direct access to Paris or Auber.
 All access must go through WireGuard.
 
 ## Key Generation & Server Configuration
+
 ### Paris Server
 
-    Generate private/public keys
-
-    Configure /etc/wireguard/wg0-paris.conf
-
-    Define peer: nomad PC
-
-    Set endpoint: 88.162.141.79:49151
+- Generate private/public keys
+- Configure /etc/wireguard/wg0-paris.conf
+- Define peer: nomad PC
+- Set endpoint: 88.162.141.79:49151
 
 ### Auber Server
 
-    Generate private/public keys
-
-    Configure /etc/wireguard/wg0-auber.conf
-
-    Define peer: nomad PC
-
-    Set endpoint: 88.162.141.79:49150
+- Generate private/public keys
+- Configure /etc/wireguard/wg0-paris.conf
+- Define peer: nomad PC
+- Set endpoint: 88.162.141.79:49150
 
 ## Nomad PC Configuration
+
 ### Key Generation
 
-    Generate private/public keys on the PC.
+- Generate private/public keys on the PC.
 
-### Client Config (Paris) — wg0-paris.conf
+### Config client  - Connection with Paris Server  
+- PrivateKey = <PRIVATE_KEY_PC>
+- PublicKey = <PUBKEY_PARIS>
+- Endpoint = 88.162.141.79:49151
+- AllowedIPs = 10.9.3.0/24, 192.168.1.0/24, 192.168.100.0/24, 10.9.2.0/24, 172.20.10.0/28
 
-    PrivateKey = <PRIVATE_KEY_PC>
-
-    PublicKey = <PUBKEY_PARIS>
-
-    Endpoint = 88.162.141.79:49151
-
-    AllowedIPs = 10.9.3.1 (initial minimal config)
-
-### Client Config (Auber) — wg0-auber.conf
-
-    Endpoint = 88.162.141.79:49150
-
-    AllowedIPs = 10.9.3.0/24, 192.168.1.0/24, 192.168.100.0/24, 10.9.2.0/24, 172.20.10.0/28
+### Config client - Connection with Auber Server   
+- PrivateKey = <PRIVATE_KEY_PC>
+- PublicKey = <PUBKEY_AUBER>
+- Endpoint = 88.162.141.79:49150
+- AllowedIPs = 10.9.3.0/24, 192.168.1.0/24, 192.168.100.0/24, 10.9.2.0/24, 172.20.10.0/28
 
 ##  Smartphone Configuration
+
 ### Key Generation
 
-    Generate keys on the phone.
+- Generate keys on the phone.
 
 ### Client Config — wg0-phone.conf
-
-    PrivateKey = <PRIVATE_KEY_PHONE>
-
-    PublicKey = <PUBKEY_PARIS>
-
-    AllowedIPs = 10.9.3.1
+- PrivateKey = <PRIVATE_KEY_PHONE>
+- PublicKey = <PUBKEY_PARIS>
+- AllowedIPs = 10.9.3.0/24, 192.168.1.0/24, 192.168.100.0/24, 10.9.2.0/24, 172.20.10.0/28
 
 5.3 QR Code Import
 
-    Generate QR code using qrencode
-
-    Scan via WireGuard mobile app
-
-    Activate interface wg0-iphone
+- Generate QR code using qrencode command
+- Scan via WireGuard mobile app
+- Activate interface wg0-iphone
 
 ##  Routing Configuration
-6.1 On Nomad PC
+
+### On Nomad PC
 
 Add internal networks to AllowedIPs:
-Code
+AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 
-AllowedIPs = 10.9.3.1, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
-
-6.2 On Auber
+### On Auber
 
 Add route to WireGuard network:
-Code
-
 ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8
 
-6.3 On Tokyo & NY
+### On Tokyo & NY
 
 Add route to WireGuard network via OpenVPN push:
-Code
-
 push "route 10.9.3.0 255.255.255.0"
 
-7. 🔥 Firewall & NAT Configuration
-7.1 Firewall Rules
+##  Firewall & NAT Configuration
+### Firewall Rules
 
 Allow WireGuard port:
-Code
-
 ufw allow 49151/udp
 
-7.2 NAT Rules
+### NAT Rules
 
 Add forwarding + masquerade:
-Code
-
 PostUp   = iptables -A FORWARD -i %i -j ACCEPT ; iptables -A FORWARD -o %i -j ACCEPT ; iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 PostDown = iptables -D FORWARD -i %i -j ACCEPT ; iptables -D FORWARD -o %i -j ACCEPT ; iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 
-7.3 Why NAT is Mandatory
+### Why NAT is Mandatory
 
-    Required for Internet access
+- Required for Internet access
 
-    Required for reaching internal networks
+- Required for reaching internal networks
 
-    Required for multi‑site routing
+- Required for multi‑site routing
 
-8. 🚀 Launching WireGuard
-8.1 Server
-Code
-
+## Launching WireGuard
+### Server
 wg-quick up wg0
 wg show
 
-8.2 Client
-Code
-
+### Client
 wg-quick up wg0-paris
 wg-quick up wg0-auber
 
-9. 🧪 Connectivity Tests
-9.1 Nomad → Paris
-
+## 🧪 Connectivity Tests
+### Nomad → Paris
     Ping 10.9.3.1 → OK
-
     Ping 192.168.1.197 → OK (after AllowedIPs update)
 
-9.2 Nomad → Auber
+### Nomad → Auber
 
     Ping 192.168.1.160 → OK
-
     Ping 192.168.100.210 → OK
-
     Ping 10.9.2.1 → OK
 
-9.3 Nomad → Tokyo
-
+### Nomad → Tokyo
     Ping 172.20.10.3 → FAIL (initial)
-
     After routing fix → OK
 
-9.4 Nomad → NY
-
+###  Nomad → NY
     Same logic as Tokyo
 
-9.5 Traceroute
+## Traceroute
 
 Expected path:
-Code
-
 Nomad → Paris (10.9.3.1) → Auber (192.168.100.210) → Tokyo
 
-10. 🛠️ Troubleshooting (Sprint 3)
-10.1 Common Issues
+## 🛠️ Troubleshooting 
+### Common Issues
+- Missing routes in AllowedIPs
 
-    Missing routes in AllowedIPs
+- Auber missing route to 10.9.3.0/24
 
-    Auber missing route to 10.9.3.0/24
-
-    Tokyo/NY missing route to WireGuard
-
-    NAT not applied → no Internet
-
-    Wrong endpoint port
+- Tokyo/NY missing route to WireGuard
 
 
 ## Configurations
@@ -212,31 +172,6 @@ Nomad → Paris (10.9.3.1) → Auber (192.168.100.210) → Tokyo
 # wg-quick up wg0-paris  # Sur le serveur
 # wg-quick up wg0-paris-client  # Sur le client
 ```
-
-##  Configurer la Bascule Automatique
-Pour OpenVPN :
-```bash
-cd 04-scripts/failover
-chmod +x openvpn-failover.sh
-sudo crontab -e
-```
-Ajoutez :
-```
-* * * * * /chemin/vers/openvpn-wireguard-site2site-nomad/04-scripts/failover/bascule.sh
-```
-Pour WireGuard :
-
-```bash
-chmod +x wireguard-failover.sh
-sudo crontab -e
-```
-
-Ajoutez :
-```
-* * * * * /chemin/vers/openvpn-wireguard-site2site-nomad/04-scripts/failover/failover_wireguard.sh
-```
-
-
 
 
 <!--
@@ -268,6 +203,38 @@ Opération 2 (Bonus) : Explique la logique de ton script de bascule automatique 
     Bonus : bascule automatique vers Aubervillier si Paris tombe
     
 procédure de génération de clés (wg genkey)
+
+
+
+
+
+### BONUS : BACKUP AUBER WHEN FAILOVER PARIS SERVER
+
+
+##  Configurer la Bascule Automatique
+Pour OpenVPN :
+```bash
+cd 04-scripts/failover
+chmod +x openvpn-failover.sh
+sudo crontab -e
+```
+Ajoutez :
+```
+* * * * * /chemin/vers/openvpn-wireguard-site2site-nomad/04-scripts/failover/bascule.sh
+```
+Pour WireGuard :
+
+```bash
+chmod +x wireguard-failover.sh
+sudo crontab -e
+```
+
+Ajoutez :
+```
+* * * * * /chemin/vers/openvpn-wireguard-site2site-nomad/04-scripts/failover/failover_wireguard.sh
+```
+
+
 format des fichiers .conf
 commandes pour activer l’interface
 exemple d’ajout d’un client nomade.
