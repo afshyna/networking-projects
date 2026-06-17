@@ -39,16 +39,16 @@ Hybride On-Premise : Simulation réaliste derrière une Box Internet. Gestion du
 ### Global Architecture / Schemas
 
 *Sprint 1 - Deployment of an OpenVPN site-to-site between Paris Server and Tokyo/NY clients*
-![Troubleshooting Sprint 0](diagrams/01-sprint1-openvpn-site-to-site-srv-paris-primary_clients-tokyo-NY.png)
+![Architecture Sprint 1](diagrams/01-sprint1-openvpn-site-to-site-srv-paris-primary_clients-tokyo-NY.png)
 
 Sprint 2 - Deployment of a Secondary OpenVPN Backup Site & Automated Network Failover*
-![Troubleshooting Sprint 0](diagrams/02-sprint2-backup-auber-openvpn-failover-automation.png)
+![Architecture Sprint 2](diagrams/02-sprint2-backup-auber-openvpn-failover-automation.png)
 
 *Sprint 3 -  Deployment of WireGuard Remote Access VPN for connecting nomade hosts (PC, phone) to the primary site (Server Paris)*
-![Troubleshooting Sprint 0](diagrams/03-sprint3-failover-vpn-wireguard-srv-paris-bascule-clients_srv-auber-backup.png)
+![Architecture Sprint 3](diagrams/04-sprint4-vpn-wireguard-nomade-clients-pc-phone_srv-paris-primary.png)
 
 *[Bonus] Sprint 4 - Deployment of a Secondary Wireguard VPN Backup (Server Auber) & Automated Network Failover*
-![Troubleshooting Sprint 0](diagrams/03-sprint3-vpn-wireguard-nomade-clients-pc-phone_srv-paris-primary.png)
+![Architecture Sprint 4](diagrams/03-sprint3-failover-vpn-wireguard-srv-paris-bascule-clients_srv-auber-backup.png)
 
 ## Directory Structure
 Brief description of the main folders.
