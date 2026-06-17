@@ -122,7 +122,7 @@ See the [Troubleshooting – Missing iroute](##troubleshooting--missing-iroute) 
 ### Routing on Auber
 Contains the return route 10.9.1.0/24 via 192.168.100.200 on interface enp0s8.
     
-## 4. NAT and Perimeter Security
+## 4. Firewall & NAT Configuration
 To enable remote offices (Client Tokyo and NY) to initiate a connection to the central server located behind a home router, a port forwarding rule and local firewall settings have been configured on Paris site.
 
 **Port Forwarding (home router)**
