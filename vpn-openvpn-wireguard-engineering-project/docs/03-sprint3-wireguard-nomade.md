@@ -1,7 +1,7 @@
-<h1> 🏁 Sprint 3 : WireGuard Remote Access VPN with VPN connection from nomade host (PC) to the central site (VPN server Paris) </h1>
+<h1> 🏁 Sprint 3 : WireGuard Remote Access VPN with VPN connection from nomad host (PC/phone) to the central site (VPN server Paris) </h1>
 
 ##  Sprint Objectives
-- Set up VPN access for enabling a remote user (nomade PC / smartphone) to securely access to internal networks (Paris, Auber, Tokyo, NY).
+- Set up VPN access for enabling a remote user (nomad PC / smartphone) to securely access to internal networks (Paris, Auber, Tokyo, NY).
 - Deploy a modern, lightweight WireGuard VPN for remote users (nomad PC + smartphone).
 - Integrate WireGuard into the existing multi‑site OpenVPN architecture.
 
@@ -44,6 +44,7 @@ The mobile client can therefore access:
 - Iphone : `10.9.3.200`
 
 **Physical Networks**:
+- WAN Nomade PC : `176.X.Y.Z`
 - WAN Paris : `88.162.141.79`
 - backup OpenVPN tunnel subnet : `10.9.2.0/24`
 - Paris/Auber LAN: `192.168.1.0/24`
@@ -67,13 +68,17 @@ wg genkey | tee server-paris-privatekey.key | wg pubkey > server-parismont-publi
 
 ```text
 [Interface]
-Address = <Local_IP_VPN_server>   # 10.9.3.1
-ListenPort = <Listenning_port>          # 49151
+Address = <IP_VPN_SERVER>                  # 10.9.3.1
+ListenPort = <LISTENING_PORT>              # 49151
 PrivateKey = <SERVER_PRIVATE_KEY>
 
 [Peer]
-PublicKey = <CLIENT_PUBLIC_KEY>      # public_key of nomade-pc / smartphone
+PublicKey = <CLIENT-NOMADE-PC_PUBLIC_KEY>  # public_key of nomade-pc
 AllowedIPs = 10.9.3.100/32
+
+[Peer]
+PublicKey = <CLIENT-PHONE_PUBLIC_KEY>      # public_key of the phone
+AllowedIPs = 10.9.3.200/32
 ```
 
 ## Nomad PC Configuration
@@ -82,17 +87,19 @@ AllowedIPs = 10.9.3.100/32
 
 ```code
 [Interface]
-Address = <Local_IP_VPN_client>             # 10.9.3.100/32 
+Address = <IP_VPN_PC-NOMADE>                 # 10.9.3.100/32 
 
 [Peer]
-Endpoint = <PUBLIC_IP>:<Listenning_port>    # 88.162.141.79:49151
-AllowedIPs = 10.9.3.1/32, 192.168.0.0/16
+Endpoint = <PUBLIC_IP>:<LISTENING_PORT>      # 88.162.141.79:49151
+AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 ```
 
 ##  Smartphone Configuration
 
 ### Key Generation
+
 - Generate private/public keys of the smartphone
+
 - Set the wireguard configuration in /etc/wireguard/wg0-phone.conf:
 
 ###  Config — wg0-phone.conf
@@ -105,7 +112,7 @@ AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 ##  Routing Configuration
 
 ### Announce OpenVPN routes (clients)
-To join to the `192.168.1.0/24`, `192.168.100.0/24`, `172.20.10.0/28` and `10.9.2.0/24` networks, PC-nomade must route traffic through its WireGuard VPN tunnel. For doing this, these subnets must be announced to wireguard client via the directive `AllowedIPs=`. It specifies the subnets/host  whose traffic  that you want to route through your VPN tunnel. The rest of the traffic (not specified) will go via your local internet connection.
+To join to the `192.168.1.0/24`, `192.168.100.0/24`, `172.20.10.0/28` and `10.9.2.0/24` subnets, PC-nomad must route traffic through its WireGuard VPN tunnel. For doing this, these subnets must be announced to wireguard client via the directive `AllowedIPs=`. It specifies the subnets/host  whose traffic  that you want to route through your VPN tunnel. The rest of the traffic (not specified) will go via your local internet connection.
 
 Add internal networks to AllowedIPs:
 `AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28`
@@ -139,7 +146,6 @@ Automatisation PostUp/PostDown :
 - Justification : Pourquoi le NAT est indispensable pour le Full Tunnel (accès Internet via VPN).
 
 ```text
-# Add forwarding + masquerade:
 PostUp   = iptables -A FORWARD -i %i -j ACCEPT ; iptables -A FORWARD -o %i -j ACCEPT ; iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 PostDown = iptables -D FORWARD -i %i -j ACCEPT ; iptables -D FORWARD -o %i -j ACCEPT ; iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 ```
@@ -154,7 +160,7 @@ PostDown = iptables -D FORWARD -i %i -j ACCEPT ; iptables -D FORWARD -o %i -j AC
 - Rule applied: `From everywhere on Internet connecting to external port UDP/49151 ➔ to 192.168.1.197 on internal port 49151`
 
 ### IP forwarding
-Kernel : Activation de net.ipv4.ip_forward.
+Kernel : Activation of `net.ipv4.ip_forward`.
 
 ## Launching WireGuard
 
@@ -165,11 +171,11 @@ wg show
 ```
 [Interface state of the server](../assets/verifs/wg-show-paris-vpn.png)
 
-### PC-nomade Client
+### PC-nomad Client
 ```bash
-wg-quick up wg0-nomade-pc
+wg-quick up wg0-nomad-pc
 ```
-[Interface state of the server](../assets/verifs/wg-show-nomad-pc.png)
+[Interface state of the client PC](../assets/verifs/wg-show-nomad-pc.png)
 
 ### Smartphone Client - launch via QR Code Import
 - Generate QR code using qrencode command
@@ -231,28 +237,34 @@ Evidence of UDP encapsulation (UDP/49151).
 
 ## 🛠️ Troubleshooting 
 
+---
+
 ### Routing issue 1 : 
-- **Symptom**: The tunnel is established, but no pings from wireguard client get through to the physical networks (e.g. 192.168.1.0/24 or 192.168.100.0/24).
+- **Symptom**: The tunnel is established, but no pings from wireguard client get through to the physical networks (e.g. `192.168.1.0/24` or `192.168.100.0/24`).
 
 - **Cause**: Incomplete AllowedIPs. WireGuard filters traffic that does not belong to the declared networks at the kernel level. Client wireguard doesn't have a route to these subnets via its wireguard tunnel.
 
 - **Fixs**:
-  - Extend the AllowedIPs on the client to include 192.168.0.0/16.
+  - Extend the AllowedIPs on the client to include `192.168.0.0/16`.
   - On auber, add a route to the wireguard VPN subnet on the openvpn configuration file.
 
+---
+
 ### Routing issue 2:
-- **Symptom**: No pings from wireguard client get through to the OpenVPN backup subnet (e.g. 10.9.2.1/24, 10.9.2.2/24).
+- **Symptom**: No pings from wireguard client get through to the OpenVPN backup subnet (e.g. `10.9.2.1/24`, `10.9.2.2/24`).
 
 - **Cause**: Incomplete  AllowedIPs. WireGuard filters traffic that does not belong to the declared networks at the kernel level.So, client wireguard doesn't have a route to the OpenVPN subnet via its wireguard tunnel.
 
 - **Fix**:
-  - Extend the AllowedIPs on the client to include 10.9.3.0/24.
+  - Extend the AllowedIPs on the client to include `10.9.3.0/24`.
+
+---
 
 ### Routing issue 3:
-- **Symptom**: No pings from wireguard client get through to the Tokyo/NY LAN (e.g. 172.20.10.0/24).
+- **Symptom**: No pings from wireguard client get through to the Tokyo/NY LAN (e.g. `172.20.10.0/24`).
 
 - **Cause**: Incomplete  AllowedIPs so, client wireguard doesn't have a route to this subnet via its wireguard tunnel.
 
 - **Fix**:
-  - Extend the AllowedIPs on the client to include 172.20.10.0/24.
+  - Extend the AllowedIPs on the client to include `172.20.10.0/24`.
   - Push the route to the wireguard VPN subnet on the openvpn configuration file, to the the OpenVPN clients
