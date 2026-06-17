@@ -47,7 +47,7 @@ Sprint 2 - Deployment of a Secondary OpenVPN Backup Site & Automated Network Fai
 *Sprint 3 -  Deployment of WireGuard Remote Access VPN for connecting nomade hosts (PC, phone) to the primary site (Server Paris)*
 ![Troubleshooting Sprint 0](diagrams/03-sprint3-failover-vpn-wireguard-srv-paris-bascule-clients_srv-auber-backup.png)
 
-*[Bonus] Sprint 3 - Deployment of a Secondary Wireguard VPN Backup (Server Auber) & Automated Network Failover*
+*[Bonus] Sprint 4 - Deployment of a Secondary Wireguard VPN Backup (Server Auber) & Automated Network Failover*
 ![Troubleshooting Sprint 0](diagrams/03-sprint3-vpn-wireguard-nomade-clients-pc-phone_srv-paris-primary.png)
 
 ## Directory Structure
@@ -56,6 +56,7 @@ Brief description of the main folders.
 - `01-sprint1-openvpn-site-to-site-paris.md`  : Détail step 1 - 
 - `02-sprint2-openvpn-backup-auber-failover-automation.md` : Détail step 2 - 
 - `03-sprint3-wireguard-nomade.md`  : Détail step 3 - VPN nomade
+- `04-script4-wireguar-backup-auber-failover-automation-paris.md`  : Step 4 -
 
 - `configs/` : files .conf of OpenVPN and Wireguard + files ccd
 - `diagrams/` : Schemas, exigences, topologies
@@ -105,9 +106,10 @@ Summary of tests performed (ping, traceroute, HTTP via tunnel), location of trac
 ##  Troubleshooting & Debugging 
 
 A local troubleshooting is available here:
-➡️ [Troubleshooting Sprint 0](docs/01-sprint1-openvpn-site-to-site-paris.md)
-➡️ [Troubleshooting Sprint 1](docs/02-sprint2-openvpn-backup-auber-failover-automation.md)
-➡️ [Troubleshooting Sprint 2](docs/03-sprint3-wireguard-nomade.md)
+➡️ [Troubleshooting Sprint 1](docs/01-sprint1-openvpn-site-to-site-paris.md)
+➡️ [Troubleshooting Sprint 2](docs/02-sprint2-openvpn-backup-auber-failover-automation.md)
+➡️ [Troubleshooting Sprint 3](docs/03-sprint3-wireguard-nomade.md)
+➡️ [Troubleshooting Sprint 4](docs/04-script4-wireguar-backup-auber-failover-automation-paris.md)
 
 A more general troubleshooting guide (routing issues, NAT, MTU, OpenVPN logs, WireGuard handshake, failover debugging, etc.) is available here:
 ➡️ [Troubleshooting Guide](docs/troubleshooting.md)
