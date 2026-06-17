@@ -1,7 +1,7 @@
 # 🏁 Sprint 2 :  Secondary OpenVPN Backup Site Deployment & Automated Network Failover 
 
 ## Sprint Objective
-- Deploy a secondary backup VPN server (Aubervilliers).
+- Deploy a secondary OpenVPN backup VPN server (Aubervilliers).
 - Ensure network‑level high availability (HA) between Paris ↔ Tokyo/New York.
 - Implement automatic network failover when the primary VPN server (Paris) becomes unavailable/goes offline.
 - Simulate a failure of the primary site & Incident management on VPN servers
