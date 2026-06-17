@@ -43,7 +43,7 @@ Only the directives relevant to the architecture are documented here:
 
 - `client-to-client` - Allows VPN clients to communicate with each other.
 
-- `port 1194` - server listenning port
+- `port 1194` - server listening port
 
  - `push ...`
  - `route add...`
@@ -61,7 +61,7 @@ Only the directives relevant to the architecture are documented here:
 
 ### Key OpenVPN Directives (Clients)
 
-- `remote 88.162.141.79 32768` - Connection to the Server (WAN/Public IP and port of Paris VPN server)
+- `remote 88.162.141.79 1194` - Connection to the Server (WAN/Public IP and port of Paris VPN server)
 
 - `client`- Indicates that this configuration is for a OpenVPN client
 
@@ -127,7 +127,7 @@ To enable remote offices (Client Tokyo and NY) to initiate a connection to the c
 
 **Port Forwarding (home router)**
 - Public WAN IP: `88.162.141.79`
-- Rule applied: `From everywhere on Internet connecting to external port UDP/32768 ➔ to 192.168.1.197 on internal port 1194`
+- Rule applied: `From everywhere on Internet connecting to external port UDP/1194 ➔ to 192.168.1.197 on internal port 1194`
 
 **Firewall Opening (UFW)**
 - By default, the standard OpenVPN port was blocked so UDP traffic must be allowed in the local firewall (on Ubuntu) :
@@ -161,7 +161,7 @@ Note : in the wireshark captures, the VPN IP of Tokyo client is seen as `10.9.1.
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png)
 
 Here is a summary of the process that happen : 
-1. When Tokyo sends a ping to `10.9.1.1`, OpenVPN encapsulates it in an encrypted tunnel and sends it to the WAN IP of VPN Paris Server (`88.162.141.79:32768`).
+1. When Tokyo sends a ping to `10.9.1.1`, OpenVPN encapsulates it in an encrypted tunnel and sends it to the WAN IP of VPN Paris Server (`88.162.141.79:1194`).
 3. The Paris home router forwards the packet to the Paris VPN server on the LAN (`192.168.1.197:1194`).
 4. The Paris VPN server decrypts the packet & responds to the ping. The response is encapsulated in OpenVPN to return to Tokyo.
 
