@@ -42,7 +42,7 @@ On both clients, add a 2nd directives with remote, for the VPN connection with t
 
 ```text
 # Backup Server VPN (Auber)
-remote 88.162.141.79 32769
+remote 88.162.141.79 1195
 ```
 
 ## 3. Routing Configuration & Adjustements
@@ -100,8 +100,8 @@ See [4. Automated Failover Script on Backup Server (Aubervilliers)](##-Automated
 
 ## Port Forwarding for Backup VPN
 Traffic coming from the public internet through the edge router (home/box router at Paris) is segregated using port-based forwarding:
-* **Primary VPN Tunnel (Paris):** `88.162.141.79:32768 (UDP)` ➔ `192.168.1.197:1194`
-* **Backup VPN Tunnel (Aubervilliers):** `88.162.141.79:32769 (UDP)` ➔ `192.168.1.160:1195`
+* **Primary VPN Tunnel (Paris):** `88.162.141.79:1194 (UDP)` ➔ `192.168.1.197:1194`
+* **Backup VPN Tunnel (Aubervilliers):** `88.162.141.79:1195 (UDP)` ➔ `192.168.1.160:1195`
 
 Purpose : Allows remote clients to reach the backup VPN server when Paris is down.
 
@@ -177,7 +177,7 @@ As soon as the main tunnel `10.9.1.0/24` is disconnected, the following network 
 ##  Progressive Changes to Routing Tables - Flow validation & Route verification
 
 **VPN Clients**
- The default gateway for the `10.9.1.X` tunnel has been replaced by the IP address of the `10.9.2.X` failover interface. Clients switch to Auber (10.9.2.1) via port remote 32769.
+ The default gateway for the `10.9.1.X` tunnel has been replaced by the IP address of the `10.9.2.X` failover interface. Clients switch to Auber (10.9.2.1) via port remote 1195.
 - Before : `192.168.100.0/24 via 10.9.1.1` | `192.168.1.0/24 via 10.9.1.1`
 - After : `192.168.100.0/24 via 10.9.2.1` | `192.168.1.0/24 via 10.9.2.1`
 
