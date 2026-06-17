@@ -1,15 +1,11 @@
 <h1> 🏁 Sprint 3 : WireGuard Remote Access VPN with VPN connection from nomade host (PC) to the central site (VPN server Paris) </h1>
 
-
 ##  Sprint Objective
 
 - Configurer l’accès distant via WireGuard.
 - Deploy a modern, lightweight WireGuard VPN for remote users (nomad PC + smartphone).
 - Allow secure access to internal networks (Paris, Auber, Tokyo, NY).
 - Integrate WireGuard into the existing multi‑site OpenVPN architecture.
-- Support dual connectivity:
-      - Nomad → Paris
-      - Nomad → Auber
 
 ##  Architecture Overview
 
@@ -17,7 +13,7 @@
 - WireGuard subnet: 10.9.3.0/2
 - Paris server: 10.9.3.1 (UDP/49151)
 - Auber server: 10.9.3.2 (UDP/49150)
--  Nomad PC: 10.9.3.100
+- Nomad PC: 10.9.3.100
 - Iphone : 10.9.3.200
 
 ### Physical Networks
@@ -30,6 +26,13 @@ A “nomad client” is an external device (4G/5G, Wi‑Fi public, home network)
 All access must go through WireGuard.
 
 ## Key Generation & Server Configuration
+
+### Générer les Clés :
+```bash
+cd 03-wireguard-nomad/keys
+umask 077
+wg genkey | tee server-parismont-privatekey | wg pubkey > server-parismont-publickey
+```
 
 ### Paris Server
 
@@ -74,7 +77,7 @@ All access must go through WireGuard.
 - PublicKey = <PUBKEY_PARIS>
 - AllowedIPs = 10.9.3.0/24, 192.168.1.0/24, 192.168.100.0/24, 10.9.2.0/24, 172.20.10.0/28
 
-5.3 QR Code Import
+### QR Code Import
 
 - Generate QR code using qrencode command
 - Scan via WireGuard mobile app
@@ -118,36 +121,47 @@ PostDown = iptables -D FORWARD -i %i -j ACCEPT ; iptables -D FORWARD -o %i -j AC
 - Required for multi‑site routing
 
 ## Launching WireGuard
-### Server
-wg-quick up wg0
-wg show
 
-### Client
+## Lancement du service WireGuard :
+
+
+### Server
+```bash
 wg-quick up wg0-paris
 wg-quick up wg0-auber
+wg show
+```
+
+### Client
+```bash
+wg-quick up wg0-nomade-pc
+wg-quick up wg0-iphone
+```
 
 ## 🧪 Connectivity Tests
+
 ### Nomad → Paris
-    Ping 10.9.3.1 → OK
-    Ping 192.168.1.197 → OK (after AllowedIPs update)
+- Ping 10.9.3.1 → OK
+- Ping 192.168.1.197 → OK (after AllowedIPs update)
 
 ### Nomad → Auber
 
-    Ping 192.168.1.160 → OK
-    Ping 192.168.100.210 → OK
-    Ping 10.9.2.1 → OK
+- Ping 192.168.1.160 → OK
+- Ping 10.9.2.1 → OK
 
 ### Nomad → Tokyo
-    Ping 172.20.10.3 → FAIL (initial)
-    After routing fix → OK
+- Ping 172.20.10.3 → FAIL (initial)
+- After routing fix → OK
 
 ###  Nomad → NY
-    Same logic as Tokyo
+- Same logic as Tokyo
 
 ## Traceroute
-
 Expected path:
 Nomad → Paris (10.9.3.1) → Auber (192.168.100.210) → Tokyo
+
+"Est-ce que le ping Nomade vers Aubervilliers passe par Paris Montrouge ou non ?"  (Explique le cheminement du paquet selon l'état des tunnels).
+
 
 ## 🛠️ Troubleshooting 
 ### Common Issues
@@ -157,35 +171,9 @@ Nomad → Paris (10.9.3.1) → Auber (192.168.100.210) → Tokyo
 
 - Tokyo/NY missing route to WireGuard
 
+## Opération 2 (Bonus) 
 
-## Configurations
-
-### Générer les Clés :
-```bash
-# cd 03-wireguard-nomad/keys
-# umask 077
-# wg genkey | tee server-parismont-privatekey | wg pubkey > server-parismont-publickey
-```
-
-## Lancement du service WireGuard :
-```bash
-# wg-quick up wg0-paris  # Sur le serveur
-# wg-quick up wg0-paris-client  # Sur le client
-```
-
-
-<!--
-Ce dossier montre ton ouverture vers des technologies modernes et performantes (WireGuard) et tes compétences en scripting.
-Dans le dossier scripts/ : Dépose ton fameux script failover_wireguard.sh qui modifie la métrique de la route automatiquement lors d'une perte de ping, ainsi que la ligne de ta crontab (* * * * * /chemin/failover_wireguard.sh).
-
-Dans le README.md :
-
-Opération 1 : Documente la topologie WireGuard (PC Nomade & Smartphone). Ajoute tes rapports de ping Nomade -> Paris, Nomade -> Auber et Nomade -> Tokyo.
-
-Question d'architecture clé : Réponds textuellement à la question de ton énoncé : "Est-ce que le ping Nomade vers Aubervilliers passe par Paris Montrouge ou non ?" 
-(Explique le cheminement du paquet selon l'état des tunnels).
-
-Opération 2 (Bonus) : Explique la logique de ton script de bascule automatique pour activer le tunnel de secours d'Aubervilliers quand Paris est injoignable.
+Explique la logique de ton script de bascule automatique pour activer le tunnel de secours d'Aubervilliers quand Paris est injoignable.
 
       
 📁 Contenu
@@ -205,34 +193,6 @@ Opération 2 (Bonus) : Explique la logique de ton script de bascule automatique 
 procédure de génération de clés (wg genkey)
 
 
-
-
-
-### BONUS : BACKUP AUBER WHEN FAILOVER PARIS SERVER
-
-
-##  Configurer la Bascule Automatique
-Pour OpenVPN :
-```bash
-cd 04-scripts/failover
-chmod +x openvpn-failover.sh
-sudo crontab -e
-```
-Ajoutez :
-```
-* * * * * /chemin/vers/openvpn-wireguard-site2site-nomad/04-scripts/failover/bascule.sh
-```
-Pour WireGuard :
-
-```bash
-chmod +x wireguard-failover.sh
-sudo crontab -e
-```
-
-Ajoutez :
-```
-* * * * * /chemin/vers/openvpn-wireguard-site2site-nomad/04-scripts/failover/failover_wireguard.sh
-```
 
 
 format des fichiers .conf
