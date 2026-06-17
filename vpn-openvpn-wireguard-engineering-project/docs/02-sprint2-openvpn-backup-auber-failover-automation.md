@@ -6,7 +6,9 @@
 - Implement automatic network failover when the primary VPN server (Paris) becomes unavailable/goes offline.
 - Simulate a failure of the primary site & Incident management on VPN servers
   
-##  Infrastructure Overview
+##  Architecture & Topology Overview
+
+![Architecture Sprint 2](diagrams/02-sprint2-backup-auber-openvpn-failover-automation.png)
 
 ### Backup Site Role
 - Aubervilliers acts as the secondary VPN hub.
