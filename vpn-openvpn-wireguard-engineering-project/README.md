@@ -7,14 +7,12 @@ Micro-project reproducing a realistic enterprise VPN architecture.
 Service delivery context for connecting remote offices (Tokyo, New York) to a resilient network core (Paris, Aubervilliers) and securing access for mobile staff (Nomads).
 
 <h3> Technologies used:  </h3>
-
-- OpenVPN (site-to-site) Robustesse/Routage complexe)
-- WireGuard (remote access) (Performance Nomade
+- OpenVPN (site-to-site) 
+- WireGuard (remote access) 
 - TLS / X.509 PKI
 - Linux Routing
 - iptables
 - Wireshark
-- Apache2
 - iptables (Sécurisation hardening).
 
 
