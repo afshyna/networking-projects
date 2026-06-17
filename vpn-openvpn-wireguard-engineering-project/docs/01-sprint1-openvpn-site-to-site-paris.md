@@ -8,9 +8,10 @@ The aim of this first sprint is to deploy the basic infrastructure for the VPN b
 - Connect Tokyo & New York clients to the central site  via an unsecured network (Internet)
 - Check routing and inter-site communication
 
-## Technical Specifications
-* **Protocol**: OpenVPN (VPN SSL/TLS) over UDP transport layer.
-* **Security**: Strong authentication via public key infrastructure (X.509 PKI) and asymmetric encryption for key exchange (2048-bit Diffie-Hellman).
+## Architecture & Topology overview
+
+![Architecture Sprint 1](diagrams/01-sprint1-openvpn-site-to-site-srv-paris-primary_clients-tokyo-NY.png)
+
 * **Addressing Architecture**:
   * **VPN Network (tun0)**: `10.9.1.0/24`
   * **IP WAN Publique (Paris and Auber)** : 88.162.141.79
@@ -18,6 +19,10 @@ The aim of this first sprint is to deploy the basic infrastructure for the VPN b
   * **Tokyo Site**: Fixed VPN IP `10.9.1.2` | Remote Local LAN: `172.20.10.0/28` (VM: `172.20.10.3`)
   * **New York Site**: Fixed VPN IP `10.9.1.3` | Remote Local LAN: `172.20.10.0/28` (VM: `172.20.10.4`)
   * **Backup Site (Aubervilliers)**: No active tunnel at this stage | Inter-site: `192.168.100.210`
+
+## Technical Specifications*
+* **Protocol**: OpenVPN (VPN SSL/TLS) over UDP transport layer.
+* **Security**: Strong authentication via public key infrastructure (X.509 PKI) and asymmetric encryption for key exchange (2048-bit Diffie-Hellman).
 
 
 ## 1. PKI Setup 
