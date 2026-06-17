@@ -8,6 +8,7 @@
 - Support dual connectivity:
       - Nomad → Paris
       - Nomad → Auber
+- Set up mobile VPN access enabling a remote user to test the network’s behaviour in the event of a failure at the main site.
    
 ##  Infrastructure Overview
 ### Backup Site Role
