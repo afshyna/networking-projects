@@ -43,10 +43,10 @@ Sprint 2 - Deployment of a Secondary OpenVPN Backup Site & Automated Network Fai
 ![Architecture Sprint 2](diagrams/02-sprint2-backup-auber-openvpn-failover-automation.png)
 
 *Sprint 3 -  Deployment of WireGuard Remote Access VPN for connecting nomade hosts (PC, phone) to the primary site (Server Paris)*
-![Architecture Sprint 3](diagrams/04-sprint4-vpn-wireguard-nomade-clients-pc-phone_srv-paris-primary.png)
+![Architecture Sprint 3](diagrams/03-sprint3-vpn-wireguard-nomade-clients-pc-phone_srv-paris-primary.png)
 
 *[Bonus] Sprint 4 - Deployment of a Secondary Wireguard VPN Backup (Server Auber) & Automated Network Failover*
-![Architecture Sprint 4](diagrams/03-sprint3-failover-vpn-wireguard-srv-paris-bascule-clients_srv-auber-backup.png)
+![Architecture Sprint 4](diagrams/04-sprint4-failover-vpn-wireguard-srv-paris-bascule-clients_srv-auber-backup.png)
 
 ## Directory Structure
 Brief description of the main folders.
