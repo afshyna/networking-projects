@@ -35,35 +35,38 @@ Full configuration files are available in the `configs/openvpn/` directory.
 
 Only the directives relevant to the architecture are documented here:
 
-### Key OpenVPN Directives (Server)
+### Server - Key OpenVPN Directives
 
 - `server 10.9.1.0 255.255.255.0` - Defines the primary VPN tunnel network, that will be used by server/client(s)
-
 - `client-config-dir /etc/openvpn/ccd` - Enables per-client static IP assignment and iroute.
-[View more details in the "Static VPN IP Assignment (CCD)" part](####-Static-VPN-IP-Assignment-(CCD)) 
-
 - `client-to-client` - Allows VPN clients to communicate with each other.
-
 - `port 1194` - server listening port
-
  - `push ...`
  - `route add...`
-[View more details about the routing directives](####3.-Routing-Configuration) 
 
-**Server TLS authentication using the PKI created in this sprint.**
+**Server TLS authentication**
 - `ca` -  the CA certificate used to validate the server’s identity.
 - `cert` - server certificate signed by the CA. 
 - `key` -  Private key of the server.
 - `dh` -
 - `tls-server` - this configuration is for a TLS server
-  
 
+### Static VPN IP Assignment (CCD)
+In the CCD configuration files, add a static VPN IP to each client: 
+   * `/etc/openvpn/ccd/client-tokyo`:
+       ```text
+       ifconfig-push 10.9.1.2 255.255.255.0
+       ```
+   * `/etc/openvpn/ccd/client-ny`:
+       ```text
+       ifconfig-push 10.9.1.3 255.255.255.0
+       ```
+  
 ---
 
-### Key OpenVPN Directives (Clients)
+### Clients - Key OpenVPN Directives
 
 - `remote 82.X.Y.Z 1194` - Connection to the Server (WAN/Public IP and port of Paris VPN server)
-
 - `client`- Indicates that this configuration is for a OpenVPN client
 
 **Client TLS authentication using the PKI created in this sprint.**
@@ -77,72 +80,73 @@ Only the directives relevant to the architecture are documented here:
 ## 3. Routing Configuration
 
 ###  Server Push Routes
+
+Routes dynamically received by the clients (Tokyo/NY) when connecting to the VPN server.
 ```
+ # openvpn server configuration
 push "route 192.168.1.0 255.255.255.0"
 push "route 192.168.100.0 255.255.255.0"
 ```
 
-**Goal**: Clients (Tokyo/NY) dynamically receive these routes when connecting to the VPN server.
  
 ###  Server route 
 Declare a dynamic route on Paris to instruct it to route via the VPN tunnel to reach the LAN network of Tokyo: 
-```route 172.20.10.0 255.255.255.240```
+```
+ # openvpn server configuration
+route 172.20.10.0 255.255.255.240
+```
 
-### iroute (OpenVPN Internal Routing Table) & Static VPN IP Assignment (CCD)
-To ensure that the OpenVPN server correctly forwards traffic to the right client, each remote client  must be explicitly mapped to the corresponding client certificate (based on the Common Name (CN)) using CCD entries & is assigned a static IP address.
+### iroute (OpenVPN Internal Routing Table)
+
+*Key Concept of OpenVPN*:
+*OpenVPN, when operating in multi‑client mode, implements its own software switching layer. This means it uses two routing tables:*
+*- Linux kernel routing table → decides which interface (tun0) the packet should use*
+*- OpenVPN internal routing table (iroute) → decides which client the packet must be delivered to*
+
+Even if the Linux kernel knows that a client subnet (ex : 172.20.10.0/28) must be sent through tun0, the OpenVPN daemon still needs to know which client owns this subnet. Without an iroute entry, Linux forwards the packet to tun0 & OpenVPN receives the packet. But OpenVPN does not know which encrypted tunnel corresponds to the subnet  specified. In result, OpenVPN silently drops the packet.
+
+To ensure that the OpenVPN server correctly forwards traffic to the right client, each remote client  must be explicitly mapped to the corresponding client certificate (based on the Common Name (CN)) using CCD entries.
 
 1. In Paris OpenVPN server configuration, enable the CCD : `client-config-dir /etc/openvpn/ccd`
 
 2. Create the CCD configuration files by matching the client certificate CN (filename) then add iroute entries to map each remote LAN IP to the correct client :
    * `/etc/openvpn/ccd/client-tokyo`:
        ```text
-       iroute 172.20.10.3 255.255.255.255
+       iroute 172.20.10.0 255.255.255.240
        ```
    * `/etc/openvpn/ccd/client-ny`:
        ```text
        iroute 172.20.10.4 255.255.255.255
        ```
 
-CDD configuration files are available in the `configs/openvpn/ccd` directory.
-
-**Key Concept of OpenVPN**: 
-
-OpenVPN, when operating in multi‑client mode, implements its own software switching layer. This means it uses two routing tables:
-- Linux kernel routing table → decides which interface (tun0) the packet should use
-- OpenVPN internal routing table (iroute) → decides which client the packet must be delivered to
-
-**Why iroute is mandatory**: 
-
-Even if the Linux kernel knows that a client subnet (ex : 172.20.10.0/28) must be sent through tun0, the OpenVPN daemon still needs to know which client owns this subnet.
-Without an iroute entry, Linux forwards the packet to tun0 & OpenVPN receives the packet. But OpenVPN does not know which encrypted tunnel corresponds to the subnet  specified. In result, OpenVPN silently drops the packet 
-This is exactly what happens when Paris tries to ping Tokyo using its LAN IP (172.20.10.3) without iroute.
-See the [Troubleshooting – Missing iroute](##troubleshooting--missing-iroute) section for details.
-
-**Goal** : Server receive the system route `172.20.10.0/28 dev tun0`
+*CDD configuration files are available in the `configs/openvpn/ccd` directory.*
 
 ### Routing on Auber
 Contains the return route 10.9.1.0/24 via 192.168.100.200 on interface enp0s8.
     
-### Firewalling, IP forwarding & NAT Configuration
-To enable remote offices (Client Tokyo and NY) to initiate a connection to the central server located behind a home router, a port forwarding rule and local firewall settings have been configured on Paris site.
+## 6. Firewalling, IP forwarding & NAT Configuration
+
+
+**IP forwarding (Linux)**
+The Linux server is acting as a firewall, router, or NAT device, it will need to be capable of forwarding packets that are meant for other destinations (other than itself). The VPN server needs to route traffic between the VPN clients and your local network or the internet. Without IP forwarding, VPN clients won’t be able to access resources beyond the VPN server itself.
+
+Linux uses the net.ipv4.ip_forward kernel variable to toggle this setting on or off.
 
 **Port Forwarding (home router)**
-- Public WAN IP: `82.X.Y.Z`
+To enable remote offices (Client Tokyo and NY) to initiate a connection to the central server located behind a home router, a port forwarding rule and local firewall settings have been configured on Paris site. 
+
 - Rule applied: `From everywhere on Internet connecting to external port UDP/1194 ➔ to 192.168.1.197 on internal port 1194`
 
-**Firewall Opening (UFW)**
-- By default, the standard OpenVPN port was blocked so UDP traffic must be allowed in the local firewall (on Ubuntu) :
+**Firewall ufw**
+- By default, when ufw is activated, all incoming traffic is blocked. So the standard UDP OpenVPN port 1194 was blocked.
+
+OpenVPN UDP traffic must be allowed in the ufw firewall:
 ```bash
 ufw allow 1194/udp
 ```
 
-**IP forwarding (Linux)**
-The Linux server is acting as a firewall, router, or NAT device, it will need to be capable of forwarding packets that are meant for other destinations (other than itself). Linux uses the net.ipv4.ip_forward kernel variable to toggle this setting on or off.
 
-if you’re running a VPN server such as OpenVPN, WireGuard, or IPsec, IP forwarding must be enabled. The VPN server needs to route traffic between the VPN clients and your local network or the internet. Without IP forwarding, VPN clients won’t be able to access resources beyond the VPN server itself.
-
-
-## 5. Starting OpenVPN Services </h2>
+## 5. Starting OpenVPN Services 
 The configuration files are stored in the root folder `configs/openvpn/`. 
 
 They are loaded by:
