@@ -273,7 +273,7 @@ On Auber, a route has been added to the VPN network via the internal interface A
 
 ---
 
-### ❌ Issue C - Ping fails Paris → Tokyo (172.20.10.3)  Fails 
+### ❌ Issue C - Ping fails Paris → Tokyo (172.20.10.3)  - Fails 
 
 - **Symptom**: The Linux kernel in Paris does indeed have the system route (`route 172.20.10.0...`), and wireshark shows the packet entering the tun0 interface, but the packet never reaches the Tokyo VM.
 
@@ -282,7 +282,7 @@ On Auber, a route has been added to the VPN network via the internal interface A
    - Paris does not know where to route responses to the `172.20.10.0/24` LAN network (not route to this network in its table routing) so it is sending packets to its default internet gateway.
 
 - **Solutions**: Declare the iroute directive in the specific CCD entry for each client on the Paris server:
-   - In `/etc/openvpn/ccd/client-tokyo` ➔ `iroute 172.20.10.3 255.255.255.255`
+   - In `/etc/openvpn/ccd/client-tokyo` ➔ `iroute 172.20.10.0 255.255.255.240`
    - In `/etc/openvpn/ccd/client-NY` ➔ `iroute 172.20.10.4 255.255.255.255`
    
    - Declare a dynamic route on Paris to instruct it to route via the VPN tunnel to reach the LAN network of Tokyo:
@@ -313,42 +313,25 @@ On Paris, a route has been added to the Tokyo LAN via the tunnel.
 iptables -A FORWARD -i tun0 -o enp0s8 -j ACCEPT
 ```
 
-### ❌ Issue F - LAN‑to‑LAN communication does not work even though the VPN tunnel is UP
-
-For exemple, ping fails from Tokyo client to machines in the distant LAN, such as the router Paris LAN 192.168.1.254 or physical PC (hypervisor) that hosts the Paris's server  192.168.1.73.
-
-- **Goal**: Allow full communication between the client LANs (Tokyo / New York) and the server LAN (Paris) using the OpenVPN tunnel as a gateway.
-
-- **Expected behavior**:
-    Machines in the client LAN should reach machines in the server LAN
-    Machines in the server LAN should reach machines in the client LAN
-    No static routes should be required on every LAN host
-
-- **Actual behavior**:
-    The VPN tunnel is UP
-    Ping works between VPN endpoints (e.g., 10.9.1.1 ↔ 10.9.1.x)
-    ❌ LAN‑to‑LAN ping fails (e.g., Paris → 172.20.10.9)
+### ❌ Issue F - Communication from LAN-to-LAN fails 
+For exemple, ping fails from  client to machines in the server LAN, such as the router Paris LAN 192.168.1.254 or physical PC (hypervisor) that hosts the Paris's server  192.168.1.73.
+Other exemple : ping fails from paris server to machines in the client LAN, such as the gw Paris LAN 172.20.10.1 or physical PC (hypervisor) that hosts the client's server  172.20.10.2.
 
 - **Root Cause** : 
 The LAN hosts (e.g., 172.20.10.0/28 or 192.168.1.0/24) do not know how to reach the remote LAN behind the VPN tunnel. Without NAT, each LAN host would need a static route: `route add <remote LAN> via <VPN gateway>`. Since these routes are not configured on every LAN machine (just Auber & Paris), replies never return to the tunnel → communication fails.
 
 - **Solution**: Use NAT (MASQUERADE) on both sides
-By applying a POSTROUTING MASQUERADE rule, the VPN gateway rewrites the source IP of packets coming from the tunnel so that they appear as if they originate from the LAN interface itself.
+By applying a POSTROUTING MASQUERADE rule, the VPN gateway (client or server here) rewrites the source IP of packets coming from the tunnel so that they appear as if they originate from the LAN interface itself.
 
 Server Paris & Client Tokyo / New York:
 ```bash
 iptables -t nat -A POSTROUTING -s 10.9.1.0/24 -o enp0s3 -j MASQUERADE`
 ```
-<!--
----❌    Missing CCD entries
--->
 
-*Note  : the anomalies are the same between Tokyo client and NY client so the troubleshooting is similar. (just replace the VPN/LAN IP of Tokyo IPs by the VPN/LAN IP of NY IPs on the configuration)*
+- **Proof** :
 
-<!-- 
-Puis tu racontes :
-problème de routage
-problème FORWARD UFW
-problème retour ICMP
-problème push route
--->
+[Wireshark Analysis - Ping Tokyo → Physical PC/hypervisor of the server LAN](../assets/wireshark/openvpn_icmp_ping_tokyo-physical-host-hypervisor-LAN-server.png)
+
+[Wireshark Analysis - Ping Paris → Gateway of Tokyo LAN](../assets/wireshark/openvpn_icmp_ping_paris-gw-lan-tokyo.png)
+
+
