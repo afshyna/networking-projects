@@ -62,7 +62,7 @@ Only the directives relevant to the architecture are documented here:
 
 ### Key OpenVPN Directives (Clients)
 
-- `remote 88.162.141.79 1194` - Connection to the Server (WAN/Public IP and port of Paris VPN server)
+- `remote 82.X.Y.Z 1194` - Connection to the Server (WAN/Public IP and port of Paris VPN server)
 
 - `client`- Indicates that this configuration is for a OpenVPN client
 
@@ -127,7 +127,7 @@ Contains the return route 10.9.1.0/24 via 192.168.100.200 on interface enp0s8.
 To enable remote offices (Client Tokyo and NY) to initiate a connection to the central server located behind a home router, a port forwarding rule and local firewall settings have been configured on Paris site.
 
 **Port Forwarding (home router)**
-- Public WAN IP: `88.162.141.79`
+- Public WAN IP: `82.X.Y.Z`
 - Rule applied: `From everywhere on Internet connecting to external port UDP/1194 ➔ to 192.168.1.197 on internal port 1194`
 
 **Firewall Opening (UFW)**
@@ -168,53 +168,39 @@ Note : in the wireshark captures, the VPN IP of Tokyo client is seen as `10.9.1.
 [Ping_OK_Tokyo-Paris-VPN](../assets/verifs/ping-tokyo-to-paris-VPN.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png)
 
+**Wireshark Captures**
 *Here is a summary of the process that happen : 
-1. When Tokyo sends a ping to `10.9.1.1`, OpenVPN encapsulates it in an encrypted tunnel and sends it to the WAN IP of VPN Paris Server (`88.162.141.79:1194`).
+1. When Tokyo sends a ping to `10.9.1.1`, OpenVPN encapsulates it in an encrypted tunnel and sends it to the WAN IP of VPN Paris Server (`82.X.Y.Z:1194`).
 3. The Paris home router forwards the packet to the Paris VPN server on the LAN (`192.168.1.197:1194`).
 4. The Paris VPN server decrypts the packet & responds to the ping. The response is encapsulated in OpenVPN to return to Tokyo.
 
-• ICMP Echo Request/Reply packets encapsulated within OpenVPN packets (UDP/1194) are observed between `37.174.64.197` (IP WAN Tokyo) and `88.162.141.79` (IP WAN Paris).
+• ICMP Echo Request/Reply packets encapsulated within OpenVPN packets (UDP/1194) are observed between `A.B.C.D` (IP WAN Tokyo) and `82.X.Y.Z` (IP WAN Paris).
 • Once decrypted, the ICMP packets appear between `10.9.1.2` (Tokyo) and `10.9.1.1` (Montrouge) inside the tunnel interface.
-
-- Paris → Tokyo (`10.9.1.2`)
-- Backup site Auber → Tokyo (`10.9.1.2`) 
-- Tokyo → VPN Server Paris (@IP `10.9.1.1`)
-
----
 
 - VPN Tokyo client → NY client (@IP `10.9.1.3`)
 [Ping_OK_Tokyo-NY-VPN](../assets/verifs/ping-tokyo-ny-VPN.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-ny-VPN.png)
 
+---
 
 ### Ping Tests - LAN Access (Paris/Auber) ✅
 - Tokyo → Server Paris LAN (@IP `192.168.1.197`)
 [Ping_OK_Tokyo-Paris-LAN](../assets/verifs/ping-tokyo-paris-lan-ok.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-LAN.png)
 
-- Tokyo → Backup site (internal @IP `192.168.100.210`)
+- Tokyo →  Auber (internal @IP `192.168.100.210`)
 [Ping_OK_Tokyo-Auber-internal-LAN](../assets/verifs/ping-tokyo-internal-lan-auber-ok.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-auber-internal-IP-192.168.100.210.png)
 
  
-- Server Paris → Tokyo (`172.20.10.3`)
+-  Paris → Tokyo (`172.20.10.3`)
  [Ping_OK_Paris-Tokyo-LAN](../assets/verifs/ping-paris-tokyo-lan-ok.png)
 
-- Backup site Auber → Tokyo (`172.20.10.3`)
+-  Auber → Tokyo (`172.20.10.3`)
 [Ping_OK_Auber-Tokyo-LAN](../assets/verifs/ping-auber-tokyo-lan-ok.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-auber-to-tokyo-VPN.png)
 
 ---
-<!--
-### Wireshark Captures
-    Before tunnel
-    After tunnel
-    Encapsulation analysis
-    UDP/1194
-    ICMP inside OpenVP
-➡️ [Capture-wireshark-connectivity-script0](assets/wireshark)
-10.9.1.0/24
--->
 
 ## 7.Troubleshooting & Fixes
 During the acceptance testing phase, several issues of ping were identified and resolved.
@@ -244,16 +230,15 @@ On Tokyo, a route has been added to the Paris LAN via the tunnel.
     - Linux kernel IP forwarding was not enabled in Paris.
     - The OS routing table on the Tokyo is not aware of the subnet behind Paris (`192.168.100.0/24`,  `192.168.1.0/24` ) and is sending packets to its default internet gateway.
     - Aubervilliers does not know where to route responses to the `10.9.1.0/24` VPN network. Its routing table is not aware of this VPN network and is sending packets to its default internet gateway.
-[Wireshark analysis - No ping response from Auber to Tokyo-VPN-IP](../assets/wireshark/wireshark_icmp_tokyo-auber-internal-lan-ping-not-responding.png)
-
       
 - **Solutions**:
-   - Activation of system forwarding on the Paris server (```net.ipv4.ip_forward=1```).
-   - Injection of the LAN route to remote clients via the Paris server: `push ‘route 192.168.100.0 255.255.255.0’` + `push ‘route 192.168.1.0 255.255.255.0’`
+   - Activation of system IP forwarding on the Paris server (```net.ipv4.ip_forward=1```).
+   - Injection of the LAN route to remote clients via the Paris server:
+         `push ‘route 192.168.100.0 255.255.255.0’` + `push ‘route 192.168.1.0 255.255.255.0’`
    - Addition of a static route on the Aubervilliers table routing to instruct it to route via Paris to reach the tunnel network:
-   ```bash
-   ip route add 10.9.1.0/24 via 192.168.100.200 dev enp0s8
-   ```
+          ```bash
+          ip route add 10.9.1.0/24 via 192.168.100.200 dev enp0s8
+          ```
 
 **Proof/Result** : 
 On Tokyo, a route has been added to the Internal LAN Paris-Auber  via the tunnel.
