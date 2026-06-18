@@ -341,4 +341,38 @@ iptables -t nat -A POSTROUTING -s 10.9.1.0/24 -o enp0s3 -j MASQUERADE`
 
 [Wireshark Analysis - Ping Paris → Gateway of Tokyo LAN](../assets/wireshark/openvpn_icmp_ping_paris-gw-lan-tokyo.png)
 
+### ❌ Issue G -  Windows PC ↔ Client or Server  Communication Through the VPN Tunnel
 
+Even though the OpenVPN tunnel between Paris and Tokyo is fully operational and LAN‑to‑LAN communication works at the Linux router level, Windows PCs hosting the client and server VMs cannot ping each other’s LANs.
+
+Example symptoms:
+    Windows PC (Paris) → cannot ping 172.20.10.x (Tokyo LAN)
+    Windows PC (Tokyo) → cannot ping 192.168.1.x (Paris LAN)
+
+This proves the VPN tunnel works, but the Windows hosts themselves do not know how to reach the remote LANs.
+
+Root Cause: Windows hosts do not automatically learn routes to the remote LANs behind the VPN tunnel. Windows does not use the VM as a router unless explicitly configured.
+
+When the Windows PC tries to reach the remote LAN, Windows PC → sends packet to default gateway → packet goes to the Internet → never reaches the VM → never enters the VPN tunnelTherefore, the Windows PC must be explicitly told: “To reach the remote LAN, send traffic to the VM’s LAN IP.”
+
+Solution:  Add Static Routes on Each Windows Host On the Windows PC hosting the Tokyo client VM.
+    - On the Windows PC hosting the tokyo/NY client VM, addd a route to the Paris LAN via the Tokyo VM LAN IP (powershell) :
+    route add 192.168.1.0 mask 255.255.255.0 172.20.10.9
+    - On the Windows PC hosting the Paris server VM, add a route to the Tokyo LAN via the Paris VM LAN IP (powershell) : 
+    route add 172.20.10.0 mask 255.255.255.240 192.168.1.197
+
+- Verification
+    Windows PC Paris → Server Tokyo (172.20.10.9) =  Ping OK
+    Windows PC Paris → Server NY (172.20.10.10) =  Ping OK
+    Windows PC Tokyo → Server Paris (192.168.1.197) =  Ping OK
+    Windows PC Tokyo → Auber (192.168.1.160) =  Ping OK
+
+
+### ❌ Issue G -  Windows PC ↔ Windows PC Communication Through the VPN Tunnel
+
+
+- Enabling Inbound firewall rule "File and Printer Sharing (Restrictive) (Echo Request – ICMPv4-In)" for the Public Profile, in the Windows Defender Firewall of Windows 11, on both Windows 11 PC
+ 
+- Verification
+    Windows PC Paris → Windows PC Tokyo (172.20.10.2) =  Ping OK
+    Windows PC Tokyo → Windows PC Paris (192.168.1.197) = Ping OK
