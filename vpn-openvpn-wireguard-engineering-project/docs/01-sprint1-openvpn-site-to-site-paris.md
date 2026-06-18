@@ -1,29 +1,25 @@
 <h1> 🏁 Sprint 1 - OpenVPN site-to-site with Paris server and Tokyo/NY clients </h1>
 
 ## Sprint Objectives
-
-The aim of this first sprint is to deploy the basic infrastructure for the VPN by setting a site-to-site OpenVPN tunnel between Tokyo/NY clients and the primary site (Paris Montrouge).
-
 - Deploy OpenVPN on  the primary server site (Paris Montrouge) 
-- Connect Tokyo & New York clients to the central site  via an unsecured network (Internet)
+- Connect Tokyo & New York clients to the central site via an unsecured network (Internet)
 - Check routing and inter-site communication
 
 ## Architecture & Topology overview
 
-![Architecture Sprint 1](diagrams/01-sprint1-openvpn-site-to-site-srv-paris-primary_clients-tokyo-NY.png)
+![Architecture Sprint 1](../diagrams/01-sprint1-openvpn-site-to-site-srv-paris-primary_clients-tokyo-NY.png)
 
-* **Addressing Architecture**:
+**Addressing Architecture**:
   * **VPN Network (tun0)**: `10.9.1.0/24`
-  * **IP WAN Publique (Paris and Auber)** : 88.162.141.79
-  * **Primary Site (Paris)**: VPN IP `10.9.1.1` | Physical LAN: `192.168.1.197` | Inter-site link: `192.168.100.200`
-  * **Tokyo Site**: Fixed VPN IP `10.9.1.2` | Remote Local LAN: `172.20.10.0/28` (VM: `172.20.10.3`)
-  * **New York Site**: Fixed VPN IP `10.9.1.3` | Remote Local LAN: `172.20.10.0/28` (VM: `172.20.10.4`)
-  * **Backup Site (Aubervilliers)**: No active tunnel at this stage | Inter-site: `192.168.100.210`
+  * **IP WAN Publique (Paris and Auber)** : `82.X.Y.Z`
+  * **Primary Site (Paris)**: VPN IP `10.9.1.1` | Physical LAN IP : `192.168.1.197` | Inter-site link IP: `192.168.100.200`
+  * **Tokyo Site**: VPN IP `10.9.1.2` | Remote LAN IP: `172.20.10.3`
+  * **New York Site**: Fixed VPN IP `10.9.1.3` | Remote LAN IP: `172.20.10.4`
+  * **Backup Site (Aubervilliers)** (No active tunnel at this stage) : Physical LAN IP : `192.168.1.197` | Inter-site: `192.168.100.210`
 
-## Technical Specifications*
+## Technical Specifications
 * **Protocol**: OpenVPN (VPN SSL/TLS) over UDP transport layer.
 * **Security**: Strong authentication via public key infrastructure (X.509 PKI) and asymmetric encryption for key exchange (2048-bit Diffie-Hellman).
-
 
 ## 1. PKI Setup 
 The ideal authentication solution to use for implementing an OpenVPN tunnel is using X.509 certificates. This significantly improves security by ensuring that each peer/entity (here the servers and the clients) proves its identity using a chain of trust.
