@@ -356,9 +356,16 @@ Windows PC Tokyo → Windows PC Paris (`192.168.1.197`) = Ping OK
 ### ❌ Issue H - HTTP Request fails Tokyo → Auber  (`192.168.100.210`)
 - **Symptom**: Pings to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests get stuck in a loop (timeout).
 
-- **Cause**: The default policy for the Linux firewall in Paris is set to `FORWARD DROP`. ICMP packets were passing through UFW exceptions, but TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris.
+- **Causes**:
+1) the incoming HTTP traffic is blocked by default when ufw is activated.
+2) The default policy for the Linux firewall in Paris is set to `FORWARD DROP`. ICMP packets were passing through UFW exceptions, but TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris.
 
-- **Solution**
+- **Solutions**
+1) Allow incoming HTTP traffic on Auber
+ ```bash
+ufw allow 80/tcp
+```
+2)
 ```bash
 iptables -A FORWARD -i tun0 -o enp0s8 -j ACCEPT
 ```
