@@ -167,11 +167,12 @@ Note : in the wireshark captures, the VPN IP of Tokyo client is seen as `10.9.1.
  le résultat du ping réussi sur la liaison inter-serveurs (192.168.100.200 <-> 192.168.100.210) et les pings des clients vers internet.
  
 ### Ping Tests - Tunnel Connectivity ✅
+
 - Tokyo → VPN Server Paris (@IP `10.9.1.1`)
 [Ping_OK_Tokyo-Paris-VPN](../assets/verifs/ping-tokyo-to-paris-VPN.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png)
 
-Here is a summary of the process that happen : 
+*Here is a summary of the process that happen : 
 1. When Tokyo sends a ping to `10.9.1.1`, OpenVPN encapsulates it in an encrypted tunnel and sends it to the WAN IP of VPN Paris Server (`88.162.141.79:1194`).
 3. The Paris home router forwards the packet to the Paris VPN server on the LAN (`192.168.1.197:1194`).
 4. The Paris VPN server decrypts the packet & responds to the ping. The response is encapsulated in OpenVPN to return to Tokyo.
@@ -181,8 +182,14 @@ Here is a summary of the process that happen :
 
 - Paris → Tokyo (`10.9.1.2`)
 - Backup site Auber → Tokyo (`10.9.1.2`) 
+- Tokyo → VPN Server Paris (@IP `10.9.1.1`)
 
 ---
+
+- VPN Tokyo client → NY client (@IP `10.9.1.3`)
+[Ping_OK_Tokyo-NY-VPN](../assets/verifs/ping-tokyo-ny-VPN.png)
+[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-ny-VPN.png)
+
 
 ### Ping Tests - LAN Access (Paris/Auber) ✅
 - Tokyo → Server Paris LAN (@IP `192.168.1.197`)
