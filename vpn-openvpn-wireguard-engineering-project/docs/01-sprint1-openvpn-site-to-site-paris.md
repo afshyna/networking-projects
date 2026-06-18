@@ -344,7 +344,7 @@ Even though Windows PCs hosting the client and server VMs can communicate with t
 
 - **Cause** : The Windows firewall was blocking incoming ICMP requests from remote private subnets.
 
-- **Solution** : enable  Inbound firewall rule "File and Printer Sharing (Restrictive) (Echo Request – ICMPv4-In)" for the Public Profile, in the Windows Defender Firewall of Windows 11, on both Windows computers.
+- **Solution** : enable  inbound firewall rule `File and Printer Sharing (Restrictive) (Echo Request – ICMPv4-In)` for the `Public` Profile, in the *Windows Defender Firewall* of Windows 11, on both Windows computers.
  
 - **Proofs & Results** : 
 Windows PC Paris → Windows PC Tokyo (`172.20.10.2`) =  Ping OK
@@ -354,9 +354,9 @@ Windows PC Tokyo → Windows PC Paris (`192.168.1.197`) = Ping OK
 ---
 
 ### ❌ Issue H - HTTP Request fails Tokyo → Auber  (`192.168.100.210`)
-- **Symptom**: Pings to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests (curl/wget) get stuck in a loop (timeout).
+- **Symptom**: Pings to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests get stuck in a loop (timeout).
 
-- **Cause**: The default policy for the Linux firewall in Paris is set to FORWARD DROP. ICMP packets were passing through UFW exceptions, but TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris.
+- **Cause**: The default policy for the Linux firewall in Paris is set to `FORWARD DROP`. ICMP packets were passing through UFW exceptions, but TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris.
 
 - **Solution**
 ```bash
