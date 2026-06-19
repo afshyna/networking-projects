@@ -8,38 +8,41 @@
   
 ##  Architecture & Topology Overview
 
-![Architecture Sprint 2](diagrams/02-sprint2-backup-auber-openvpn-failover-automation.png)
+![Architecture Sprint 2](../diagrams/02-sprint2-backup-auber-openvpn-failover-automation.png)
 
 ### Backup Site Role
 - Aubervilliers acts as the secondary VPN hub.
 - Must be reachable by both Tokyo and New York when Paris is down.
 - LAN IP of Auber : `192.168.1.160`
+- internal LAN IP of Auber-Paris interface : `192.168.100.210`
 
 ### Tunnel Networks
 - Primary tunnel: `10.9.1.0/24` (Paris)
 - Backup tunnel: `10.9.2.0/24` (Auber)
 
+## 1. PKI Setup 
+In the same way, he authentication solution to use for implementing an OpenVPN tunnel is using X.509 certificates.
+
+The full PKI setup (CA creation, key generation, certificate signing, installation steps) is documented here:
+[Authentication via SSL/TLS certificates](pki-certificate-authentication.md)
+
+
 ## 🔧 1. OpenVPN Configuration
 
-Only the directives relevant to the architecture are documented here:
-
 ### Backup VPN Server - Key OpenVPN Directives
-- `server 10.9.9.0 255.255.255.0` - Defines the backup VPN tunnel network, that will be used by server/client(s)
+- `server 10.9.2.0 255.255.255.0` - Defines the backup VPN tunnel network, that will be used by Auber server/clients
 - `client-to-client` - Allows VPN clients to communicate with each other.
-- `port 1195` - Auber server listenning port
-- `ca`, `cert`, `key`, - `dh`, - `tls-server` : TLS authentication
- - `push ...`,  `route add...`
-- `client-config-dir /etc/openvpn/ccd` - Enables per-client static IP assignment and iroute.
+- `port 1195` - Auber server listening port
+- `ca`, `cert`, `key`, - `dh`, `tls-server` : TLS authentication
 
-### Client - Key OpenVPN Directives
-
+### Clients - Key OpenVPN Directives
 For Multi‑Server Failover, on clients, after the 1st directive `remote` with Paris server, add a 2nd `remote` for a second VPN connection with the backup server.
+
 ```text
-# Backup Server VPN (Auber)
 remote 82.X.Y.Z 1195
 ```
 
-## 🔀 3. Routing Configuration & Adjustements
+## 🔀 2. Routing Configuration & Adjustements
 
 ### CCD
 OpenVPN must know which client owns which LAN, otherwise packets are dropped.
@@ -84,15 +87,12 @@ See [4. Automated Failover Script on Backup Server (Aubervilliers)](##-Automated
 - Required for return traffic when clients are still connected to Paris.
 - See Troubleshooting – Return Path Issues.
 
-### Paris Server  (primary)
-
 ### CCD Files
-
 1. Create CCD entries for both clients (Tokyo & NY).
 2. Add iroute entries to map each remote LAN to the correct client.
+3. Add the directive `client-config-dir /etc/openvpn/ccd` in the auber openvpn configuration for enabling per-client static IP assignment and iroute.
 
-
-## Port Forwarding for Backup VPN
+## 3. Port Forwarding for Backup VPN
 Traffic coming from the public internet through the edge router (home/box router at Paris) is segregated using port-based forwarding:
 * **Primary VPN Tunnel (Paris):** `82.X.Y.Z:1194 (UDP)` ➔ `192.168.1.197:1194`
 * **Backup VPN Tunnel (Aubervilliers):** `82.X.Y.Z:1195 (UDP)` ➔ `192.168.1.160:1195`
@@ -106,7 +106,7 @@ Purpose : Allows remote clients to reach the backup VPN server when Paris is dow
 - Clients always try Paris first.
 - If unreachable → automatically switch to Aubervilliers.
 
-## 4. Automated Failover Script  on Backup Server (Aubervilliers)
+## 4. Automated Failover Script on Backup Server (Aubervilliers)
  
 **Purpose**
 Automatically switch routing on Aubervilliers depending on tunnel availability.
@@ -214,7 +214,7 @@ Explanation: The main VPN network no longer exists.
 Explanation: The main VPN network no longer exists.
 
 
-## Troubleshooting
+## 6. Troubleshooting
 Temps de bascule supérieur à 1 minute
 
 Cause
