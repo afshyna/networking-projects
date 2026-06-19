@@ -202,6 +202,7 @@ systemctl start openvpn@client-NY
 ---
 
 ## 7.Troubleshooting & Fixes
+
 During the acceptance testing phase, several issues of ping were identified and resolved.
 
 ---
@@ -254,6 +255,7 @@ A traceroute to the Auber internal LAN confirms also the utilization of the VPN 
 On Auber, a route has been added to the VPN network via the internal interface Auber-Paris.
 [Routing Table Auber](../assets/verifs/routing-table-auber-sprint0.png) <!-- A SCREEN -->
 
+*See [Ping Tests - LAN Access (Paris/Auber)](#ping-tests---lan-access-parisauber-).*
 
 ---
 
@@ -277,6 +279,8 @@ On Auber, a route has been added to the VPN network via the internal interface A
 On Paris, a route has been added to the Tokyo LAN via the tunnel.
 [Routing Table Paris](../assets/verifs/routing-table-paris-sprint0.png)
 
+*See [Ping Tests - LAN Access (Paris/Auber)](#ping-tests---lan-access-tokyony-).*
+
 ---
 
 ### ❌ Issue D - Ping fails Auber → Tokyo  (172.20.10.3) 
@@ -293,6 +297,8 @@ On Paris, a route has been added to the Tokyo LAN via the tunnel.
 - **Proof**:
 On Auber, a route has been added to the Tokyo LAN network via the internal interface Auber-Paris. 
 [Routing Table Auber](../assets/verifs/routing-table-auber-sprint0.png) <!-- A SCREEN -->
+
+*See [Ping Tests - LAN Access (Paris/Auber)](#ping-tests---lan-access-tokyony-).*
 
 ---
 
@@ -313,13 +319,16 @@ iptables -t nat -A POSTROUTING -s 10.9.1.0/24 -o enp0s3 -j MASQUERADE
 ```
 
 2) enable  Inbound firewall rule `File and Printer Sharing (Echo Request – ICMPv4-In)` for the `Private, Public` Profile, in the *Windows Defender Firewall* of Windows 11, on both Windows computers.
- 
+ [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+
 - **Proof** :
 Tokyo can ping the Windows PC server : 
-[Wireshark Analysis - Ping Tokyo → Physical PC/hypervisor of the server LAN](../assets/wireshark/openvpn_icmp_ping_tokyo-physical-host-hypervisor-LAN-server.png)
+[Ping Tokyo → Physical PC/hypervisor of the server LAN](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png) <!-- A AJOUTER -->
 
 Paris can ping the Windows PC client:
-[Wireshark Analysis - Ping Paris → Gateway of Tokyo LAN](../assets/wireshark/openvpn_icmp_ping_paris-gw-lan-tokyo.png)
+[Ping Paris → Gateway of Tokyo LAN](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png) <!-- A AJOUTER -->
 
 ---
 
@@ -343,9 +352,16 @@ Paris can ping the Windows PC client:
 
 - **Proofs & Results** : 
     Windows PC Paris → Server Tokyo (`172.20.10.2`) =  Ping OK
+[Ping Windows PC Paris → Server Tokyo ](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+
     Windows PC Paris → Server NY (`172.20.10.3`) =  Ping OK
+[Ping Windows PC Paris → Server NY](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+
     Windows PC Tokyo → Server Paris (`192.168.1.197`) =  Ping OK
+[Ping Windows PC Tokyo → Server Paris](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+
     Windows PC Tokyo → Auber (`192.168.1.160`) =  Ping OK
+[Ping Windows PC Tokyo → Auber](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
 
 ---
 
@@ -355,7 +371,8 @@ Even though Windows PCs hosting the client and server can communicate with the d
 - **Cause** : The Windows firewall was blocking incoming ICMP requests from remote private subnets.
 
 - **Solution** : enable  inbound firewall rule `File and Printer Sharing (Restrictive) (Echo Request – ICMPv4-In)` for the `Public` Profile, in the *Windows Defender Firewall* of Windows 11, on both Windows computers.
- 
+[Windows Defender Firewall - Inbound firewall rule](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+
 - **Proofs & Results** : 
 Windows PC Paris → Windows PC Tokyo (`172.20.10.2`) =  Ping OK
 [Ping Windows PC Paris → Windows PC Tokyo](../assets/verifs/routing-table-auber-sprint0.png)
