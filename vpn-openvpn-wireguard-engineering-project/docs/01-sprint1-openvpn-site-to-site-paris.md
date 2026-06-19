@@ -199,7 +199,7 @@ systemctl start openvpn@client-NY
  [Ping_OK_Paris-Tokyo-LAN](../assets/verifs/sprint1/ping-paris-tokyo-lan-ok.png)
 
 -  Auber → Tokyo (`172.20.10.3`)
-[Ping_OK_Auber-Tokyo-LAN](../assets/verifs/sprint1/ping-auber-tokyo-lan-ok.png) <!-- A SCREEN -->
+[Ping_OK_Auber-Tokyo-LAN](../assets/verifs/sprint1/ping-auber-tokyo-lan) 
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-auber-to-tokyo-VPN.png)  <!-- A SCREEN -->
 
 ---
