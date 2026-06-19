@@ -323,7 +323,7 @@ Tokyo → Windows PC server = [Ping OK](../assets/verifs/sprint1/ping-tokyo-wind
 [Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-tokyo-windows-pc-paris.png) <!-- A AJOUTER -->
 
 Paris → Windows PC client = [Ping OK](../assets/verifs/sprint1/ping-paris-windows-pc-tokyo.png)
-[Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-paris-windows-pc-tokyo) 
+[Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-paris-windows-pc-tokyo.png) 
 
 ---
 
