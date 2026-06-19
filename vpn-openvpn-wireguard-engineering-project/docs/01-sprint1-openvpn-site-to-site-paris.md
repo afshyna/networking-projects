@@ -381,14 +381,25 @@ Windows PC Tokyo → Windows PC Paris (`192.168.1.73`) = [Ping OK & Tracert](../
 
 - **Causes**:
 1) the incoming HTTP traffic is blocked by default when ufw is activated.
-2) The default policy for the Linux firewall in Paris is set to `FORWARD DROP`. ICMP packets were passing through UFW exceptions, but TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris.
+  
+3) The default policy FORWARD for the Linux firewall in Paris is set to `DROP`.  TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris. [FORWARD chain policy dropl](../assets/verifs/sprint1/chain-forward-policy-drop-server-paris.png)
+
+Note that ICMP packets were passing through UFW exceptions. ICMP is enabled by default in the ufw-before-input and ufw-before-forward chains
 
 - **Solutions**
 1) Allow incoming HTTP traffic on Auber
  ```bash
 ufw allow 80/tcp
 ```
-2)
+
+2) Allow the traffic forwarding between VPN network & LAN-Auber-Paris network.
 ```bash
-iptables -A FORWARD -i tun0 -o enp0s8 -j ACCEPT
+# Outward
+iptables -A FORWARD -i tun0 -o enp0s8 -s 10.9.1.0/24 -d 192.168.100.0/24 -j ACCEPT
+# Return 
+iptables -A FORWARD -i enp0s8 -o tun0 -s 192.168.100.0/24 -d 10.9.1.0/24 -j ACCEPT
 ```
+
+- **Results**:
+Client Tokyo → Auber  (`192.168.100.210`) = [HTTP request successful](../assets/verifs/sprint1/curl-http-request-tokyo_auber.png)
+
