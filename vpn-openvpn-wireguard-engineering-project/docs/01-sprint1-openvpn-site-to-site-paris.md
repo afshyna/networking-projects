@@ -1,8 +1,8 @@
 <h1> 🏁 Sprint 1 - OpenVPN site-to-site with Paris server and Tokyo/NY clients </h1>
 
-See the [Sprint Objectives](#Sprint-Objectives) section for details.
+See the [Sprint Objectives](##-Sprint-Objectives) section for details.
 
-# Sprint Objectives
+## Sprint Objectives
 - Deploy OpenVPN on  the primary server site (Paris Montrouge) 
 - Connect Tokyo & New York clients to the central site via an unsecured network (Internet)
 - Check routing and inter-site communication
