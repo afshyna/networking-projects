@@ -161,8 +161,7 @@ systemctl start openvpn@client-NY
 
 ### Ping Tests - Tunnel Connectivity 
 
-- Tokyo → VPN Server Paris (IP `10.9.1.1`)
-[Ping_OK_Tokyo-Paris-VPN](../assets/verifs/sprint1/ping-tokyo-paris-vpn.png)
+- Tokyo → VPN Server Paris (IP `10.9.1.1`) = [Ping OK](../assets/verifs/sprint1/ping-tokyo-paris-vpn.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png) <!-- A SCREEN -->
 
 **Wireshark Captures - Analysis**
@@ -174,32 +173,26 @@ systemctl start openvpn@client-NY
 • ICMP Echo Request/Reply packets encapsulated within OpenVPN packets (UDP/1194) are observed between `A.B.C.D` (IP WAN Tokyo) and `82.X.Y.Z` (IP WAN Paris).
 • Once decrypted, the ICMP packets appear between `10.9.1.2` (Tokyo) and `10.9.1.1` (Montrouge) inside the tunnel interface.
 
-- VPN Auber → Tokyo VPN (IP `10.9.1.2`)
-[Ping](../assets/verifs/sprint1/ping-auber-tokyo-vpn-ok.png) 
+- VPN Auber → Tokyo VPN (IP `10.9.1.2`) = [Ping OK](../assets/verifs/sprint1/ping-auber-tokyo-vpn-ok.png) 
 
-- VPN Tokyo → NY client (IP `10.9.1.3`)
-[Ping](../assets/verifs/sprint1/ping-tokyo-ny-vpn.png)
+- VPN Tokyo → NY client (IP `10.9.1.3`) = [Ping OK](../assets/verifs/sprint1/ping-tokyo-ny-vpn.png)
 [Capture-Wireshark](../assets/wireshark/icmp-openvpn-ping-tokyo-ny-vpn.png) 
 
 ---
 
 ### Ping Tests - LAN Access (Paris/Auber) ✅
 
-- Tokyo → Server Paris LAN (IP `192.168.1.197`)
-[Ping_OK_Tokyo-Paris-LAN](../assets/verifs/sprint1/ping-tokyo-paris-lan-ok.png)
+- Tokyo → Server Paris LAN (IP `192.168.1.197`) = [Ping OK](../assets/verifs/sprint1/ping-tokyo-paris-lan-ok.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-LAN.png) <!-- A SCREEN -->
 
-- Tokyo →  Auber (internal IP `192.168.100.210`)
-[Ping_OK_Tokyo-Auber-internal-LAN](../assets/verifs/sprint1/ping-tokyo-internal-lan-auber-ok.png)
+- Tokyo →  Auber (internal IP `192.168.100.210`) = [Ping OK](../assets/verifs/sprint1/ping-tokyo-internal-lan-auber-ok.png)
 [Capture-Wireshark](../assets/wireshark/) <!-- A SCREEN -->
 
  ### Ping Tests - LAN Access (Tokyo/NY) ✅
 
--  Paris → Tokyo (`172.20.10.3`)
- [Ping_OK_Paris-Tokyo-LAN](../assets/verifs/sprint1/ping-paris-tokyo-lan-ok.png)
+-  Paris → Tokyo (`172.20.10.3`) = [Ping OK](../assets/verifs/sprint1/ping-paris-tokyo-lan-ok.png)
 
--  Auber → Tokyo (`172.20.10.3`)
-[Ping_OK_Auber-Tokyo-LAN](../assets/verifs/sprint1/ping-auber-tokyo-lan.png)
+-  Auber → Tokyo (`172.20.10.3`) = [Ping OK](../assets/verifs/sprint1/ping-auber-tokyo-lan.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-auber-to-tokyo-VPN.png)  <!-- A SCREEN -->
 
 ---
@@ -326,16 +319,13 @@ iptables -t nat -A POSTROUTING -s 10.9.1.0/24 -o enp0s3 -j MASQUERADE
  [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-enabled.png)
 
 - **Proof** :
-Tokyo can ping the Windows PC server : 
-[Ping Tokyo → Physical PC/hypervisor of the server LAN](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+Tokyo → Windows PC server = [Ping OK](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping_tokyo-physical-host-hypervisor-LAN-server.png)
 
-Paris can ping the Windows PC client:
-[Ping Paris → Gateway of Tokyo LAN](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+Paris → Windows PC client = [Ping OK](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png) <!-- A AJOUTER -->
 
-Paris can ping the GW client:
-[Ping Paris → Gateway of Tokyo LAN](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+Paris → GW client = [Ping OK](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping_paris-gw-lan-tokyo.png) 
 
 ---
@@ -370,7 +360,8 @@ Even though Windows PCs hosting the client and server can communicate with the d
 
 - **Cause** : The Windows firewall was blocking incoming ICMP requests from remote private subnets.
 
-- **Solution** : enable [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-enabled.png) `File and Printer Sharing (Restrictive) (Echo Request – ICMPv4-In)` for the `Public` Profile on both Windows computers.
+- **Solution** : enable the Inbound firewall rule `File and Printer Sharing (Restrictive) (Echo Request – ICMPv4-In)` for the `Public` Profile in the Windows Defender Firewall app, on both Windows computers.
+[Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-enabled.png)
 
 - **Proofs & Results** : 
 Windows PC Paris → Windows PC Tokyo (`172.20.10.2`) = [Ping OK](../assets/verifs/sprint1/ping_windowsPC-server-windowsPC-tokyo.png) 
