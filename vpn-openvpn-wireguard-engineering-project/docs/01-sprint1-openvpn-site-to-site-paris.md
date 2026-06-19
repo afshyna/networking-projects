@@ -219,7 +219,7 @@ On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
 [Routing Table Tokyo](../assets/verifs/routing-table-tokyo-sprint1.png)  <!-- A SCREEN -->
 [Routing Table NY](../assets/verifs/routing-table-NY-sprint1.png)  <!-- A SCREEN -->
 
-*See [Ping Tests - LAN Access (Paris/Auber)](#Ping-Tests---LAN-Access-(Paris/Auber)).*
+*See [Ping Tests - LAN Access (Paris/Auber)](#Ping-Tests---LAN-Access-(Paris/Auber)-✅).*
 
 ---
 
