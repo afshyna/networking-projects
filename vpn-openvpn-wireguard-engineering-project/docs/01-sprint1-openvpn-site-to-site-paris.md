@@ -33,14 +33,12 @@ The full PKI setup (CA creation, key generation, certificate signing, installati
 
 *Full configuration files are available in the root folder  `configs/openvpn/` directory.*
 
-### Server - Key OpenVPN Directives
+### Paris Server - Key OpenVPN Directives
 
 - `server 10.9.1.0 255.255.255.0` - Defines the primary VPN tunnel network, that will be used by server/client(s)
 - `client-config-dir /etc/openvpn/ccd` - Enables per-client static IP assignment and iroute.
 - `client-to-client` - Allows VPN clients to communicate with each other.
 - `port 1194` - server listening port
- - `push ...`
- - `route add...`
 
 **Server TLS authentication**
 - `ca` -  the CA certificate used to validate the server’s identity.
@@ -59,7 +57,7 @@ In the CCD configuration files, add a static VPN IP to each client:
        ```text
        ifconfig-push 10.9.1.3 255.255.255.0
        ```
-  
+
 ---
 
 ### Clients - Key OpenVPN Directives
