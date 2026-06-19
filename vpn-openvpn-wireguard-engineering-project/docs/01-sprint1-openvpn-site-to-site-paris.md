@@ -199,7 +199,7 @@ systemctl start openvpn@client-NY
  [Ping_OK_Paris-Tokyo-LAN](../assets/verifs/sprint1/ping-paris-tokyo-lan-ok.png)
 
 -  Auber → Tokyo (`172.20.10.3`)
-[Ping_OK_Auber-Tokyo-LAN](../assets/verifs/sprint1/ping-auber-tokyo-lan) 
+[Ping_OK_Auber-Tokyo-LAN](../assets/verifs/sprint1/ping-auber-tokyo-lan.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-auber-to-tokyo-VPN.png)  <!-- A SCREEN -->
 
 ---
@@ -323,7 +323,7 @@ iptables -t nat -A POSTROUTING -s 10.9.1.0/24 -o enp0s3 -j MASQUERADE
 ```
 
 2) enable  Inbound firewall rule `File and Printer Sharing (Echo Request – ICMPv4-In)` for the `Private, Public` Profile, in the *Windows Defender Firewall* of Windows 11, on both Windows computers.
- [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+ [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-enabled.png)
 
 - **Proof** :
 Tokyo can ping the Windows PC server : 
@@ -359,8 +359,8 @@ Paris can ping the GW client:
 ```
 
 - **Proofs & Results** : 
-    Windows PC Paris → Server Tokyo (`172.20.10.2`) =  Ping OK
-[Ping](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+    Windows PC Paris → Server Tokyo (`172.20.10.9`) / NY (`172.20.10.10`)  =  Ping OK
+[Ping](../assets/verifs/sprint1/ping_windowsPC-server_tokyo-NY-VPNs.png) <!-- A AJOUTER -->
 
     Windows PC Tokyo → Server Paris (`192.168.1.197`) =  Ping OK
 [Ping](../assets/verifs/sprint1/) <!-- A AJOUTER -->
@@ -373,12 +373,13 @@ Even though Windows PCs hosting the client and server can communicate with the d
 - **Cause** : The Windows firewall was blocking incoming ICMP requests from remote private subnets.
 
 - **Solution** : enable  inbound firewall rule `File and Printer Sharing (Restrictive) (Echo Request – ICMPv4-In)` for the `Public` Profile, in the *Windows Defender Firewall* of Windows 11, on both Windows computers.
-[Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-enabled.png) <!-- A AJOUTER -->
+[Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-enabled.png)
 
 - **Proofs & Results** : 
 Windows PC Paris → Windows PC Tokyo (`172.20.10.2`) =  Ping OK
-[Ping](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+[Ping](../assets/verifs/sprint1/ping_windowsPC-server-windowsPC-tokyo.png) 
 [Tracert](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+[Wireshark](../assets/verifs/wireshark/openvpn_icmp_ping_windowsPC-server-windowsPC-tokyo.png) 
 
 
 Windows PC Tokyo → Windows PC Paris (`192.168.1.197`) = Ping OK
