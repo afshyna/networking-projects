@@ -1,6 +1,8 @@
 <h1> 🏁 Sprint 1 - OpenVPN site-to-site with Paris server and Tokyo/NY clients </h1>
 
-## Sprint Objectives
+See the [Sprint Objectives](#Sprint-Objectives) section for details.
+
+# Sprint Objectives
 - Deploy OpenVPN on  the primary server site (Paris Montrouge) 
 - Connect Tokyo & New York clients to the central site via an unsecured network (Internet)
 - Check routing and inter-site communication
@@ -157,9 +159,9 @@ systemctl start openvpn@client-tokyo
 systemctl start openvpn@client-NY
 ```
 
-## 6. Validation  / Connectivity 
+## 6. Validation  / Connectivity ✅
 
-### Ping Tests - Tunnel Connectivity ✅
+### Ping Tests - Tunnel Connectivity 
 
 - Tokyo → VPN Server Paris (IP `10.9.1.1`)
 [Ping_OK_Tokyo-Paris-VPN](../assets/verifs/ping-tokyo-paris-vpn.png)
@@ -181,6 +183,7 @@ systemctl start openvpn@client-NY
 ---
 
 ### Ping Tests - LAN Access (Paris/Auber) ✅
+
 - Tokyo → Server Paris LAN (IP `192.168.1.197`)
 [Ping_OK_Tokyo-Paris-LAN](../assets/verifs/ping-tokyo-paris-lan-ok.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-LAN.png) <!-- A SCREEN -->
@@ -189,7 +192,8 @@ systemctl start openvpn@client-NY
 [Ping_OK_Tokyo-Auber-internal-LAN](../assets/verifs/ping-tokyo-internal-lan-auber-ok.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-auber-internal-IP-192.168.100.210.png) <!-- A SCREEN -->
 
- 
+ ### Ping Tests - LAN Access (Tokyo/NY) ✅
+
 -  Paris → Tokyo (`172.20.10.3`)
  [Ping_OK_Paris-Tokyo-LAN](../assets/verifs/ping-paris-tokyo-lan-ok.png)
 
@@ -216,6 +220,9 @@ During the acceptance testing phase, several issues of ping were identified and 
 On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
 [Routing Table Tokyo](../assets/verifs/routing-table-tokyo-sprint1.png)  <!-- A SCREEN -->
 [Routing Table NY](../assets/verifs/routing-table-NY-sprint1.png)  <!-- A SCREEN -->
+
+*See [Ping Tests - LAN Access (Paris/Auber)](###-Ping-Tests---Tunnel-Connectivity).*
+
 
 ### Ping Tests - LAN Access (Paris/Auber)
 ---
