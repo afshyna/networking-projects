@@ -1,7 +1,5 @@
 <h1> 🏁 Sprint 1 - OpenVPN site-to-site with Paris server and Tokyo/NY clients </h1>
 
-See the [Technical Specifications](#Technical-Specifications) section for details.
-
 ## Sprint Objectives
 - Deploy OpenVPN on  the primary server site (Paris Montrouge) 
 - Connect Tokyo & New York clients to the central site via an unsecured network (Internet)
@@ -221,7 +219,7 @@ On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
 [Routing Table Tokyo](../assets/verifs/routing-table-tokyo-sprint1.png)  <!-- A SCREEN -->
 [Routing Table NY](../assets/verifs/routing-table-NY-sprint1.png)  <!-- A SCREEN -->
 
-*See [Ping Tests - LAN Access (Paris/Auber)](###-Ping-Tests---Tunnel-Connectivity).*
+*See [Ping Tests - LAN Access (Paris/Auber)](#Ping-Tests---Tunnel-Connectivity).*
 
 
 ### Ping Tests - LAN Access (Paris/Auber)
