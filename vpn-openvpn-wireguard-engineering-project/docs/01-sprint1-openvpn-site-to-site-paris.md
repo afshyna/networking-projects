@@ -162,7 +162,7 @@ systemctl start openvpn@client-NY
 ### Ping Tests - Tunnel Connectivity 
 
 - Tokyo → VPN Server Paris (IP `10.9.1.1`) = [Ping OK](../assets/verifs/sprint1/ping-tokyo-paris-vpn.png)
-[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png) <!-- A SCREEN -->
+[Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-tokyo-paris-vpn.png) <!-- A SCREEN -->
 
 **Wireshark Captures - Analysis**
 *Here is a summary of the process that happen : 
@@ -183,17 +183,17 @@ systemctl start openvpn@client-NY
 ### Ping Tests - LAN Access (Paris/Auber) ✅
 
 - Tokyo → Server Paris LAN (IP `192.168.1.197`) = [Ping OK](../assets/verifs/sprint1/ping-tokyo-paris-lan-ok.png)
-[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-LAN.png) <!-- A SCREEN -->
+[Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-tokyo-paris-lan.png)
 
 - Tokyo →  Auber (internal IP `192.168.100.210`) = [Ping OK](../assets/verifs/sprint1/ping-tokyo-internal-lan-auber-ok.png)
-[Capture-Wireshark](../assets/wireshark/) <!-- A SCREEN -->
+[Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-tokyo-auber-internal-lan.png)
 
  ### Ping Tests - LAN Access (Tokyo/NY) ✅
 
 -  Paris → Tokyo (`172.20.10.3`) = [Ping OK](../assets/verifs/sprint1/ping-paris-tokyo-lan-ok.png)
 
 -  Auber → Tokyo (`172.20.10.3`) = [Ping OK](../assets/verifs/sprint1/ping-auber-tokyo-lan.png)
-[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-auber-to-tokyo-VPN.png)  <!-- A SCREEN -->
+[Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-auber-tokyo-lan.png)  
 
 ---
 
@@ -213,8 +213,8 @@ During the acceptance testing phase, several issues of ping were identified and 
 
 - **Proof & Result** : 
 On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
-[Routing Table Tokyo](../assets/verifs/sprint1/routing-table-tokyo-sprint1.png)  <!-- A SCREEN -->
-[Routing Table NY](../assets/verifs/sprint1/routing-table-NY-sprint1.png)  <!-- A SCREEN -->
+[Routing Table Tokyo](../assets/verifs/sprint1/routing-table-tokyo.png) 
+[Routing Table NY](../assets/verifs/sprint1/routing-table-NY.png) 
 
 *See [Ping Tests - LAN Access (Paris/Auber)](#ping-tests---lan-access-parisauber-).*
 
@@ -228,7 +228,7 @@ On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
 1) Linux kernel IP forwarding was not enabled in Paris.
 2) The OS routing table on the Tokyo is not aware of the subnet behind Paris (`192.168.100.0/24`,  `192.168.1.0/24` ) and is sending packets to its default internet gateway.
 3) Aubervilliers does not know where to route ping responses to the `10.9.1.0/24` VPN network. Its routing table is not aware of this VPN network and is sending packets to its default internet gateway.
-[Capture Wireshark showing that Auber reply to the VPN IP Tokyo](../assets/wireshark/icmp-ping-reply-auber-tokyo-vpn.png) <!-- A AJOUTER -->
+[Capture Wireshark showing that Auber reply to the VPN IP Tokyo](../assets/wireshark/icmp-ping-reply-auber-tokyo-vpn.png)
       
 - **Solutions**:
 1) Activation of IP forwarding on the Paris server (`net.ipv4.ip_forward=1`).
@@ -244,7 +244,7 @@ On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
 
 - **Proofs & Results** : 
 On Tokyo, a route has been added to the these 2 distant LANs via the tunnel.
-[Routing Table Tokyo](../assets/verifs/sprint1/routing-table-tokyo-sprint0.png) <!-- A SCREEN -->
+[Routing Table Tokyo](../assets/verifs/sprint1/routing-table-tokyo.png)
 
 A traceroute to the Auber internal LAN confirms also the utilization of the VPN tunnel as gw :
 [Traceroute-tokyo-to-auber-internal-LAN](../assets/verifs/sprint1/traceroute-tokyo_auber-internal-lan.png)
