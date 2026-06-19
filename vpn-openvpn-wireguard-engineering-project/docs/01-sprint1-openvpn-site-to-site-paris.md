@@ -384,7 +384,7 @@ Windows PC Tokyo → Windows PC Paris (`192.168.1.73`) = [Ping OK & Tracert](../
   
 3) The default policy FORWARD for the Linux firewall in Paris is set to `DROP`.  TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris. [FORWARD chain policy dropl](../assets/verifs/sprint1/chain-forward-policy-drop-server-paris.png)
 
-Note that ICMP packets were passing through UFW exceptions. ICMP is enabled by default in the ufw-before-input and ufw-before-forward chains
+Note that ICMP packets were passing through UFW exceptions. ICMP is enabled by default in the `ufw-before-input` and `ufw-before-forward` chains
 
 - **Solutions**
 1) Allow incoming HTTP traffic on Auber
