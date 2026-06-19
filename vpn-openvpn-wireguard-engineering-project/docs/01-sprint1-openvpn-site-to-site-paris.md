@@ -363,11 +363,9 @@ Even though Windows PCs hosting the client and server can communicate with the d
 [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-enabled.png)
 
 - **Proofs & Results** : 
-Windows PC Paris → Windows PC Tokyo (`172.20.10.2`) = [Ping OK](../assets/verifs/sprint1/ping_windowsPC-server-windowsPC-tokyo.png) 
-[Tracert](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+Windows PC Paris → Windows PC Tokyo (`172.20.10.2`) = [Ping OK & Tracert](../assets/verifs/sprint1/ping_tracert-windows-pc-server-windows-pc-client.png) 
 
-Windows PC Tokyo → Windows PC Paris (`192.168.1.197`) = [Ping OK](../assets/verifs/sprint1/) <!-- A AJOUTER -->
-[Tracert](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+Windows PC Tokyo → Windows PC Paris (`192.168.1.73`) = [Ping OK & Tracert](../assets/verifs/sprint1/ping_tracert-windows-pc-client-windows-pc-server.png)
 
 ---
 
