@@ -157,7 +157,11 @@ systemctl start openvpn@client-tokyo
 systemctl start openvpn@client-NY
 ```
 
-## 6. Validation  / Connectivity ✅
+## 6. Web server configuration  
+
+- Installation of nginx service web on auber site
+
+## 7. Validation  / Connectivity ✅
 
 ### Ping Tests - Tunnel Connectivity 
 
@@ -197,7 +201,7 @@ systemctl start openvpn@client-NY
 
 ---
 
-## 7.Troubleshooting & Fixes
+## 8.Troubleshooting & Fixes
 
 During the acceptance testing phase, several issues of ping were identified and resolved.
 
@@ -377,7 +381,7 @@ Windows PC Tokyo → Windows PC Paris (`192.168.1.73`) = [Ping OK & Tracert](../
 ---
 
 ### ❌ Issue H - HTTP Request fails Tokyo → Auber  (`192.168.100.210`)
-- **Symptom**: Ping to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests get stuck in a loop (timeout).
+- **Symptom**: Ping to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests not.
 
 - **Causes**:
 1) the incoming HTTP traffic is blocked by default when ufw is activated.
