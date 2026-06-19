@@ -162,7 +162,7 @@ systemctl start openvpn@client-NY
 ### Ping Tests - Tunnel Connectivity 
 
 - Tokyo → VPN Server Paris (IP `10.9.1.1`)
-[Ping_OK_Tokyo-Paris-VPN](../assets/verifs/ping-tokyo-paris-vpn.png)
+[Ping_OK_Tokyo-Paris-VPN](../assets/verifs/sprint1/ping-tokyo-paris-vpn.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png) <!-- A SCREEN -->
 
 **Wireshark Captures - Analysis**
@@ -174,29 +174,32 @@ systemctl start openvpn@client-NY
 • ICMP Echo Request/Reply packets encapsulated within OpenVPN packets (UDP/1194) are observed between `A.B.C.D` (IP WAN Tokyo) and `82.X.Y.Z` (IP WAN Paris).
 • Once decrypted, the ICMP packets appear between `10.9.1.2` (Tokyo) and `10.9.1.1` (Montrouge) inside the tunnel interface.
 
-- VPN Tokyo client → NY client (IP `10.9.1.3`)
-[Ping_OK_Tokyo-NY-VPN](../assets/verifs/ping-tokyo-ny-VPN.png) <!-- A SCREEN --> 
+- VPN Tokyo → NY client (IP `10.9.1.3`)
+[Ping_OK_Tokyo-NY-VPN](../assets/verifs/sprint1/ping-tokyo-ny-VPN.png) <!-- A SCREEN --> 
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-ny-VPN.png) <!-- A SCREEN --> 
+
+- VPN Auber → Tokyo VPN (IP `10.9.1.2`)
+[Ping_OK_Tokyo-NY-VPN](../assets/verifs/sprint1/ping-auber-tokyo-vpn-ok.png) <!-- A SCREEN --> 
 
 ---
 
 ### Ping Tests - LAN Access (Paris/Auber) ✅
 
 - Tokyo → Server Paris LAN (IP `192.168.1.197`)
-[Ping_OK_Tokyo-Paris-LAN](../assets/verifs/ping-tokyo-paris-lan-ok.png)
+[Ping_OK_Tokyo-Paris-LAN](../assets/verifs/sprint1/ping-tokyo-paris-lan-ok.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-LAN.png) <!-- A SCREEN -->
 
 - Tokyo →  Auber (internal IP `192.168.100.210`)
-[Ping_OK_Tokyo-Auber-internal-LAN](../assets/verifs/ping-tokyo-internal-lan-auber-ok.png)
+[Ping_OK_Tokyo-Auber-internal-LAN](../assets/verifs/sprint1/ping-tokyo-internal-lan-auber-ok.png)
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-auber-internal-IP-192.168.100.210.png) <!-- A SCREEN -->
 
  ### Ping Tests - LAN Access (Tokyo/NY) ✅
 
 -  Paris → Tokyo (`172.20.10.3`)
- [Ping_OK_Paris-Tokyo-LAN](../assets/verifs/ping-paris-tokyo-lan-ok.png)
+ [Ping_OK_Paris-Tokyo-LAN](../assets/verifs/sprint1/ping-paris-tokyo-lan-ok.png)
 
 -  Auber → Tokyo (`172.20.10.3`)
-[Ping_OK_Auber-Tokyo-LAN](../assets/verifs/ping-auber-tokyo-lan-ok.png)
+[Ping_OK_Auber-Tokyo-LAN](../assets/verifs/sprint1/ping-auber-tokyo-lan-ok.png) <!-- A SCREEN -->
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-auber-to-tokyo-VPN.png)  <!-- A SCREEN -->
 
 ---
@@ -217,8 +220,8 @@ During the acceptance testing phase, several issues of ping were identified and 
 
 - **Proof & Result** : 
 On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
-[Routing Table Tokyo](../assets/verifs/routing-table-tokyo-sprint1.png)  <!-- A SCREEN -->
-[Routing Table NY](../assets/verifs/routing-table-NY-sprint1.png)  <!-- A SCREEN -->
+[Routing Table Tokyo](../assets/verifs/sprint1/routing-table-tokyo-sprint1.png)  <!-- A SCREEN -->
+[Routing Table NY](../assets/verifs/sprint1/routing-table-NY-sprint1.png)  <!-- A SCREEN -->
 
 *See [Ping Tests - LAN Access (Paris/Auber)](#ping-tests---lan-access-parisauber-).*
 
@@ -247,13 +250,13 @@ On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
 
 - **Proofs & Results** : 
 On Tokyo, a route has been added to the these 2 distant LANs via the tunnel.
-[Routing Table Tokyo](../assets/verifs/routing-table-tokyo-sprint0.png) <!-- A SCREEN -->
+[Routing Table Tokyo](../assets/verifs/sprint1/routing-table-tokyo-sprint0.png) <!-- A SCREEN -->
 
 A traceroute to the Auber internal LAN confirms also the utilization of the VPN tunnel as gw :
-[Traceroute-tokyo-to-auber-internal-LAN](../assets/verifs/traceroute-tokyo_auber-internal-lan.png)
+[Traceroute-tokyo-to-auber-internal-LAN](../assets/verifs/sprint1/traceroute-tokyo_auber-internal-lan.png)
 
 On Auber, a route has been added to the VPN network via the internal interface Auber-Paris.
-[Routing Table Auber](../assets/verifs/routing-table-auber-sprint0.png) <!-- A SCREEN -->
+[Routing Table Auber](../assets/verifs/sprint1/routing-table-auber-sprint0.png) 
 
 *See [Ping Tests - LAN Access (Paris/Auber)](#ping-tests---lan-access-parisauber-).*
 
@@ -277,7 +280,7 @@ On Auber, a route has been added to the VPN network via the internal interface A
 
 **Proof & Result** : 
 On Paris, a route has been added to the Tokyo LAN via the tunnel.
-[Routing Table Paris](../assets/verifs/routing-table-paris-sprint0.png)
+[Routing Table Paris](../assets/verifs/sprint1/routing-table-paris-sprint0.png)
 
 *See [Ping Tests - LAN Access (Tokyo/NY)](#ping-tests---lan-access-tokyony-).*
 
@@ -296,7 +299,7 @@ On Paris, a route has been added to the Tokyo LAN via the tunnel.
 
 - **Proof**:
 On Auber, a route has been added to the Tokyo LAN network via the internal interface Auber-Paris. 
-[Routing Table Auber](../assets/verifs/routing-table-auber-sprint0.png) <!-- A SCREEN -->
+[Routing Table Auber](../assets/verifs/sprint1/routing-table-auber-sprint0.png)
 
 *See [Ping Tests - LAN Access (Tokyo/NY)](#ping-tests---lan-access-tokyony-).*
 
@@ -319,15 +322,15 @@ iptables -t nat -A POSTROUTING -s 10.9.1.0/24 -o enp0s3 -j MASQUERADE
 ```
 
 2) enable  Inbound firewall rule `File and Printer Sharing (Echo Request – ICMPv4-In)` for the `Private, Public` Profile, in the *Windows Defender Firewall* of Windows 11, on both Windows computers.
- [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+ [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 
 - **Proof** :
 Tokyo can ping the Windows PC server : 
-[Ping Tokyo → Physical PC/hypervisor of the server LAN](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+[Ping Tokyo → Physical PC/hypervisor of the server LAN](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png) <!-- A AJOUTER -->
 
 Paris can ping the Windows PC client:
-[Ping Paris → Gateway of Tokyo LAN](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+[Ping Paris → Gateway of Tokyo LAN](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png) <!-- A AJOUTER -->
 
 ---
@@ -352,16 +355,16 @@ Paris can ping the Windows PC client:
 
 - **Proofs & Results** : 
     Windows PC Paris → Server Tokyo (`172.20.10.2`) =  Ping OK
-[Ping Windows PC Paris → Server Tokyo ](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+[Ping Windows PC Paris → Server Tokyo ](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 
     Windows PC Paris → Server NY (`172.20.10.3`) =  Ping OK
-[Ping Windows PC Paris → Server NY](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+[Ping Windows PC Paris → Server NY](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 
     Windows PC Tokyo → Server Paris (`192.168.1.197`) =  Ping OK
-[Ping Windows PC Tokyo → Server Paris](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+[Ping Windows PC Tokyo → Server Paris](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 
     Windows PC Tokyo → Auber (`192.168.1.160`) =  Ping OK
-[Ping Windows PC Tokyo → Auber](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+[Ping Windows PC Tokyo → Auber](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 
 ---
 
@@ -371,14 +374,14 @@ Even though Windows PCs hosting the client and server can communicate with the d
 - **Cause** : The Windows firewall was blocking incoming ICMP requests from remote private subnets.
 
 - **Solution** : enable  inbound firewall rule `File and Printer Sharing (Restrictive) (Echo Request – ICMPv4-In)` for the `Public` Profile, in the *Windows Defender Firewall* of Windows 11, on both Windows computers.
-[Windows Defender Firewall - Inbound firewall rule](../assets/verifs/ping-tokyo-paris-vpn.png) <!-- A AJOUTER -->
+[Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-enabled.png) <!-- A AJOUTER -->
 
 - **Proofs & Results** : 
 Windows PC Paris → Windows PC Tokyo (`172.20.10.2`) =  Ping OK
-[Ping Windows PC Paris → Windows PC Tokyo](../assets/verifs/routing-table-auber-sprint0.png)
+[Ping Windows PC Paris → Windows PC Tokyo](../assets/verifs/sprint1/)
 
 Windows PC Tokyo → Windows PC Paris (`192.168.1.197`) = Ping OK
-[Ping Windows PC Tokyo → Windows PC Paris](../assets/verifs/routing-table-auber-sprint0.png)
+[Ping Windows PC Tokyo → Windows PC Paris](../assets/verifs/sprint1/)
 
 ---
 
