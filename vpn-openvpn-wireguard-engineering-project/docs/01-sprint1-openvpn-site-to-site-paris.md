@@ -234,7 +234,8 @@ On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
 - **Causes**:
 1) Linux kernel IP forwarding was not enabled in Paris.
 2) The OS routing table on the Tokyo is not aware of the subnet behind Paris (`192.168.100.0/24`,  `192.168.1.0/24` ) and is sending packets to its default internet gateway.
-3) Aubervilliers does not know where to route responses to the `10.9.1.0/24` VPN network. Its routing table is not aware of this VPN network and is sending packets to its default internet gateway.
+3) Aubervilliers does not know where to route ping responses to the `10.9.1.0/24` VPN network. Its routing table is not aware of this VPN network and is sending packets to its default internet gateway.
+[Capture Wireshark showing that Auber reply to the VPN IP Tokyo](../assets/wireshark/icmp-ping-reply-auber-tokyo-vpn.png) <!-- A AJOUTER -->
       
 - **Solutions**:
 1) Activation of IP forwarding on the Paris server (`net.ipv4.ip_forward=1`).
@@ -327,11 +328,15 @@ iptables -t nat -A POSTROUTING -s 10.9.1.0/24 -o enp0s3 -j MASQUERADE
 - **Proof** :
 Tokyo can ping the Windows PC server : 
 [Ping Tokyo → Physical PC/hypervisor of the server LAN](../assets/verifs/sprint1/) <!-- A AJOUTER -->
-[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png) <!-- A AJOUTER -->
+[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping_tokyo-physical-host-hypervisor-LAN-server.png)
 
 Paris can ping the Windows PC client:
 [Ping Paris → Gateway of Tokyo LAN](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 [Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png) <!-- A AJOUTER -->
+
+Paris can ping the GW client:
+[Ping Paris → Gateway of Tokyo LAN](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping_paris-gw-lan-tokyo.png) 
 
 ---
 
@@ -355,16 +360,10 @@ Paris can ping the Windows PC client:
 
 - **Proofs & Results** : 
     Windows PC Paris → Server Tokyo (`172.20.10.2`) =  Ping OK
-[Ping Windows PC Paris → Server Tokyo ](../assets/verifs/sprint1/) <!-- A AJOUTER -->
-
-    Windows PC Paris → Server NY (`172.20.10.3`) =  Ping OK
-[Ping Windows PC Paris → Server NY](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+[Ping](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 
     Windows PC Tokyo → Server Paris (`192.168.1.197`) =  Ping OK
-[Ping Windows PC Tokyo → Server Paris](../assets/verifs/sprint1/) <!-- A AJOUTER -->
-
-    Windows PC Tokyo → Auber (`192.168.1.160`) =  Ping OK
-[Ping Windows PC Tokyo → Auber](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+[Ping](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 
 ---
 
@@ -378,10 +377,13 @@ Even though Windows PCs hosting the client and server can communicate with the d
 
 - **Proofs & Results** : 
 Windows PC Paris → Windows PC Tokyo (`172.20.10.2`) =  Ping OK
-[Ping Windows PC Paris → Windows PC Tokyo](../assets/verifs/sprint1/)
+[Ping](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+[Tracert](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+
 
 Windows PC Tokyo → Windows PC Paris (`192.168.1.197`) = Ping OK
-[Ping Windows PC Tokyo → Windows PC Paris](../assets/verifs/sprint1/)
+[Ping](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+[Tracert](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 
 ---
 
