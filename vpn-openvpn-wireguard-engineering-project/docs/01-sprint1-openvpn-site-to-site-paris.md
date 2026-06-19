@@ -247,7 +247,7 @@ On Tokyo, a route has been added to the these 2 distant LANs via the tunnel.
 [Routing Table Tokyo](../assets/verifs/sprint1/routing-table-tokyo.png)
 
 A traceroute to the Auber internal LAN confirms also the utilization of the VPN tunnel as gw :
-[Traceroute-tokyo-to-auber-internal-LAN](../assets/verifs/sprint1/traceroute-tokyo_auber-internal-lan.png)
+[Traceroute-tokyo-to-auber-internal-LAN](../assets/verifs/sprint1/traceroute-tokyo-auber-lans.png)
 
 On Auber, a route has been added to the VPN network via the internal interface Auber-Paris.
 [Routing Table Auber](../assets/verifs/sprint1/routing-table-auber-sprint0.png) 
