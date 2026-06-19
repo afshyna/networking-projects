@@ -1,6 +1,6 @@
 # 🏁 Sprint 2 :  Secondary OpenVPN Backup Site Deployment & Automated Network Failover 
 
-## Sprint Objective
+## Sprint Objectives
 - Deploy a secondary OpenVPN backup VPN server (Aubervilliers).
 - Ensure network‑level high availability (HA) between Paris ↔ Tokyo/New York.
 - Implement automatic network failover when the primary VPN server (Paris) becomes unavailable/goes offline.
@@ -19,35 +19,27 @@
 - Primary tunnel: `10.9.1.0/24` (Paris)
 - Backup tunnel: `10.9.2.0/24` (Auber)
 
-## 1. OpenVPN Configuration
+## 🔧 1. OpenVPN Configuration
 
 Only the directives relevant to the architecture are documented here:
 
-### Backup VPN Server (Auber) - Key OpenVPN Directives
+### Backup VPN Server - Key OpenVPN Directives
 - `server 10.9.9.0 255.255.255.0` - Defines the backup VPN tunnel network, that will be used by server/client(s)
-
-- `client-config-dir /etc/openvpn/ccd` - Enables per-client static IP assignment and iroute.
-[View more details in the "Static VPN IP Assignment (CCD)" part](###CDD) 
-
 - `client-to-client` - Allows VPN clients to communicate with each other.
-
-- `port 1195` - server listenning port
-
+- `port 1195` - Auber server listenning port
 - `ca`, `cert`, `key`, - `dh`, - `tls-server` : TLS authentication
-
  - `push ...`,  `route add...`
-[View more details about the routing directives](####3.-Routing-Configuration-&-Adjustements)
+- `client-config-dir /etc/openvpn/ccd` - Enables per-client static IP assignment and iroute.
 
-### Client Configuration for Multi‑Server Failover - Key OpenVPN Directives
+### Client - Key OpenVPN Directives
 
-On both clients, add a 2nd directives with remote, for the VPN connection with the backup server
-
+For Multi‑Server Failover, on clients, after the 1st directive `remote` with Paris server, add a 2nd `remote` for a second VPN connection with the backup server.
 ```text
 # Backup Server VPN (Auber)
-remote 88.162.141.79 1195
+remote 82.X.Y.Z 1195
 ```
 
-## 3. Routing Configuration & Adjustements
+## 🔀 3. Routing Configuration & Adjustements
 
 ### CCD
 OpenVPN must know which client owns which LAN, otherwise packets are dropped.
@@ -102,8 +94,8 @@ See [4. Automated Failover Script on Backup Server (Aubervilliers)](##-Automated
 
 ## Port Forwarding for Backup VPN
 Traffic coming from the public internet through the edge router (home/box router at Paris) is segregated using port-based forwarding:
-* **Primary VPN Tunnel (Paris):** `88.162.141.79:1194 (UDP)` ➔ `192.168.1.197:1194`
-* **Backup VPN Tunnel (Aubervilliers):** `88.162.141.79:1195 (UDP)` ➔ `192.168.1.160:1195`
+* **Primary VPN Tunnel (Paris):** `82.X.Y.Z:1194 (UDP)` ➔ `192.168.1.197:1194`
+* **Backup VPN Tunnel (Aubervilliers):** `82.X.Y.Z:1195 (UDP)` ➔ `192.168.1.160:1195`
 
 Purpose : Allows remote clients to reach the backup VPN server when Paris is down.
 
@@ -131,7 +123,6 @@ When the primary tunnel drops, Aubervilliers must stop routing client traffic th
 - Executed every minute via Root Crontab :
 ```text
 sudo crontab -e
-
 * * * * * /usr/local/bin/failover.sh
 ```
 (Note: For real-time 2-second quick execution, a daemon loop or a systemd timer is recommended over standard cron).
@@ -210,16 +201,16 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
 - Auber restores the primary route.
 
 ### Validation of Operation 1 – Analysis of the switch to Aubervillier
-- Ping 	✅ Tokyo → Aubervilliers (192.168.1.160, 192.168.100.210, 10.9.2.1)  
+- Ping 	✅ Tokyo → Aubervilliers (`192.168.1.160, 192.168.100.210, 10.9.2.1`  
 Traffic is now routed through the backup VPN tunnel.
 
-- Ping 	✅ Tokyo → Paris (192.168.100.200)
+- Ping 	✅ Tokyo → Paris (`192.168.100.200`)
 Analysis: Paris remains accessible via the local link between the two servers.
 
-- Ping 	✅ Aubervilliers → Tokyo (172.20.10.3	✅, 10.9.1.2	❌)
+- Ping 	✅ Aubervilliers → Tokyo (`172.20.10.3`	✅, `10.9.1.2`	❌)
 Explanation: The main VPN network no longer exists.
 
-- Ping 	✅ Paris → Tokyo(172.20.10.3	✅, 10.9.1.2	❌)
+- Ping 	✅ Paris → Tokyo(`172.20.10.3`	✅, `10.9.1.2`	❌)
 Explanation: The main VPN network no longer exists.
 
 
