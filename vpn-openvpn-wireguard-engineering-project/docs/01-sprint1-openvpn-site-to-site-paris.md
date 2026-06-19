@@ -231,12 +231,15 @@ On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
 [Capture Wireshark showing that Auber reply to the VPN IP Tokyo](../assets/wireshark/icmp-ping-reply-auber-tokyo-vpn.png)
       
 - **Solutions**:
+
 1) Activation of IP forwarding on the Paris server (`net.ipv4.ip_forward=1`).
+
 2) Addition of the route injection directive to the Paris/Auber's LAN, to the OpenVPN Paris server configuration:
   ```text
       push "route 192.168.100.0 255.255.255.0"
       push "route 192.168.1.0 255.255.255.0’`
   ```
+
 3) Addition of a static route on the Aubervilliers table routing to instruct it to route via Paris to reach the tunnel network:
   ```bash
       ip route add 10.9.1.0/24 via 192.168.100.200 dev enp0s8
@@ -265,6 +268,7 @@ On Auber, a route has been added to the VPN network via the internal interface A
 2) Paris does not know where to route responses to the `172.20.10.0/24` LAN network (not route to this network in its table routing) so it is sending packets to its default internet gateway.
 
 - **Solutions**:
+
 1) Declare the iroute directive in the specific CCD entry for each client on the Paris server:
    - In CDD OpenVPN file of Tokyo, add `iroute 172.20.10.0 255.255.255.240`
    - In CDD OpenVPN file of NY, add `iroute 172.20.10.4 255.255.255.255`
@@ -309,6 +313,7 @@ On Auber, a route has been added to the Tokyo LAN network via the internal inter
 2) The Windows firewall blocks incoming ICMP requests from anywhere. Indeed, Inbound ICMP (ping) is blocked by default so other machines on the LAN cannot ping the windows machine. (As a contrary, Outbound ICMP (ping) is allowed by default, this is why Windows PC can ping other machines on the LAN.)
 
 - **Solutions**:
+
 1)  Apply a POSTROUTING MASQUERADE NAT rule on both server and clients. This enables the VPN gateway (client or server here) rewrites the source IP of packets coming from the tunnel so that they appear as if they originate from the LAN interface itself.
 
 ```bash
@@ -349,7 +354,7 @@ Paris → Windows PC client = [Ping OK](../assets/verifs/sprint1/ping-paris-wind
     Windows PC Paris → Server Tokyo (`172.20.10.9`) / NY (`172.20.10.10`) = [Ping OK](../assets/verifs/sprint1/ping-windows-pc-paris-tokyo-NY-lan.png) <!-- A AJOUTER -->
 [Tracert](../assets/verifs/sprint1/tracert-windows-pc-paris-tokyo-lan) <!-- A AJOUTER -->
 
-    Windows PC Tokyo → Server Paris (`192.168.1.197`) = [Ping OK](../assets/verifs/sprint1/ping-windows-pc-tokyo-paris-lan.png) <!-- A AJOUTER -->
+    Windows PC Tokyo → Server Paris (`192.168.1.197` & `192.168.1.160`) = [Ping OK](../assets/verifs/sprint1/ping-windows-pc-tokyo-paris-lan.png) <!-- A AJOUTER -->
 [Tracert](../assets/verifs/sprint1/tracert-windows-pc-tokyo-paris-lan.png) <!-- A AJOUTER -->
 
 ---
@@ -363,6 +368,7 @@ Even though Windows PCs hosting the client and server can communicate with the d
 [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-enabled.png)
 
 - **Proofs & Results** : 
+
 Windows PC Paris → Windows PC Tokyo (`172.20.10.2`) = [Ping OK & Tracert](../assets/verifs/sprint1/ping_tracert-windows-pc-server-windows-pc-client.png) 
 
 Windows PC Tokyo → Windows PC Paris (`192.168.1.73`) = [Ping OK & Tracert](../assets/verifs/sprint1/ping_tracert-windows-pc-client-windows-pc-server.png)
