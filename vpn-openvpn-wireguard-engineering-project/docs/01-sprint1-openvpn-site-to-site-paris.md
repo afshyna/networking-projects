@@ -316,17 +316,14 @@ iptables -t nat -A POSTROUTING -s 10.9.1.0/24 -o enp0s3 -j MASQUERADE
 ```
 
 2) enable  Inbound firewall rule `File and Printer Sharing (Echo Request – ICMPv4-In)` for the `Private, Public` Profile, in the *Windows Defender Firewall* of Windows 11, on both Windows computers.
- [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-enabled.png)
+ [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-firewall.png)
 
 - **Proof** :
-Tokyo → Windows PC server = [Ping OK](../assets/verifs/sprint1/) <!-- A AJOUTER -->
-[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping_tokyo-physical-host-hypervisor-LAN-server.png)
+Tokyo → Windows PC server = [Ping OK](../assets/verifs/sprint1/openvpn-icmp-ping-tokyo-windows-pc-paris.png)
+[Capture-Wireshark](../assets/wireshark/) <!-- A AJOUTER -->
 
-Paris → Windows PC client = [Ping OK](../assets/verifs/sprint1/) <!-- A AJOUTER -->
-[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-paris-VPN.png) <!-- A AJOUTER -->
-
-Paris → GW client = [Ping OK](../assets/verifs/sprint1/) <!-- A AJOUTER -->
-[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping_paris-gw-lan-tokyo.png) 
+Paris → Windows PC client = [Ping OK](../assets/verifs/sprint1/ping-paris-windows-pc-tokyo.png)
+[Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-paris-windows-pc-tokyo) 
 
 ---
 
