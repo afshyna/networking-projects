@@ -174,12 +174,12 @@ systemctl start openvpn@client-NY
 • ICMP Echo Request/Reply packets encapsulated within OpenVPN packets (UDP/1194) are observed between `A.B.C.D` (IP WAN Tokyo) and `82.X.Y.Z` (IP WAN Paris).
 • Once decrypted, the ICMP packets appear between `10.9.1.2` (Tokyo) and `10.9.1.1` (Montrouge) inside the tunnel interface.
 
-- VPN Tokyo → NY client (IP `10.9.1.3`)
-[Ping_OK_Tokyo-NY-VPN](../assets/verifs/sprint1/ping-tokyo-ny-VPN.png) <!-- A SCREEN --> 
-[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-ny-VPN.png) <!-- A SCREEN --> 
-
 - VPN Auber → Tokyo VPN (IP `10.9.1.2`)
-[Ping_OK_Tokyo-NY-VPN](../assets/verifs/sprint1/ping-auber-tokyo-vpn-ok.png) <!-- A SCREEN --> 
+[Ping](../assets/verifs/sprint1/ping-auber-tokyo-vpn-ok.png) 
+
+- VPN Tokyo → NY client (IP `10.9.1.3`)
+[Ping](../assets/verifs/sprint1/ping-tokyo-ny-vpn.png)
+[Capture-Wireshark](../assets/wireshark/icmp-openvpn-ping-tokyo-ny-vpn.png) 
 
 ---
 
@@ -191,7 +191,7 @@ systemctl start openvpn@client-NY
 
 - Tokyo →  Auber (internal IP `192.168.100.210`)
 [Ping_OK_Tokyo-Auber-internal-LAN](../assets/verifs/sprint1/ping-tokyo-internal-lan-auber-ok.png)
-[Capture-Wireshark](../assets/wireshark/openvpn_icmp_ping-tokyo-to-auber-internal-IP-192.168.100.210.png) <!-- A SCREEN -->
+[Capture-Wireshark](../assets/wireshark/) <!-- A SCREEN -->
 
  ### Ping Tests - LAN Access (Tokyo/NY) ✅
 
