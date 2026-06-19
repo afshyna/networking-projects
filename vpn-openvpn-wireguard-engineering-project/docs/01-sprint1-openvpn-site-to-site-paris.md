@@ -325,7 +325,7 @@ iptables -t nat -A POSTROUTING -s 10.9.1.0/24 -o enp0s3 -j MASQUERADE
 
 - **Proof** :
 Tokyo → Windows PC server = [Ping OK](../assets/verifs/sprint1/ping-tokyo-windows-pc-paris.png)
-[Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-tokyo-windows-pc-paris.png) <!-- A AJOUTER -->
+[Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-tokyo-windows-pc-paris.png)
 
 Paris → Windows PC client = [Ping OK](../assets/verifs/sprint1/ping-paris-windows-pc-tokyo.png)
 [Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-paris-windows-pc-tokyo.png) 
@@ -351,11 +351,12 @@ Paris → Windows PC client = [Ping OK](../assets/verifs/sprint1/ping-paris-wind
 ```
 
 - **Proofs & Results** : 
-    Windows PC Paris → Server Tokyo (`172.20.10.9`) / NY (`172.20.10.10`) = [Ping OK](../assets/verifs/sprint1/ping-windows-pc-paris-tokyo-NY-lan.png) <!-- A AJOUTER -->
-[Tracert](../assets/verifs/sprint1/tracert-windows-pc-paris-tokyo-lan) <!-- A AJOUTER -->
 
-    Windows PC Tokyo → Server Paris (`192.168.1.197` & `192.168.1.160`) = [Ping OK](../assets/verifs/sprint1/ping-windows-pc-tokyo-paris-lan.png) <!-- A AJOUTER -->
-[Tracert](../assets/verifs/sprint1/tracert-windows-pc-tokyo-paris-lan.png) <!-- A AJOUTER -->
+    Windows PC Paris → Server Tokyo (`172.20.10.9`) / NY (`172.20.10.10`) = [Ping OK](../assets/verifs/sprint1/ping-windows-pc-paris-tokyo-NY-lan.png) 
+[Tracert](../assets/verifs/sprint1/tracert-windows-pc-paris-tokyo-lan.png)
+
+    Windows PC Tokyo → Server Paris (`192.168.1.197` & `192.168.1.160`) = [Ping OK](../assets/verifs/sprint1/ping-windows-pc-tokyo-paris-lan.png) 
+[Tracert](../assets/verifs/sprint1/tracert-windows-pc-tokyo-paris-lan.png)
 
 ---
 
