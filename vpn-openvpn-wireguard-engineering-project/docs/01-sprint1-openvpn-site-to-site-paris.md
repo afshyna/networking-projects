@@ -346,9 +346,11 @@ Paris → Windows PC client = [Ping OK](../assets/verifs/sprint1/ping-paris-wind
 ```
 
 - **Proofs & Results** : 
-    Windows PC Paris → Server Tokyo (`172.20.10.9`) / NY (`172.20.10.10`) = [Ping OK](../assets/verifs/sprint1/ping_windowsPC-server_tokyo-NY-VPNs.png) <!-- A AJOUTER -->
+    Windows PC Paris → Server Tokyo (`172.20.10.9`) / NY (`172.20.10.10`) = [Ping OK](../assets/verifs/sprint1/ping-windows-pc-paris-tokyo-NY-lan.png) <!-- A AJOUTER -->
+[Tracert](../assets/verifs/sprint1/tracert-windows-pc-paris-tokyo-lan) <!-- A AJOUTER -->
 
-    Windows PC Tokyo → Server Paris (`192.168.1.197`) = [Ping OK](../assets/verifs/sprint1/) <!-- A AJOUTER -->
+    Windows PC Tokyo → Server Paris (`192.168.1.197`) = [Ping OK](../assets/verifs/sprint1/ping-windows-pc-tokyo-paris-lan.png) <!-- A AJOUTER -->
+[Tracert](../assets/verifs/sprint1/tracert-windows-pc-tokyo-paris-lan.png) <!-- A AJOUTER -->
 
 ---
 
@@ -363,8 +365,6 @@ Even though Windows PCs hosting the client and server can communicate with the d
 - **Proofs & Results** : 
 Windows PC Paris → Windows PC Tokyo (`172.20.10.2`) = [Ping OK](../assets/verifs/sprint1/ping_windowsPC-server-windowsPC-tokyo.png) 
 [Tracert](../assets/verifs/sprint1/) <!-- A AJOUTER -->
-[Wireshark](../assets/wireshark/openvpn_icmp_ping_windowsPC-server-windowsPC-tokyo.png) 
-
 
 Windows PC Tokyo → Windows PC Paris (`192.168.1.197`) = [Ping OK](../assets/verifs/sprint1/) <!-- A AJOUTER -->
 [Tracert](../assets/verifs/sprint1/) <!-- A AJOUTER -->
