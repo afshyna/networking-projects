@@ -279,7 +279,7 @@ On Auber, a route has been added to the VPN network via the internal interface A
 On Paris, a route has been added to the Tokyo LAN via the tunnel.
 [Routing Table Paris](../assets/verifs/routing-table-paris-sprint0.png)
 
-*See [Ping Tests - LAN Access (Paris/Auber)](#ping-tests---lan-access-tokyony-).*
+*See [Ping Tests - LAN Access (Tokyo/NY)](#ping-tests---lan-access-tokyony-).*
 
 ---
 
@@ -298,7 +298,7 @@ On Paris, a route has been added to the Tokyo LAN via the tunnel.
 On Auber, a route has been added to the Tokyo LAN network via the internal interface Auber-Paris. 
 [Routing Table Auber](../assets/verifs/routing-table-auber-sprint0.png) <!-- A SCREEN -->
 
-*See [Ping Tests - LAN Access (Paris/Auber)](#ping-tests---lan-access-tokyony-).*
+*See [Ping Tests - LAN Access (Tokyo/NY)](#ping-tests---lan-access-tokyony-).*
 
 ---
 
