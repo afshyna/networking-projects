@@ -379,7 +379,7 @@ Even though Windows PCs hosting the client and server can communicate with the d
 Windows PC Paris → Windows PC Tokyo (`172.20.10.2`) =  Ping OK
 [Ping](../assets/verifs/sprint1/ping_windowsPC-server-windowsPC-tokyo.png) 
 [Tracert](../assets/verifs/sprint1/) <!-- A AJOUTER -->
-[Wireshark](../assets/verifs/wireshark/openvpn_icmp_ping_windowsPC-server-windowsPC-tokyo.png) 
+[Wireshark](../assets/wireshark/openvpn_icmp_ping_windowsPC-server-windowsPC-tokyo.png) 
 
 
 Windows PC Tokyo → Windows PC Paris (`192.168.1.197`) = Ping OK
