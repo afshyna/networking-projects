@@ -319,8 +319,8 @@ iptables -t nat -A POSTROUTING -s 10.9.1.0/24 -o enp0s3 -j MASQUERADE
  [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-firewall.png)
 
 - **Proof** :
-Tokyo → Windows PC server = [Ping OK](../assets/verifs/sprint1/openvpn-icmp-ping-tokyo-windows-pc-paris.png)
-[Capture-Wireshark](../assets/wireshark/) <!-- A AJOUTER -->
+Tokyo → Windows PC server = [Ping OK](../assets/verifs/sprint1/ping-tokyo-windows-pc-paris.png)
+[Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-tokyo-windows-pc-paris.png) <!-- A AJOUTER -->
 
 Paris → Windows PC client = [Ping OK](../assets/verifs/sprint1/ping-paris-windows-pc-tokyo.png)
 [Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-paris-windows-pc-tokyo) 
