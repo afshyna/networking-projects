@@ -53,15 +53,12 @@ Explanation :
 - Add a static route to client remote LAN via Paris when primary tunnel is UP.
 - Add this route via backup tunnel when primary tunnel is DOWN.
 
-### Add local route
+**Add local route**
 - Declare a dynamic route to reach the Tokyo/NY LAN network by routing via the VPN tunnel: 
 ```text
  # openvpn server configuration
 route 172.20.10.0 255.255.255.240`
 ```
-
-- Declare a static route to reach the primary VPN subnet by routing via its internal interface with Paris, when the Paris tunnel VPN is UP :
-`route 10.9.1.0 255.255.255.0 192.168.100.200`
 
 **Push Routes**
 Clients (Tokyo/NY) will dynamically receive these routes when connecting to the backup VPN server, in the same way that the primary server.
@@ -72,17 +69,14 @@ push "route 192.168.100.0 255.255.255.0"
 ```
 
 ### Paris Server 
-- Make an adjustment on the dynamic route to the LAN network of Tokyo (configured in Step 1) by adding the VPN as gateway and assigning the route  metric 10 in the paris server configuration file.
-`route 172.20.10.0 255.255.255.240` --> `route 172.20.10.0 255.255.255.240 vpn_gateway 10`
-
-- Add the same route with a higher metric, statically on the shell.
+- Add a second route to the Tokyo's LAN with a higher metric that the primary route and with a gateway via Auber.
 ```bash
 ip route add 172.20.10.0/28 via 192.168.100.210 dev enp0s8 metric 100`
 ```
-
-<!--- Moreover, add a new route to the backup VPN subnet with its internal interface with Auber as gateway.
-  `route 10.9.2.0/24 via 192.168.100.210 dev enp0s8`
--->
+- Moreover, add a new route to the backup VPN subnet via Auber as gateway.
+```bash
+ip route add 10.9.2.0/24 via 192.168.100.210 dev enp0s8
+```
 
 ### iroute via CCD
 OpenVPN must know which client owns which LAN, otherwise packets are dropped.
