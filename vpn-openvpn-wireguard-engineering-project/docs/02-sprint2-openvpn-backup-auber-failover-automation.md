@@ -13,10 +13,14 @@
 ### Backup Site Role
 - Aubervilliers acts as the secondary VPN hub.
 - Must be reachable by both Tokyo and New York when Paris is down.
-- LAN IP of Auber : `192.168.1.160`
-- internal LAN IP of Auber-Paris interface : `192.168.100.210`
+- Private IP of Auber : `192.168.1.160`
+- LAN IP Auber-Paris internal interface : `192.168.100.210`
+- Public IP of Auber : `73.B.C.D`
 
-### Tunnel Networks
+*Note: The public WAN IP of the Tokyo/NY client is different from Sprint 1. This is expected because the client is connected through a mobile network, where the ISP assigns a dynamic public IP that changes frequently. Therefore, in the logs shown in this sprint, the WAN IP does not start with 32.A.B.C as it did in Sprint 1.*
+
+
+### Tunnel VPN Networks
 - Primary tunnel: `10.9.1.0/24` (Paris)
 - Backup tunnel: `10.9.2.0/24` (Auber)
 
