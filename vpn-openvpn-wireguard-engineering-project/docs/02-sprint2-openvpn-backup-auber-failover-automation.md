@@ -54,15 +54,13 @@ Explanation :
 ## 🔀 3. Routing Configuration & Adjustements
 
 ###  Backup Server
-**Add local route**
-- Declare a dynamic route to reach the Tokyo/NY LAN network by routing via the VPN tunnel: 
+- **Add local route** : Declare a dynamic route to reach the Tokyo/NY LAN network by routing via the VPN tunnel: 
 ```text
  # openvpn server configuration
 route 172.20.10.0 255.255.255.240`
 ```
 
-**Push Routes**
-Clients (Tokyo/NY) will dynamically receive these routes when connecting to the backup VPN server, in the same way that the primary server.
+- **Push Routes** :Clients (Tokyo/NY) will dynamically receive these routes when connecting to the backup VPN server, in the same way that the primary server.
 ```text
  # openvpn server configuration
 push "route 192.168.1.0 255.255.255.0"
@@ -71,12 +69,12 @@ push "route 192.168.100.0 255.255.255.0"
 
 ### Paris Server 
 - Add a second static route to the Tokyo's LAN with a higher metric that the primary route and with a gateway via Auber. This route will be used when the primary VPN is down so the metric needs to be higher, in order to choose the dynamic route already added by the VPN paris.
-```bash
+```console
 ip route add 172.20.10.0/28 via 192.168.100.210 dev enp0s8 metric 100`
 ```
 
 - Add a static route to the backup VPN subnet via Auber as gateway. This route will be used when the primary VPN is down in order for Paris to join the Tokyo LAN network via the backup VPN tunnel.
-```bash
+```console
 ip route add 10.9.2.0/24 via 192.168.100.210 dev enp0s8
 ```
 
@@ -92,72 +90,71 @@ To ensure that the Aubervilliers backup server can properly handle routing back 
 See [Sprint 0: Paris Routing & CCD Configuration](01-sprint1-openvpn-site-to-site-paris.md#iroute-openvpn-internal-routing-table)
 
 
-## 3. Port Forwarding for Backup VPN
+## 4. Port Forwarding for Backup VPN
 Traffic coming from the public internet through the edge router (local router at Paris) is segregated using port-based forwarding:
 * **Primary VPN Tunnel (Paris):** `82.X.Y.Z:1194 (UDP)` ➔ `192.168.1.197:1194`
 * **Backup VPN Tunnel (Aubervilliers):** `82.X.Y.Z:1195 (UDP)` ➔ `192.168.1.160:1195`
 
-Purpose : Allows remote clients to reach the backup VPN server when Paris is down.
+**Purpose**: Allows remote clients to reach the backup VPN server when Paris is down.
 
-## 4. Automated Failover Script on Backup Server
+## 5. Automated Failover Script on Backup Server
 - Located at `/usr/local/bin/`
-- Executed every 10 seconds via System Timer
+- Executed every 10 seconds via `System Timers`
 
 ### Script 
-*Full script file is available in the root folder configs/openvpn/ directory.*
+*Full script file is available in the root folder configs/openvpn/.*
 
 **Script Purpose**
-This script ensures automatic switching between:
-- the primary VPN (Paris)
-- the backup VPN (Aubervilliers)
-It continuously checks the status of the primary tunnel (if it is shut or not) and activates or deactivates the backup tunnel accordingly.
 
-**Script Logic**
+This script ensures automatic switching between the primary VPN (Paris) and the backup VPN (Aubervilliers). It continuously checks the status of the primary tunnel (if it is shut or not) and activates or deactivates the backup tunnel accordingly.
+
+**Script Logic** : 
+
 The script is based on two tests:
-- Testing the reachability of the main VPN server (Paris) by pinging the tunnel’s IP address 10.9.1.1.
-- Checking the status of the backup OpenVPN service (Auber) by verifying the presence of UDP port 1195 in netstat.
+- Testing the reachability of the primary VPN server (Paris) by pinging the tunnel’s IP address `10.9.1.1`.
+- Checking the status of the backup OpenVPN service (Auber) by verifying the presence of UDP port `1195` in netstat.
     
 Based on these results, the script decides:
-- to stop the backup VPN if the main VPN is UP
-- to start the backup VPN if the main VPN is DOWN
+- to stop the backup VPN if the primary VPN is up
+- to start the backup VPN if the primary VPN is down
 
+### Automatic execution
 
-### Automatic execution of the script
+A systemd timer is used for executing of the script automatically (every 10s).
 
-I have used a systemd timer for executing of the script automatically, every 10s.
+1) Creation of two files:
 
-1) I create two files:
-- one for service, that simply runs the script once :  `/etc/systemd/system/openvpn-failover.service`
+- a file for service, that runs the script once :  `/etc/systemd/system/openvpn-failover.service`
 
-- other for timer (with same name) that will trigger the service repeatedly, every 10 seconds :  `/etc/systemd/system/openvpn-failover.timer`
+- a file for timer (with the same name) that will trigger the service every 10 seconds :  `/etc/systemd/system/openvpn-failover.timer`
 
-*Both systemd files are available in the folder configs/systemd/ directory.*
+*Both systemd files are available in the folder configs/systemd/.*
 
-2) Reload the systemd
+2) Reload the `systemd`
 ```console
 # systemctl daemon-reload
 ```
 
-3) start your timer by systemctl start test.timer, or enable it by default
+3) start your `timer` or enable it by default
 ```console
 # systemctl start openvpn-failover.timer
 # systemctl enable --now openvpn-failover.timer
 ```
 
-- Check timer status:
-You should see:  `Active: active (waiting)`
+- Check timer status: initially, the timer state needs to be `Active: active (waiting)`.
 
-- To see each execution of the failover script:
+- See each execution of the failover script:
+```console
 journalctl -u openvpn-failover.service -f
+```
 
-This shows real‑time logs every time the timer triggers the service.
+- Show real‑time logs every time the timer triggers the service:  [Result](../assets/verifs/sprint2/Systemctl-status-openvpn-failover.timer-state-auber)
 ```console
 # systemctl status openvpn-failover.timer
 ```
-[Result](../assets/verifs/sprint2/Systemctl-status-openvpn-failover.timer-state-auber)
 
 
-**Why using system timer ? (instead of crontab for ex)**
+**Why using `systemd timers` ?**
 - High reliability
 - Precise execution intervals
 - Automatic restart
@@ -167,37 +164,35 @@ This shows real‑time logs every time the timer triggers the service.
 This setup ensures that the VPN failover mechanism reacts quickly and consistently to network changes.
 
 ### Expected Behavior before the failover
-- All traffic still uses the primary tunnel (Paris), which is active.
+- All traffic still uses the primary tunnel (Paris), that works initially.
 - Backup tunnel (10.9.2.0/24) is not yet active.
 
-## 5. Failover Simulation - Incident management on VPN servers with the shutdown of Paris OpenVPN service
-
-To stop the Paris primary server, shut down the system service: 
+## 6. Paris server failover Simulation & Incident management on VPN servers 
+To stop the Paris primary server, shutdown the system service: 
 
 ```console
-# Service suspension:
 systemctl stop openvpn@srv-paris
 ```
 
 ### Post-Failure Analysis: System and Network Impacts
 As soon as the main tunnel `10.9.1.0/24` is disconnected, the following network and system changes are triggered transparently.
 
-**Dynamic Behaviour of VPN Clients (Tokyo / NY) & backup openvpn Auber**
+**Dynamic Behaviour of VPN Clients (Tokyo / NY)  & Auber Backup Server**
 - Route Loss: The virtual IP addresses associated with the main tunnel (`10.9.1.1` & `10.9.1.2`) are immediately flushed from the local tun0 interface.
 - Retry & Failover Algorithm:
   - The client detects a timeout on port 1194.
-  - the client re-try the connection to the Paris server (port 1194).
+  - the client re-try the connection to the Paris server (port `1194`).
   - Once again, a timeout is detect.
 [Reconnexion Attempt Tokyo -> Paris & timeout detected](../assets/verifs/sprint2/log-tokyo-attempt-reconnexion-tokyo-paris.png)
-  - The multi-remote implementation of the client configuration file is executed. Now, the client try to connect to the backup auber openvpn server  (Port 1195) and the connection is establised.
+  - The multi-remote implementation of the client configuration file is executed. Now, the client try to connect to the backup auber openvpn server  (Port `1195`) and the connection is establised.
 
   [Log Tokyo - Connexion Successful Tokyo -> Backup Server](../assets/verifs/sprint2/log-tokyo-attempt-connexion-tokyo-auber-successful.png)
   [Log Auber - Connexion Successful Tokyo -> Backup Server](../assets/verifs/sprint2/log-auber-attempt-connexion-tokyo-auber-successful.png)
 
-=> After approximately 1 minutes, the failover tunnel is established: a new virtual IP from the `10.9.2.0/24` range is assigned to the tun0 interface.
+After approximately 1 minutes, the failover tunnel is established: a new virtual IP from the `10.9.2.0/24` range is assigned to the tun0 interface.
 
 
-##  6. Progressive Changes to Routing Tables - Flow validation & Route verification
+## 7. Flow validation & Route verification - Progressive Changes to Routing Tables 
 
 **Server Paris**
 Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24`).
