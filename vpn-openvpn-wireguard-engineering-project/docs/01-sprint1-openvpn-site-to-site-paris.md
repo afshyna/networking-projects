@@ -9,13 +9,28 @@
 
 ![Architecture Sprint 1](../diagrams/01-sprint1-openvpn-site-to-site-srv-paris-primary_clients-tokyo-NY.png)
 
-**Addressing Architecture**:
-  * **VPN Network (tun0)**: `10.9.1.0/24`
-  * **IP WAN Publique (Paris and Auber)** : `82.X.Y.Z`
-  * **Primary Site (Paris)**: VPN IP `10.9.1.1` | Physical LAN IP : `192.168.1.197` | Inter-site link IP: `192.168.100.200`
-  * **Tokyo Site**: VPN IP `10.9.1.2` | Remote LAN IP: `172.20.10.3`
-  * **New York Site**: Fixed VPN IP `10.9.1.3` | Remote LAN IP: `172.20.10.4`
-  * **Backup Site (Aubervilliers)** (No active tunnel at this stage) : Physical LAN IP : `192.168.1.197` | Inter-site: `192.168.100.210`
+### Addressing Architecture
+  * **Public/WAN IP Paris / Auber** : `82.X.Y.Z`
+  * **Public/WAN IP Tokyo / NY** : `37.B.C.D`
+  * **Paris Site/Server (Paris)**:
+      - Private LAN IP : `192.168.1.197`
+      - Inter-site Paris-Auber link IP: `192.168.100.200`
+  * **Tokyo Site/Client**:  Private LAN IP  `172.20.10.3`
+  * **New York Site/Client**: Private LAN IP `172.20.10.4`
+  * **Backup Site (Aubervilliers)** (No active tunnel at this stage) :
+      - Physical LAN IP : `192.168.1.197`
+      - Inter-site Auber-Paris : `192.168.100.210`
+
+### Primary  Site Role (Paris-Montrouge)
+- Paris acts as the primary VPN hub.
+- Must be reachable by both Tokyo and New York
+ 
+### Tunnel VPN Network
+- Primary tunnel (tun0) : `10.9.1.0/24` (Paris)
+   - Primary Site IP (Paris) : `10.9.1.1`
+   - Client Tokyo IP : `10.9.1.2`
+   - Client NY IP : `10.9.1.3`
+
 
 ## Technical Specifications
 * **Protocol**: OpenVPN (VPN SSL/TLS) over UDP transport layer.
