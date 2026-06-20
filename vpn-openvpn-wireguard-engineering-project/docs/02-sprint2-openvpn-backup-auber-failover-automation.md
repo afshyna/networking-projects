@@ -175,13 +175,18 @@ systemctl stop openvpn@srv-paris
 ### Post-Failure Analysis: System and Network Impacts
 As soon as the main tunnel `10.9.1.0/24` is disconnected, the following network and system changes are triggered transparently.
 
-**Dynamic Behaviour of VPN Clients (Tokyo / NY)**
+**Dynamic Behaviour of VPN Clients (Tokyo / NY) & backup openvpn Auber**
 - Route Loss: The virtual IP addresses associated with the main tunnel (`10.9.1.1` & `10.9.1.2`) are immediately flushed from the local tun0 interface.
-- Retry & Failover Algorithm: - The client detects a timeout on port 1194.
+- Retry & Failover Algorithm:
+  - The client detects a timeout on port 1194.
   - the client re-try the connection to the Paris server (port 1194).
   - Once again, a timeout is detect.
-  - The multi-remote implementation of the client configuration file is executed.
-  - Clients switch to the Aubervilliers failover server (Port 1195).
+[Reconnexion Attempt Tokyo -> Paris & timeout detected](../assets/verifs/sprint2/log-tokyo-attempt-reconnexion-tokyo-paris.png)
+  - The multi-remote implementation of the client configuration file is executed. Now, the client try to connect to the backup auber openvpn server  (Port 1195) and the connection is establised.
+
+  [Log Tokyo - Connexion Successful Tokyo -> Backup Server](../assets/verifs/sprint2/log-tokyo-attempt-connexion-tokyo-auber-successful.png)
+  [Log Auber - Connexion Successful Tokyo -> Backup Server](../assets/verifs/sprint2/log-auber-attempt-connexion-tokyo-auber-successful.png)
+
 => After approximately 1 minutes, the failover tunnel is established: a new virtual IP from the `10.9.2.0/24` range is assigned to the tun0 interface.
 
 
@@ -217,29 +222,29 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
 [Routing Table Auber After failover](../assets/verifs/sprint2/routing-table-auber-after-failover.png) 
 
 
-## Validation & Connectivity  – Analysis of the switch to Aubervillier
-- Ping 	✅ Tokyo → Aubervilliers (`192.168.1.160, 192.168.100.210, 10.9.2.1`  
-Traffic is now routed through the backup VPN tunnel.
+## Validation & Connectivity ✅  
+- Ping 	OK = Tokyo → Aubervilliers (`192.168.1.160, 192.168.100.210, 10.9.2.1`) 
+Analysis: Traffic is now routed through the backup VPN tunnel.
 
-- Ping 	✅ Tokyo → Paris (`192.168.100.200`)
+- Ping 	OK = Tokyo → Paris (`192.168.100.200`,`192.168.100.197` )
 Analysis: Paris remains accessible via the local link between the two servers.
+[Traceroute Tokyo → Paris ](../assets/verifs/sprint2/traceroute-tokyo-paris.png)
 
-- Ping 	✅ Aubervilliers → Tokyo (`172.20.10.3`	✅, `10.9.1.2`	❌)
-Explanation: The main VPN network no longer exists.
+- Ping 	OK = Aubervilliers → Tokyo (`172.20.10.10`, `10.9.2.2`)
+Analysis: LAN Tokyo/NY remains accessible via the backup VPN tunnel between the peers
 
-- Ping 	✅ Paris → Tokyo(`172.20.10.3`	✅, `10.9.1.2`	❌)
-Explanation: The main VPN network no longer exists.
+- Ping 	OK  = Paris → Tokyo(`172.20.10.9`, `10.9.2.2`)
+Analysis: LAN Tokyo/NY remains accessible  via the local link between the two servers. 
+[Traceroute Paris → Tokyo ](../assets/verifs/sprint2/traceroute-paris-tokyo.png)
 
 
 ## When Paris Comes Back
 - Clients reconnect to Paris (first remote), after ~1minute. 
 - The monitoring script on Auber detects it and shutdown the Auber server OpenVPN service. The backup tunnel `10.9.2.0/24` is not anymore active so all of the route injected dynamically are deleted from the routing table of Auber & the client. The primary route (already added) are used.
-
-
+=> the openvpn state (connexion, routing table) is similar to the one state of the initial, before the failover.
 
 
 ## 7. Troubleshooting
-
 **Symptom**: Temps de bascule supérieur à 1 minute
 
 **Cause**
