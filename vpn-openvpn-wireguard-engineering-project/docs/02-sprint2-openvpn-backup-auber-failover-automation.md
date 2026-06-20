@@ -96,7 +96,6 @@ Traffic coming from the public internet through the edge router (local router at
 Purpose : Allows remote clients to reach the backup VPN server when Paris is down.
 
 ## 4. Automated Failover Script on Backup Server
-
 - Located at `/usr/local/bin/`
 - Executed every 10 seconds via System Timer
 
@@ -151,7 +150,7 @@ This shows real‑time logs every time the timer triggers the service.
 
 
 
-**Why using system timer ? (instead of crontab for ex)
+**Why using system timer ? (instead of crontab for ex)**
 - High reliability
 - Precise execution intervals
 - Automatic restart
@@ -223,7 +222,7 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
 - Clients reconnect to Paris (first remote), after ~1minute. 
 - The monitoring script on Auber detects it and shutdown the Auber server OpenVPN service. The backup tunnel `10.9.2.0/24` is not anymore active so all of the route injected dynamically are deleted from the routing table of Auber & the client. The primary route (already added) are used.
 
-### Validation & Connectivity  – Analysis of the switch to Aubervillier
+## 6. Validation & Connectivity  – Analysis of the switch to Aubervillier
 - Ping 	✅ Tokyo → Aubervilliers (`192.168.1.160, 192.168.100.210, 10.9.2.1`  
 Traffic is now routed through the backup VPN tunnel.
 
@@ -237,7 +236,7 @@ Explanation: The main VPN network no longer exists.
 Explanation: The main VPN network no longer exists.
 
 
-## 6. Troubleshooting
+## 7. Troubleshooting
 
 **Symptom**: Temps de bascule supérieur à 1 minute
 
