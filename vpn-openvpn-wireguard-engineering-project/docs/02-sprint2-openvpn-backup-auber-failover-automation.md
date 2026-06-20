@@ -227,21 +227,21 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
 ## 8. Validation & Connectivity ✅  
 - Ping 	OK = Tokyo → Aubervilliers (`192.168.1.160`, `192.168.100.210`, `10.9.2.1`) 
 
-Analysis: Traffic is now routed through the backup VPN tunnel.
-
+  Analysis: Traffic is now routed through the backup VPN tunnel.
+  
 - Ping 	OK = Tokyo → Paris (`192.168.100.200`,`192.168.100.197` )
 
-Analysis: Paris remains accessible via the local link between the two servers.
-[Traceroute Tokyo → Paris ](../assets/verifs/sprint2/traceroute-tokyo-paris.png)
+  Analysis: Paris remains accessible via the local link between the two servers.
+  [Traceroute Tokyo → Paris ](../assets/verifs/sprint2/traceroute-tokyo-paris.png)
 
 - Ping 	OK = Aubervilliers → Tokyo (`172.20.10.10`, `10.9.2.2`)
 
-Analysis: LAN Tokyo/NY remains accessible via the backup VPN tunnel between the peers
+  Analysis: LAN Tokyo/NY remains accessible via the backup VPN tunnel between the peers
 
 - Ping 	OK  = Paris → Tokyo(`172.20.10.9`, `10.9.2.2`)
 
-Analysis: LAN Tokyo/NY remains accessible  via the local link between the two servers. 
-[Traceroute Paris → Tokyo ](../assets/verifs/sprint2/traceroute-paris-tokyo.png)
+  Analysis: LAN Tokyo/NY remains accessible  via the local link between the two servers. 
+  [Traceroute Paris → Tokyo ](../assets/verifs/sprint2/traceroute-paris-tokyo.png)
 
 
 ## 9. When Paris Comes Back
