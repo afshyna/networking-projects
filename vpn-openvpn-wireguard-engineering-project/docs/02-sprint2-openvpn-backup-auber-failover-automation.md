@@ -132,13 +132,13 @@ A systemd timer is used for executing of the script automatically (every 10s).
 
 2) Reload the `systemd`
 ```console
-# systemctl daemon-reload
+systemctl daemon-reload
 ```
 
 3) start your `timer` or enable it by default
 ```console
-# systemctl start openvpn-failover.timer
-# systemctl enable --now openvpn-failover.timer
+systemctl start openvpn-failover.timer
+systemctl enable --now openvpn-failover.timer
 ```
 
 - Check timer status: initially, the timer state needs to be `Active: active (waiting)`.
@@ -150,7 +150,7 @@ journalctl -u openvpn-failover.service -f
 
 - Show real‑time logs every time the timer triggers the service:  [Result](../assets/verifs/sprint2/Systemctl-status-openvpn-failover.timer-state-auber)
 ```console
-# systemctl status openvpn-failover.timer
+systemctl status openvpn-failover.timer
 ```
 
 
@@ -197,15 +197,16 @@ After approximately 1 minutes, the failover tunnel is established: a new virtual
 **Server Paris**
 Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24`).
 - The `10.9.1.0/24` network and the subnet `172.20.10.0/28` via the Paris VPN tunnel have disappeared.
-- The static routes to the Tokyo subnet (that has been statically injected initially) remain in place :
+- The static routes to the Tokyo/NY private LAN (statically injected initially) remain in place :
     - `172.20.10.0/28 via 192.168.100.210`
-    - `10.0.0.0/28 via 192.168.100.210`
+    - `10.9.1.0/28 via 192.168.100.210`
 
 [Routing Table Paris Before failover](../assets/verifs/sprint2/routing-table-paris-before-failover.png)
 [Routing Table Paris After failover](../assets/verifs/sprint2/routing-table-paris-after-failover.png) 
  
 **VPN Clients**
- The default gateway for the `10.9.1.X` tunnel has been replaced by the IP address of the `10.9.2.X` failover interface. Clients switch to Auber (10.9.2.1) via port remote 1195.
+
+ The default gateway for the `10.9.1.X` tunnel has been replaced by the IP address of the `10.9.2.X` failover interface. Clients switch to Auber (`10.9.2.1`) via port remote `1195`.
 - Before : `192.168.100.0/24 via 10.9.1.1` | `192.168.1.0/24 via 10.9.1.1`
 - After : `192.168.100.0/24 via 10.9.2.1` | `192.168.1.0/24 via 10.9.2.1`
 
@@ -215,38 +216,42 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
 
   
 **Server Aubervilliers**
-- As soon as the primary tunnel is shutdown, the monitoring script (run via Systemd.time) detects it and active the Auber server OpenVPN service. The backup tunnel `10.9.2.0/24` is fully active
-- The route to the Tokyo/NY LAN subnet (e.g. `172.20.10.0/28`) is dynamically injected to pass through its own VPN tunnel: `172.20.10.0/28 via 10.9.2.1`
-- The routes to the Auber/Paris LAN subnet (e.g. `192.168.x.y/16`) via its own VPN tunnel: `172.20.10.0/28 via 10.9.2.1`, are dynamically injected to the VPN clients by the backup server.
-- The static route to the Tokyo/NY subnet (that has been statically injected initially) remains in place but it is not used anymore, because its metric is higher that the new route injected dynamically by OpenVPN server.
+- As soon as the primary tunnel is shutdown, the monitoring script (run via `Systemd timers`) detects it and launch the Auber server OpenVPN service. The backup tunnel `10.9.2.0/24` became fully active
+- A second route to the private remote LAN (e.g. `172.20.10.0/28`) is dynamically injected to pass through its own VPN tunnel: `172.20.10.0/28 via 10.9.2.1`. The initial static route to this LAN  remains in place but it is not used anymore, because the dynamic route has a lower metric (by default, metric = 0) so this is the prioraty route.
+- The routes to the Auber/Paris LAN subnet (e.g. `192.168.x.y/16`) via its own VPN tunnel are dynamically injected to the VPN clients.
 
 [Routing Table Auber Before failover](../assets/verifs/sprint2/routing-table-auber-before-failover.png) 
 [Routing Table Auber After failover](../assets/verifs/sprint2/routing-table-auber-after-failover.png) 
 
 
-## Validation & Connectivity ✅  
-- Ping 	OK = Tokyo → Aubervilliers (`192.168.1.160, 192.168.100.210, 10.9.2.1`) 
+## 8. Validation & Connectivity ✅  
+- Ping 	OK = Tokyo → Aubervilliers (`192.168.1.160`, `192.168.100.210`, `10.9.2.1`) 
+
 Analysis: Traffic is now routed through the backup VPN tunnel.
 
 - Ping 	OK = Tokyo → Paris (`192.168.100.200`,`192.168.100.197` )
+
 Analysis: Paris remains accessible via the local link between the two servers.
 [Traceroute Tokyo → Paris ](../assets/verifs/sprint2/traceroute-tokyo-paris.png)
 
 - Ping 	OK = Aubervilliers → Tokyo (`172.20.10.10`, `10.9.2.2`)
+
 Analysis: LAN Tokyo/NY remains accessible via the backup VPN tunnel between the peers
 
 - Ping 	OK  = Paris → Tokyo(`172.20.10.9`, `10.9.2.2`)
+
 Analysis: LAN Tokyo/NY remains accessible  via the local link between the two servers. 
 [Traceroute Paris → Tokyo ](../assets/verifs/sprint2/traceroute-paris-tokyo.png)
 
 
-## When Paris Comes Back
-- Clients reconnect to Paris (first remote), after ~1minute. 
-- The monitoring script on Auber detects it and shutdown the Auber server OpenVPN service. The backup tunnel `10.9.2.0/24` is not anymore active so all of the route injected dynamically are deleted from the routing table of Auber & the client. The primary route (already added) are used.
-=> the openvpn state (connexion, routing table) is similar to the one state of the initial, before the failover.
+## 9. When Paris Comes Back
+The server Paris re-launch its openvpn service. 
+- The monitoring script on Auber detects it and shutdown the Auber server OpenVPN service. The backup tunnel `10.9.2.0/24` is not anymore active so all of the route injected dynamically are deleted from the routing table of Auber & the client. The first route (already injected) is now used.
+- Clients, that have lost the connexion with the backup server, try to reconnect to the primary server. So, after ~1 minute, the connexion is established. 
 
+In conclusion, the openvpn and routing table state became similar to the one state of the initial, before the failover.
 
-## 7. Troubleshooting
+## 10. Troubleshooting
 **Symptom**: Temps de bascule supérieur à 1 minute
 
 **Cause**
