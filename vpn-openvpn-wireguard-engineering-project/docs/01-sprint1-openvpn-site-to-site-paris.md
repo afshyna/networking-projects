@@ -215,8 +215,8 @@ During the acceptance testing phase, several issues of ping were identified and 
 
 - **Proof & Result** : 
 On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
-[Routing Table Tokyo](../assets/verifs/sprint1/routing-table-tokyo.png) 
-[Routing Table NY](../assets/verifs/sprint1/routing-table-NY.png) 
+[Routing Table Tokyo](../assets/verifs/routing-table-NY-before-failover.png) 
+[Routing Table NY](../assets/verifs/routing-table-NY-before-failover.png) 
 
 *See [Ping Tests - LAN Access (Paris/Auber)](#ping-tests---lan-access-parisauber-).*
 
@@ -249,7 +249,7 @@ On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
 
 - **Proofs & Results** : 
 On Tokyo, a route has been added to the these 2 distant LANs via the tunnel.
-[Routing Table Tokyo](../assets/verifs/sprint1/routing-table-tokyo.png)
+[Routing Table Tokyo](../assets/verifs/routing-table-tokyo-before-failover.png)
 
 A traceroute to the Auber internal LAN confirms also the utilization of the VPN tunnel as gw :
 [Traceroute-tokyo-to-auber-internal-LAN](../assets/verifs/sprint1/traceroute-tokyo-auber-lans.png)
