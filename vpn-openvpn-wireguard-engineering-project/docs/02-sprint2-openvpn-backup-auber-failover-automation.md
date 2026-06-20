@@ -185,7 +185,7 @@ As soon as the main tunnel `10.9.1.0/24` is disconnected, the following network 
 => After approximately 1 minutes, the failover tunnel is established: a new virtual IP from the `10.9.2.0/24` range is assigned to the tun0 interface.
 
 
-##  Progressive Changes to Routing Tables - Flow validation & Route verification
+##  6. Progressive Changes to Routing Tables - Flow validation & Route verification
 
 **Server Paris**
 Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24`).
@@ -217,12 +217,7 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
   [Routing Table Auber After failover](../assets/verifs/) <!-- A AJOUTER -->
 
 
-
-### When Paris Comes Back
-- Clients reconnect to Paris (first remote), after ~1minute. 
-- The monitoring script on Auber detects it and shutdown the Auber server OpenVPN service. The backup tunnel `10.9.2.0/24` is not anymore active so all of the route injected dynamically are deleted from the routing table of Auber & the client. The primary route (already added) are used.
-
-## 6. Validation & Connectivity  – Analysis of the switch to Aubervillier
+## Validation & Connectivity  – Analysis of the switch to Aubervillier
 - Ping 	✅ Tokyo → Aubervilliers (`192.168.1.160, 192.168.100.210, 10.9.2.1`  
 Traffic is now routed through the backup VPN tunnel.
 
@@ -234,6 +229,13 @@ Explanation: The main VPN network no longer exists.
 
 - Ping 	✅ Paris → Tokyo(`172.20.10.3`	✅, `10.9.1.2`	❌)
 Explanation: The main VPN network no longer exists.
+
+
+## When Paris Comes Back
+- Clients reconnect to Paris (first remote), after ~1minute. 
+- The monitoring script on Auber detects it and shutdown the Auber server OpenVPN service. The backup tunnel `10.9.2.0/24` is not anymore active so all of the route injected dynamically are deleted from the routing table of Auber & the client. The primary route (already added) are used.
+
+
 
 
 ## 7. Troubleshooting
