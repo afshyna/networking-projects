@@ -1,4 +1,4 @@
-# 🏁 Sprint 2 :  Secondary OpenVPN Backup Site Deployment & Automated Network Failover 
+# 🏁 Sprint 2 :  OpenVPN Backup Site Deployment & Automated Network Failover 
 
 ## Sprint Objectives
 - Deploy a secondary OpenVPN backup VPN server (Aubervilliers).
@@ -21,13 +21,15 @@
 - Backup tunnel: `10.9.2.0/24` (Auber)
 
 ## 1. PKI Setup 
-In the same way, he authentication solution to use for implementing an OpenVPN tunnel is using X.509 certificates.
+In the same way that with the primary server, the authentication solution to use for implementing an OpenVPN tunnel is using X.509 certificates.
 
 The full PKI setup (CA creation, key generation, certificate signing, installation steps) is documented here:
-[Authentication via SSL/TLS certificates](pki-certificate-authentication.md)
+*[Authentication via SSL/TLS certificates](pki-certificate-authentication.md)*
 
 
-## 🔧 1. OpenVPN Configuration
+## 🔧 2. OpenVPN Configuration
+
+*Full configuration files are available in the root folder  `configs/openvpn/` directory.*
 
 ### Backup VPN Server - Key OpenVPN Directives
 - `server 10.9.2.0 255.255.255.0` - Defines the backup VPN tunnel network, that will be used by Auber server/clients
@@ -36,75 +38,70 @@ The full PKI setup (CA creation, key generation, certificate signing, installati
 - `ca`, `cert`, `key`, - `dh`, `tls-server` : TLS authentication
 
 ### Clients - Key OpenVPN Directives
-For Multi‑Server Failover, on clients, after the 1st directive `remote` with Paris server, add a 2nd `remote` for a second VPN connection with the backup server.
+- For Multi‑Server Failover, on clients, after the 1st directive `remote` with Paris server, add a 2nd `remote` for a second VPN connection with the backup server.
+```remote 82.X.Y.Z 1195```
+- `resolv-retry infinite`: Forces the client to infinitely retry resolving and connecting.
+- `keepalive 5 30`: Pings the server every 5 seconds. If no response is received within 30 seconds, the client considers the tunnel broken and immediately attempts a connection restart, triggering the switch to the next remote endpoint.
 
+Explanation : 
+- Clients always try Paris first.
+- If unreachable → automatically switch to Aubervilliers.
+
+## 🔀 3. Routing Configuration & Adjustements
+
+###  Backup Server
+- Add a static route to client remote LAN via Paris when primary tunnel is UP.
+- Add this route via backup tunnel when primary tunnel is DOWN.
+
+### Add local route
+- Declare a dynamic route to reach the Tokyo/NY LAN network by routing via the VPN tunnel: 
 ```text
-remote 82.X.Y.Z 1195
+ # openvpn server configuration
+route 172.20.10.0 255.255.255.240`
 ```
 
-## 🔀 2. Routing Configuration & Adjustements
+- Declare a static route to reach the primary VPN subnet by routing via its internal interface with Paris, when the Paris tunnel VPN is UP :
+`route 10.9.1.0 255.255.255.0 192.168.100.200`
 
-### CCD
-OpenVPN must know which client owns which LAN, otherwise packets are dropped.
-To ensure that the Aubervilliers backup server can properly handle routing back to the client subnets, OpenVPN must map internal virtual endpoints using CDD.
-
-> 📑 **Architectural Reference:** The mechanics of OpenVPN's internal routing engine, directory bindings, and the critical role of the `iroute` directive are detailed in the primary site's documentation.
-See [Sprint 0: Paris Routing & CCD Configuration](01-sprint0-openvpn-site-to-site-paris.md#iroute-openvpn-internal-routing-table--static-vpn-ip-assignment-ccd).
-
-###  Backup Server Push Routes  (OpenVPN file configuration)
-Clients (Tokyo/NY) will dynamically receive these routes when connecting to the backup VPN server.
-
+**Push Routes**
+Clients (Tokyo/NY) will dynamically receive these routes when connecting to the backup VPN server, in the same way that the primary server.
 ```text
+ # openvpn server configuration
 push "route 192.168.1.0 255.255.255.0"
 push "route 192.168.100.0 255.255.255.0"
 ```
 
-### Backup Server route  (OpenVPN file configuration)
-- Declare a dynamic route on Paris to instruct it  to reach the Tokyo/NY LAN network by routing via the VPN tunnel: 
-`route 172.20.10.0 255.255.255.240`
-
-- Declare also a dynamic route on Paris to instruct it  to reach the primary VPN subnet by routing via its internal interface with Paris, when the Paris tunnel VPN will be UP againt
-`route 10.9.1.0 255.255.255.0 192.168.100.200`
-
-### Paris Server Route 
+### Paris Server 
 - Make an adjustment on the dynamic route to the LAN network of Tokyo (configured in Step 1) by adding the VPN as gateway and assigning the route  metric 10 in the paris server configuration file.
 `route 172.20.10.0 255.255.255.240` --> `route 172.20.10.0 255.255.255.240 vpn_gateway 10`
 
-- Add the same route with a higher metric, manually on the console.
-`ip route add 172.20.10.0/28 via 192.168.100.210 dev enp0s8 metric 100`
-  
+- Add the same route with a higher metric, statically on the shell.
+```bash
+ip route add 172.20.10.0/28 via 192.168.100.210 dev enp0s8 metric 100`
+```
+
 <!--- Moreover, add a new route to the backup VPN subnet with its internal interface with Auber as gateway.
   `route 10.9.2.0/24 via 192.168.100.210 dev enp0s8`
 -->
 
-### On Aubervilliers (Backup)
-- Add routes to remote LANs via Paris when primary tunnel is UP.
-- Add routes via backup tunnel when primary tunnel is DOWN.
+### iroute via CCD
+OpenVPN must know which client owns which LAN, otherwise packets are dropped.
+To ensure that the Aubervilliers backup server can properly handle routing back to the client subnets, OpenVPN must map internal virtual endpoints using CDD.
 
-See [4. Automated Failover Script on Backup Server (Aubervilliers)](##-Automated-Failover-Script-on-Backup-Server-(Aubervilliers)).
-
-**Why Auber Must Know 10.9.1.0/24**
-- Required for return traffic when clients are still connected to Paris.
-- See Troubleshooting – Return Path Issues.
-
-### CCD Files
 1. Create CCD entries for both clients (Tokyo & NY).
 2. Add iroute entries to map each remote LAN to the correct client.
-3. Add the directive `client-config-dir /etc/openvpn/ccd` in the auber openvpn configuration for enabling per-client static IP assignment and iroute.
+3. Add the directive `client-config-dir /etc/openvpn/ccd` in the auber openvpn configuration for enabling iroute.
+
+> 📑 **Architectural Reference:** The mechanics of OpenVPN's internal routing engine, directory bindings, and the critical role of the `iroute` directive are detailed in the primary site's documentation.
+See [Sprint 0: Paris Routing & CCD Configuration](01-sprint1-openvpn-site-to-site-paris.md#iroute-openvpn-internal-routing-table)
+
 
 ## 3. Port Forwarding for Backup VPN
-Traffic coming from the public internet through the edge router (home/box router at Paris) is segregated using port-based forwarding:
+Traffic coming from the public internet through the edge router (local router at Paris) is segregated using port-based forwarding:
 * **Primary VPN Tunnel (Paris):** `82.X.Y.Z:1194 (UDP)` ➔ `192.168.1.197:1194`
 * **Backup VPN Tunnel (Aubervilliers):** `82.X.Y.Z:1195 (UDP)` ➔ `192.168.1.160:1195`
 
 Purpose : Allows remote clients to reach the backup VPN server when Paris is down.
-
-### Behavior
-- `resolv-retry infinite`: Forces the client to infinitely retry resolving and connecting.
-- `keepalive 5 30`: Pings the server every 5 seconds. If no response is received within 30 seconds, the client considers the tunnel broken and immediately attempts a connection restart, triggering the switch to the next remote endpoint.
-
-- Clients always try Paris first.
-- If unreachable → automatically switch to Aubervilliers.
 
 ## 4. Automated Failover Script on Backup Server (Aubervilliers)
  
@@ -122,22 +119,20 @@ When the primary tunnel drops, Aubervilliers must stop routing client traffic th
 - Uses `ip route replace` to update routes dynamically.
 - Executed every minute via Root Crontab :
 ```text
-sudo crontab -e
+# crontab -e
 * * * * * /usr/local/bin/failover.sh
 ```
 (Note: For real-time 2-second quick execution, a daemon loop or a systemd timer is recommended over standard cron).
 
-
+    Auber →
 <!--
 ## 🧪 Testing Before Failover
 ### Ping Tests
     Tokyo → Paris (10.9.1.1 / 192.168.1.197)
     Tokyo → Auber (192.168.1.160 / 192.168.100.210)
-    Paris → Tokyo (172.20.10.3 / 10.9.1.2)
-    Auber → Tokyo (172.20.10.3 / 10.9.1.2)
+    Paris → Tokyo (172.20 Tokyo (172.20.10.3 / 10.9.1.2)
 -->
 ### Expected Behavior
-
 - All traffic still uses the primary tunnel (Paris).
 - Backup tunnel (10.9.2.0/24) is not yet active.
 
