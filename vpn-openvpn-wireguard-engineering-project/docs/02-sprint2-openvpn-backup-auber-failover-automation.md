@@ -95,16 +95,14 @@ Traffic coming from the public internet through the edge router (local router at
 
 Purpose : Allows remote clients to reach the backup VPN server when Paris is down.
 
-## 4. Automated Failover Script on Backup Server (Aubervilliers)
+## 4. Automated Failover Script on Backup Server
 
 - Located at `/usr/local/bin/`
-- Executed every minute via Root Crontab :
-```text
-# crontab -e
-* * * * * /usr/local/bin/failover.sh
-```
+- Executed every 10 seconds via System Timer
 
 ### Script 
+*Full script file is available in the root folder configs/openvpn/ directory.*
+
 **Script Purpose**
 This script ensures automatic switching between:
 - the primary VPN (Paris)
@@ -130,12 +128,14 @@ I have used a systemd timer for executing of the script automatically, every 10s
 
 - other for timer (with same name) that will trigger the service repeatedly, every 10 seconds :  `/etc/systemd/system/openvpn-failover.timer`
 
-- Reload the systemd
+*Both systemd files are available in the folder configs/systemd/ directory.*
+
+2) Reload the systemd
 ```console
 # systemctl daemon-reload
 ```
 
-- Start your timer by systemctl start test.timer, or enable it by default
+3) start your timer by systemctl start test.timer, or enable it by default
 ```console
 # systemctl start openvpn-failover.timer
 # systemctl enable --now openvpn-failover.timer
@@ -148,6 +148,8 @@ You should see:  `Active: active (waiting)`
 journalctl -u openvpn-failover.service -f
 
 This shows real‑time logs every time the timer triggers the service.
+
+
 
 **Why using system timer ? (instead of crontab for ex)
 - High reliability
