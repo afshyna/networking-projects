@@ -10,7 +10,7 @@
 
 ![Architecture Sprint 2](../diagrams/02-sprint2-backup-auber-openvpn-failover-automation.png)
 
-### Backup Site Role
+### Backup Site Role (Aubervilliers)
 - Aubervilliers acts as the secondary VPN hub.
 - Must be reachable by both Tokyo and New York when Paris is down.
 - Private IP of Auber : `192.168.1.160`
