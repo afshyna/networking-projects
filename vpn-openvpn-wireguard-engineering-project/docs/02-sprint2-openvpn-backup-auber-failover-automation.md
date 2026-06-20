@@ -166,27 +166,27 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
     - `172.20.10.0/28 via 192.168.100.210`
     - `10.0.0.0/28 via 192.168.100.210`
 
-  [Routing Table Paris Before failover](../assets/verifs/)
-  [Routing Table Paris After failover](../assets/verifs/)
-
+  [Routing Table Paris Before failover](../assets/verifs/) <!-- A AJOUTER -->
+  [Routing Table Paris After failover](../assets/verifs/) <!-- A AJOUTER -->
+ 
 **VPN Clients**
  The default gateway for the `10.9.1.X` tunnel has been replaced by the IP address of the `10.9.2.X` failover interface. Clients switch to Auber (10.9.2.1) via port remote 1195.
 - Before : `192.168.100.0/24 via 10.9.1.1` | `192.168.1.0/24 via 10.9.1.1`
 - After : `192.168.100.0/24 via 10.9.2.1` | `192.168.1.0/24 via 10.9.2.1`
 
-  [Routing Table Tokyo Before failover](../assets/verifs/) <!-- A AJOUTER -->
+  [Routing Table Tokyo & NY Before failover](../assets/verifs/) <!-- A AJOUTER -->
   
-  [Routing Table Tokyo After failover](../assets/verifs/) <!-- A AJOUTER -->
+  [Routing Table Tokyo & NY After failover](../assets/verifs/) <!-- A AJOUTER -->
 
-
+  
 **Server Aubervilliers**
 - As soon as the primary tunnel is shutdown, the monitoring script (run via Systemd.time) detects it and active the Auber server OpenVPN service. The backup tunnel `10.9.2.0/24` is fully active
 - The route to the Tokyo/NY LAN subnet (e.g. `172.20.10.0/28`) is dynamically injected to pass through its own VPN tunnel: `172.20.10.0/28 via 10.9.2.1`
 - The routes to the Auber/Paris LAN subnet (e.g. `192.168.x.y/16`) via its own VPN tunnel: `172.20.10.0/28 via 10.9.2.1`, are dynamically injected to the VPN clients by the backup server.
 - The static route to the Tokyo/NY subnet (that has been statically injected initially) remains in place but it is not used anymore, because its metric is higher that the new route injected dynamically by OpenVPN server.
-  [Routing Table Auber Before failover](../assets/verifs/)
+  [Routing Table Auber Before failover](../assets/verifs/) <!-- A AJOUTER -->
   
-  [Routing Table Auber After failover](../assets/verifs/)
+  [Routing Table Auber After failover](../assets/verifs/) <!-- A AJOUTER -->
 
 
 
