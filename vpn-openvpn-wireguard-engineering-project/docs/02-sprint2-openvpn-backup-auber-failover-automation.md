@@ -260,27 +260,6 @@ Valeurs keepalive trop élevées.
 **Solution**
 keepalive 5 30
 
----
-
-Route vers Tokyo toujours via Paris
-
-Cause
-Route statique devenue invalide après panne.
-
-Solution
-Script de failover dynamique.
-
----
-Clients reconnectés mais réseau inaccessible
-
-Cause
-Routes non poussées par le serveur de secours.
-
-Solution
-Ajout des directives : push "route ..."
-
-----
-
 ❌ Issue  - HTTP Request fails Tokyo → Paris (`192.168.100.200`, `192.168.1.197`)
 
 - **Symptom**:: Ping to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests not.
