@@ -1,5 +1,5 @@
 ```text
-## Location : /etc/systemd/system/openvpn-failover.service 
+## Location : /etc/systemd/system/
 [Unit]
 Description=OpenVPN Failover Script - Switch between Paris VPN & Auber VPN according to the Paris VPN state (shut or active)
 
