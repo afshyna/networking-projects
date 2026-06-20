@@ -40,7 +40,7 @@ The full PKI setup (CA creation, key generation, certificate signing, installati
 ### Clients - Key OpenVPN Directives
 - For Multi‑Server Failover, on clients, after the 1st directive `remote` with Paris server, add a 2nd `remote` for a second VPN connection with the backup server.
 ```remote 82.X.Y.Z 1195```
-- `resolv-retry infinite`: Forces the client to infinitely retry resolving and connecting.
+- `resolv-retry infinite`: Forces the client to infinitely retry resolving and connecting to the servers.
 - `keepalive 5 30`: Pings the server every 5 seconds. If no response is received within 30 seconds, the client considers the tunnel broken and immediately attempts a connection restart, triggering the switch to the next remote endpoint.
 
 Explanation : 
@@ -147,7 +147,10 @@ You should see:  `Active: active (waiting)`
 journalctl -u openvpn-failover.service -f
 
 This shows real‑time logs every time the timer triggers the service.
-
+```console
+# systemctl status openvpn-failover.timer
+```
+[Result](../assets/verifs/sprint2/Systemctl-status-openvpn-failover.timer-state-auber)
 
 
 **Why using system timer ? (instead of crontab for ex)**
@@ -272,6 +275,29 @@ Routes non poussées par le serveur de secours.
 Solution
 Ajout des directives : push "route ..."
 
+----
+
+❌ Issue  - HTTP Request fails Tokyo → Paris (`192.168.100.200`, `192.168.1.197`)
+
+- **Symptom**:: Ping to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests not.
+
+- **Cause**:: The default policy FORWARD for the Linux firewall in Paris is set to DROP. TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris. FORWARD chain policy dropl
+
+- **Solution**: : Allow the traffic forwarding between VPN network & LAN-Auber-Paris network.
+```console
+iptables -A FORWARD -s 10.9.2.0/24 -d 192.168.0.0/16 -j ACCEPT
+```
+
+**Results**: Client Tokyo → Paris = HTTP requests successfu
+
+
+<!--
+# Outward
+iptables -A FORWARD -i tun0 -o enp0s8 -s 10.9.1.0/24 -d 192.168.100.0/24 -j ACCEPT
+# Return 
+iptables -A FORWARD -i enp0s8 -o tun0 -s 192.168.100.0/24 -d 10.9.1.0/24 -j ACCEPT
+
+-->
 <!-- Autre troubleshooting possible
 Backup tunnel unreachable
 Wrong route metrics
@@ -279,11 +305,7 @@ Wrong route metrics
 ### References
     See Troubleshooting – Missing iroute
     See Troubleshooting – Return Path Problems
-    See Troubleshooting – Failover Script
-
 -->
 
-Conclusion : My captures traces & the routing  table show how traffic is redirected to the Aubervilliers server (10.9.2.1) when paris server is shutdown to maintain access to resources and HTTP requests, demonstrating the effectiveness of my disaster recovery plan.
-
-
+*Conclusion : My captures traces & the routing  table show how traffic is redirected to the Aubervilliers server (10.9.2.1) when paris server is shutdown to maintain access to resources and HTTP requests, demonstrating the effectiveness of my disaster recovery plan.*
 
