@@ -104,6 +104,7 @@ Purpose : Allows remote clients to reach the backup VPN server when Paris is dow
 * * * * * /usr/local/bin/failover.sh
 ```
 
+### Script 
 **Script Purpose**
 This script ensures automatic switching between:
 - the primary VPN (Paris)
@@ -119,17 +120,43 @@ Based on these results, the script decides:
 - to stop the backup VPN if the main VPN is UP
 - to start the backup VPN if the main VPN is DOWN
 
-**Script Summary**
 
+### Automatic execution of the script
 
-    Auber →
-<!--
-## 🧪 Testing Before Failover
-### Ping Tests
-    Tokyo → Paris (10.9.1.1 / 192.168.1.197)
-    Tokyo → Auber (192.168.1.160 / 192.168.100.210)
-    Paris → Tokyo (172.20 Tokyo (172.20.10.3 / 10.9.1.2)
--->
+I have used a systemd timer for executing of the script automatically, every 10s.
+
+1) I create two files:
+- one for service, that simply runs the script once :  `/etc/systemd/system/openvpn-failover.service`
+
+- other for timer (with same name) that will trigger the service repeatedly, every 10 seconds :  `/etc/systemd/system/openvpn-failover.timer`
+
+- Reload the systemd
+```console
+# systemctl daemon-reload
+```
+
+- Start your timer by systemctl start test.timer, or enable it by default
+```console
+# systemctl start openvpn-failover.timer
+# systemctl enable --now openvpn-failover.timer
+```
+
+- Check timer status:
+You should see:  `Active: active (waiting)`
+
+- To see each execution of the failover script:
+journalctl -u openvpn-failover.service -f
+
+This shows real‑time logs every time the timer triggers the service.
+
+**Why using system timer ? (instead of crontab for ex)
+- High reliability
+- Precise execution intervals
+- Automatic restart
+- Clean logging
+- Production‑grade behavior
+
+This setup ensures that the VPN failover mechanism reacts quickly and consistently to network changes.
 
 ### Expected Behavior before the failover
 - All traffic still uses the primary tunnel (Paris), which is active.
