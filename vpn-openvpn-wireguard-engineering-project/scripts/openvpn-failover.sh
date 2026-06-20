@@ -1,5 +1,7 @@
 #!/bin/bash
 
+## Location : /usr/local/bin/
+
 # Reachability test of the Primary VPN (Paris) 
 ping -c 1 -W 1 10.9.1.1 > /dev/null
 
