@@ -237,20 +237,32 @@ Path/Gateways followed : Nomad → Paris (`10.9.3.1`) → Auber (`192.168.100.21
 
 ## 🛠️ 7. Troubleshooting 
 
----
-
 ### Routing issue 1 : 
-- **Symptom**: The tunnel is established, but no pings from wireguard client get through to the physical networks (e.g. `192.168.1.0/24` or `192.168.100.0/24`).
+- **Symptom**: The tunnel is established, but no pings from wireguard client get through to the Paris  (e.g. `192.168.1.197/24` or `192.168.100.200/24`).
 
 - **Cause**: Incomplete AllowedIPs. WireGuard filters traffic that does not belong to the declared networks at the kernel level. Client wireguard doesn't have a route to these subnets via its wireguard tunnel.
 
 - **Fixs**:
   - Extend the AllowedIPs on the client to include `192.168.0.0/16`.
-  - On auber, add a route to the wireguard VPN subnet on the openvpn configuration file.
 
 ---
 
-### Routing issue 2:
+### Routing issue 2 : 
+- **Symptom**: The tunnel is established, but no pings from wireguard client get through to the Auber (e.g. `192.168.1.160/24` or `192.168.100.210/24`).
+
+- **Causes**:
+      - Incomplete AllowedIPs. WireGuard filters traffic that does not belong to the declared networks at the kernel level. Client wireguard doesn't have a route to these subnets via its wireguard tunnel.
+      - Auber doesn't know the route to the Wireguard network so i can't reply to the ping
+
+- **Fixs**:
+  - Extend the AllowedIPs on the client to include `192.168.0.0/16`.
+  - On auber, add a route to the wireguard VPN subnet on the openvpn configuration file.
+``` console
+ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8 
+```
+---
+
+### Routing issue 3:
 - **Symptom**: No pings from wireguard client get through to the OpenVPN backup subnet (e.g. `10.9.2.1/24`, `10.9.2.2/24`).
 
 - **Cause**: Incomplete  AllowedIPs. WireGuard filters traffic that does not belong to the declared networks at the kernel level.So, client wireguard doesn't have a route to the OpenVPN subnet via its wireguard tunnel.
