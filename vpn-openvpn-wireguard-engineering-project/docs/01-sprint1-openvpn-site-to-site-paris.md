@@ -393,7 +393,7 @@ Windows PC Tokyo → Windows PC Paris (`192.168.1.73`) = [Ping OK & Tracert](../
 
 ---
 
-### ❌ Issue H - HTTP Request fails Tokyo → Auber  (`192.168.100.210`)
+### ❌ Issue H - HTTP Request fails Tokyo → Auber  (`192.168.100.210` & `192.168.1.160`)
 - **Symptom**: Ping to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests not.
 
 - **Causes**:
@@ -411,12 +411,10 @@ ufw allow 80/tcp
 
 2) Allow the traffic forwarding between VPN network & LAN-Auber-Paris network.
 ```bash
-# Outward
-iptables -A FORWARD -i tun0 -o enp0s8 -s 10.9.1.0/24 -d 192.168.100.0/24 -j ACCEPT
-# Return 
-iptables -A FORWARD -i enp0s8 -o tun0 -s 192.168.100.0/24 -d 10.9.1.0/24 -j ACCEPT
+iptables -A FORWARD  -s 10.9.1.0/24 -d 192.168.0.0/16 -j ACCEPT
 ```
 
 - **Results**:
 Client Tokyo → Auber  (`192.168.100.210`) = [HTTP request successful](../assets/verifs/sprint1/curl-http-request-tokyo_auber.png)
 
+Client Tokyo → Auber  (`192.168.1.160`) = [HTTP request successful](../assets/verifs/sprint1/http-request-tokyo-auber-lan-private)
