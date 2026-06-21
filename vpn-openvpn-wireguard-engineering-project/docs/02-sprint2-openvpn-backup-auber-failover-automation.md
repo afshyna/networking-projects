@@ -102,7 +102,7 @@ Traffic coming from the public internet through the edge router (local router at
 - Executed every 10 seconds via `System Timers`
 
 ### Script 
-*Full script file is available in the root folder configs/openvpn/.*
+*Full script file is available in the root folder scripts/.*
 
 **Script Purpose**
 
