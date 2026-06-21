@@ -43,12 +43,13 @@ The mobile client can therefore access:
 - Smartphone : `10.9.3.200`
 
 **Physical Networks**:
-- Public/WAN IP Nomad PC : `A.B.C.D`
+- Public/WAN IP Nomad PC : `176.B.C.D`
 - Public/WAN IP Paris : `88.162.141.79`
-- backup OpenVPN tunnel subnet : `10.9.2.0/24`
+- Backup OpenVPN tunnel subnet : `10.9.2.0/24`
 - Paris/Auber LAN: `192.168.1.0/24`
 - Inter-site Auber-Paris networks: `192.168.100.0/24`
 - Tokyo/NY LAN: `172.20.10.0/28`
+- PC Nomade LAN: `10.81.42.0/24` (IP PC : `10.81.42.102`)
 
 ### Remote Access Concept
 A “nomad client” is an external device (4G/5G, Wi‑Fi public, home network) with no direct access to Paris.
