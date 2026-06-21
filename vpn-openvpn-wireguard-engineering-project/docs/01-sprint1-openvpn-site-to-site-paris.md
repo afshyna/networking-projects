@@ -151,7 +151,7 @@ To enable remote offices (Client Tokyo and NY) to initiate a connection to the c
 - By default, when ufw is activated, all incoming traffic is blocked. So the standard UDP OpenVPN port 1194 was blocked.
 
 OpenVPN UDP traffic must be allowed in the ufw firewall:
-```bash
+```console
 ufw allow 1194/udp
 ```
 
@@ -159,12 +159,12 @@ ufw allow 1194/udp
 The configuration files are stored in the root folder `configs/openvpn/`. 
 
 They are loaded by:
-```bash
+```console
 # Paris server
 systemctl start openvpn@srv-parismont
 ```
 
-```bash
+```console
 # Remote clients
 systemctl start openvpn@client-tokyo
 systemctl start openvpn@client-NY
@@ -258,7 +258,7 @@ On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
   ```
 
 3) Addition of a static route on the Aubervilliers table routing to instruct it to route via Paris to reach the tunnel network:
-  ```bash
+  ```console
       ip route add 10.9.1.0/24 via 192.168.100.200 dev enp0s8
    ```
 
@@ -333,7 +333,7 @@ On Auber, a route has been added to the Tokyo LAN network via the internal inter
 
 1)  Apply a POSTROUTING MASQUERADE NAT rule on both server and clients. This enables the VPN gateway (client or server here) rewrites the source IP of packets coming from the tunnel so that they appear as if they originate from the LAN interface itself.
 
-```bash
+```console
 iptables -t nat -A POSTROUTING -s 10.9.1.0/24 -o enp0s3 -j MASQUERADE
 ```
 
@@ -391,6 +391,7 @@ Windows PC Paris → Windows PC Tokyo (`172.20.10.2`) = [Ping OK & Tracert](../a
 
 Windows PC Tokyo → Windows PC Paris (`192.168.1.73`) = [Ping OK & Tracert](../assets/verifs/sprint1/ping_tracert-windows-pc-client-windows-pc-server.png)
 
+
 ---
 
 ### ❌ Issue H - HTTP Request fails Tokyo → Auber  (`192.168.100.210` & `192.168.1.160`)
@@ -405,13 +406,20 @@ Note that ICMP packets were passing through UFW exceptions. ICMP is enabled by d
 
 - **Solutions**
 1) Allow incoming HTTP traffic on Auber
- ```bash
+ ```console
 ufw allow 80/tcp
 ```
 
-2) Allow the traffic forwarding between VPN network & LAN-Auber-Paris network.
-```bash
-iptables -A FORWARD  -s 10.9.1.0/24 -d 192.168.0.0/16 -j ACCEPT
+2) Allow the traffic forwarding between VPN network & inter-link Auber-Paris subnet. (for http request to 192.168.100.X /24)
+```console
+iptables -A FORWARD -i tun0 -o enp0s8 -s 10.9.1.0/24 -d 192.168.100.0/24 -j ACCEPT
+iptables -A FORWARD -i enp0s8 -o tun0  -d 10.9.1.0/24 -s 192.168.100.0/24 -j ACCEPT
+```
+
+3) Allow the traffic forwarding between VPN network & private Auber network.  (for http request to 192.168.1.X /24)
+```console
+iptables -A FORWARD -i tun0 -o enp0s3 -s 10.9.1.0/24 -d 192.168.1.0/24 -j ACCEPT
+iptables -A FORWARD -i enp0s3 -o tun0  -d 10.9.1.0/24 -s 192.168.1.0/24 -j ACCEPT
 ```
 
 - **Results**:
