@@ -394,7 +394,24 @@ Windows PC Tokyo → Windows PC Paris (`192.168.1.73`) = [Ping OK & Tracert](../
 
 ---
 
-### ❌ Issue H - HTTP Request fails Tokyo → Auber  (`192.168.100.210` & `192.168.1.160`)
+
+### ❌ Issue H - HTTP Request fails Tokyo → Paris  (`10.9.1.1`, `192.168.100.200`. `192.168.1.197`)
+- **Symptom**: Ping to the Paris web server work, but HTTP requests not.
+
+- **Causes**:
+1) the incoming HTTP traffic is blocked by default when ufw is activated.
+  
+- **Solutions** : Allow incoming HTTP traffic on Paris
+ ```console
+ufw allow 80/tcp
+```
+
+- **Results**:
+Client Tokyo → Paris  (`10.9.1.1`, `192.168.100.200`. `192.168.1.197` ) = [HTTP request successful](../assets/verifs/sprint1/http-request-tokyo-paris)
+
+---
+
+### ❌ Issue J - HTTP Request fails Tokyo → Auber  (`192.168.100.210` & `192.168.1.160`)
 - **Symptom**: Ping to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests not.
 
 - **Causes**:
@@ -412,13 +429,17 @@ ufw allow 80/tcp
 
 2) Allow the traffic forwarding between VPN network & inter-link Auber-Paris subnet. (for http request to 192.168.100.X /24)
 ```console
+# Outward 
 iptables -A FORWARD -i tun0 -o enp0s8 -s 10.9.1.0/24 -d 192.168.100.0/24 -j ACCEPT
+# Return 
 iptables -A FORWARD -i enp0s8 -o tun0  -d 10.9.1.0/24 -s 192.168.100.0/24 -j ACCEPT
 ```
 
 3) Allow the traffic forwarding between VPN network & private Auber network.  (for http request to 192.168.1.X /24)
 ```console
+# Outward 
 iptables -A FORWARD -i tun0 -o enp0s3 -s 10.9.1.0/24 -d 192.168.1.0/24 -j ACCEPT
+# Return 
 iptables -A FORWARD -i enp0s3 -o tun0  -d 10.9.1.0/24 -s 192.168.1.0/24 -j ACCEPT
 ```
 
