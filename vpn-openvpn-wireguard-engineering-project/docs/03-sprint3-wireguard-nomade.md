@@ -85,7 +85,7 @@ AllowedIPs = 10.9.3.200/32
 
 ### Nomad PC Configuration
 - Generate private/public keys of the PC.
-- Set the wireguard configuration in `/etc/wireguard/wg0-pc-nomad.conf`:
+- Set the wireguard configuration in `/etc/wireguard/wg0-pc-paris.conf`:
 
 ```text
 [Interface]
