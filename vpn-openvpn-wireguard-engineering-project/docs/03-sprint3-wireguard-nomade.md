@@ -171,13 +171,13 @@ Kernel : Activation of `net.ipv4.ip_forward`.
 wg-quick up <name_wg_file>
 wg show
 ```
-[Server - Wireguard Interface state](../assets/verifs/wg-show-paris-vpn.png)
+[Server - Wireguard Interface state](../assets/verifs/sprint3/wg-show-paris-vpn.png)
 
 ### Client nomad-PC
 ```console
 wg-quick up <name_wg_file>
 ```
-[PC - Wireguard Interface state](../assets/verifs/wg-show-nomad-pc.png)
+[PC - Wireguard Interface state](../assets/verifs/sprint3/wg-show-nomad-pc.png)
 
 ### Smartphone Client - launch via QR Code Import
 - Generate QR code using `qrencode` command
@@ -193,26 +193,26 @@ wg-quick up <name_wg_file>
 
 ### Ping Tests - Tunnel Connectivity ✅
 - Nomad → Paris (`10.9.3.1`)
-[Ping_OK_Nomade-PC → Paris-Wireguard-VPN](../assets/verifs/ping-nomad-pc_paris-wireguard.png)
+[Ping_OK_Nomade-PC → Paris-Wireguard-VPN](../assets/verifs/sprint3/ping-nomad-pc_paris-wireguard.png)
 
 - Nomad → Paris (`10.9.2.1`)
-[Ping_OK_Nomade PC → Paris OpenVPN](../assets/verifs/ping-nomad-pc_auber-openvpn-ok.png)
+[Ping_OK_Nomade PC → Paris OpenVPN](../assets/verifs/sprint3/ping-nomad-pc_auber-openvpn-ok.png)
 
 - Nomad → Paris (`10.9.2.2`)
-[Ping_OK_Nomade PC → Paris OpenVPN](../assets/verifs/ping-nomad-pc_tokyo-openvpn-ok.png)
+[Ping_OK_Nomade PC → Paris OpenVPN](../assets/verifs/sprint3/ping-nomad-pc_tokyo-openvpn-ok.png)
 
 ### Ping Tests - LAN Access (Paris/Auber) ✅
 - Nomad → `192.168.1.197` → OK (after AllowedIPs update)
-[Ping_OK_Nomade PC → Paris-LAN](../assets/verifs/ping-nomad-pc_paris-lan-ok.png)
+[Ping_OK_Nomade PC → Paris-LAN](../assets/verifs/sprint3/ping-nomad-pc_paris-lan-ok.png)
 
 - Nomad → Auber (`192.168.100.210`)
-[Ping_OK_Nomade Auber internal LAN](../assets/verifs/ping-nomad-pc_auber-internal-lan-ok.png)
+[Ping_OK_Nomade Auber internal LAN](../assets/verifs/sprint3/ping-nomad-pc_auber-internal-lan-ok.png)
 
 - Nomad → Auber (`192.168.1.160`)
-[Ping_OK_Nomade Auber LAN](../assets/verifs/ping-nomad-pc_auber-lan-ok.png)
+[Ping_OK_Nomade Auber LAN](../assets/verifs/sprint3/ping-nomad-pc_auber-lan-ok.png)
 
 - Nomad → Tokyo (`172.20.10.3`)
-[Ping_OK_Nomade Tokyo LAN](../assets/verifs/ping-nomad-pc_tokyo-lan-ok.png)
+[Ping_OK_Nomade Tokyo LAN](../assets/verifs/sprint3/ping-nomad-pc_tokyo-lan-ok.png)
 
 
 ### Traceroute
@@ -222,18 +222,18 @@ Observation :
 
 Nomad → Paris (`10.9.3.1`) → Auber (`192.168.100.210`) → Tokyo
 
-[Traceroute Nomade → Tokyo](../assets/verifs/traceroute-nomad-pc-tokyo-lan.png)
+[Traceroute Nomade → Tokyo](../assets/verifs/sprint3/traceroute-nomad-pc-tokyo-lan.png)
 
 Traffic therefore passes through the central site before reaching the remote branch.
 
 ## Wireshark Analysis
 Evidence of UDP encapsulation (UDP/49151).
-[Capture-Wireshark](../assets/wireshark/wireguard-icmp-ping-pc-nomad-paris-lan.png)
+[Capture-Wireshark](../assets/wireshark/sprint3/wireguard-icmp-ping-pc-nomad-paris-lan.png)
 
 ## Routing table 
-[Routing table PC Nomade](../assets/verifs/routing-table-pc-nomad-wireguard.png)
-[Routing table Paris Server](../assets/verifs/routing-table-paris-wireguard.png)
-[Routing table Auber Server](../assets/verifs/routing-table-auber.png)
+[Routing table PC Nomade](../assets/verifs/sprint3/routing-table-pc-nomad-wireguard.png)
+[Routing table Paris Server](../assets/verifs/sprint3/routing-table-paris-wireguard.png)
+[Routing table Auber Server](../assets/verifs/sprint3/routing-table-auber.png)
 
 
 
