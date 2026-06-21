@@ -1,4 +1,4 @@
-<h1> 🏁 Sprint 3 : WireGuard Remote Access VPN with VPN connection from nomad host (PC/phone) to the central site (VPN server Paris) </h1>
+<h1> 🏁 Sprint 3 : Remote Access VPN with WireGuard VPN connection from nomad hosts to Paris server </h1>
 
 ##  Sprint Objectives
 - Set up VPN access for enabling a remote user (nomad PC / smartphone) to securely access to internal networks (Paris, Auber, Tokyo, NY).
@@ -83,16 +83,18 @@ PublicKey = <CLIENT-PHONE_PUBLIC_KEY>
 AllowedIPs = 10.9.3.200/32
 ```
 
-### Nomad PC Configuration
+### Client Nomad PC Configuration
 - Generate private/public keys of the PC.
 - Set the wireguard configuration in `/etc/wireguard/wg0-pc-paris.conf`:
 
 ```text
 [Interface]
 Address = 10.9.3.100/32                      # IP_VPN_PC-NOMADE 
+PrivateKey = <PRIVATE_KEY_PC>
 
 [Peer]
-Endpoint = 88.162.141.79:49151               # <PUBLIC_IP>:<LISTENING_PORT>
+PublicKey = <PUBKEY_AUBER>
+Endpoint = 88.162.141.79:49151               # <PUBLIC_IP_PARIS>:<LISTENING_PORT>
 AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 ```
 ### Smartphone Configuration
