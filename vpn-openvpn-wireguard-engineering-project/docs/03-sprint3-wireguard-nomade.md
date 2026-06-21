@@ -40,7 +40,7 @@ The mobile client can therefore access:
 - WireGuard subnet: `10.9.3.0/24`
 - Paris server: `10.9.3.1` (UDP/49151)
 - Nomad PC: `10.9.3.100`
-- Iphone : `10.9.3.200`
+- Smartphone : `10.9.3.200`
 
 **Physical Networks**:
 - Public/WAN IP Nomad PC : `A.B.C.D`
@@ -67,44 +67,45 @@ wg genkey | tee server-paris-privatekey.key | wg pubkey > server-parismont-publi
 
 ```text
 [Interface]
-Address = <IP_VPN_SERVER>                  # 10.9.3.1
-ListenPort = <LISTENING_PORT>              # 49151
+Address = 10.9.3.1                        # IP_VPN_SERVER
+ListenPort = 49151                        # LISTENING_PORT
 PrivateKey = <SERVER_PRIVATE_KEY>
 
 [Peer]
-PublicKey = <CLIENT-NOMADE-PC_PUBLIC_KEY>  # public_key of nomad-pc
+PublicKey = <CLIENT-NOMAD-PC_PUBLIC_KEY>
 AllowedIPs = 10.9.3.100/32
 
 [Peer]
-PublicKey = <CLIENT-PHONE_PUBLIC_KEY>      # public_key of the phone
+PublicKey = <CLIENT-PHONE_PUBLIC_KEY> 
 AllowedIPs = 10.9.3.200/32
 ```
 
 ## Nomad PC Configuration
 - Generate private/public keys of the PC.
-- Set the wireguard configuration in `/etc/wireguard/wg0-pc-nomade.conf`:
+- Set the wireguard configuration in `/etc/wireguard/wg0-pc-nomad.conf`:
 
 ```text
 [Interface]
-Address = <IP_VPN_PC-NOMADE>                 # 10.9.3.100/32 
+Address = 10.9.3.100/32                      # IP_VPN_PC-NOMADE 
 
 [Peer]
-Endpoint = <PUBLIC_IP>:<LISTENING_PORT>      # 88.162.141.79:49151
+Endpoint = 88.162.141.79:49151               # <PUBLIC_IP>:<LISTENING_PORT>
 AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 ```
 
 ##  Smartphone Configuration
 
-### Key Generation
-
 - Generate private/public keys of the smartphone
 
-- Set the wireguard configuration in `/etc/wireguard/wg0-phone.conf`:
-
-###  Config — wg0-phone.conf
-```code
+- Set the wireguard configuration in `/etc/wireguard/wg0-phone.conf` :
+```text
+[Interface]
+Address = 10.9.3.200/32                     # IP VPN Phone
 PrivateKey = <PRIVATE_KEY_PHONE>
+
+[Peer]
 PublicKey = <PUBKEY_PARIS>
+Endpoint = 88.162.141.79:49151               # <PUBLIC_IP>:<LISTENING_PORT>
 AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 ```
 
@@ -175,16 +176,16 @@ wg show
 
 ### Client nomad-PC
 ```console
-wg-quick up <name_wg_file>
+wg-quick up <name_wg_file>      
 ```
 [PC - Wireguard Interface state](../assets/verifs/sprint3/wg-show-nomad-pc.png)
 
 ### Smartphone Client - launch via QR Code Import
 - Generate QR code using `qrencode` command
 - Scan via WireGuard mobile app
-- Activate interface `wg0-iphone`
+- Activate interface `wg0-phone`
 
-[Configuration-Wireguard-Phone](../assets/verifs/sprint3/configuration-iphone-wireguard.png)
+[Configuration-Wireguard-Phone](../assets/verifs/sprint3/configuration-phone-wireguard.png)
 
 [Ping_OK_Phone → All others subnets](../assets/verifs/sprint3/ping-phone-other-subnets-ok.png)
 
