@@ -253,7 +253,7 @@ In conclusion, the openvpn and routing table state became similar to the one sta
 
 ## 📝 10. Troubleshooting
 
-📝 Issue A -  Client does not reconnect to Backup VPN when Paris goes down (KeepAlive missing)
+###📝 Issue A -  Client does not reconnect to Backup VPN when Paris goes down (KeepAlive missing)
 
 **Symptom** : When the Paris VPN server is shut down, the OpenVPN client does not automatically reconnect to the second remote server defined in its configuration.
 
@@ -285,7 +285,7 @@ This is exactly what enables automatic failover.
 
 --- 
 
-❌ Issue B -  Switchover time exceeding 1 minute
+### ❌ Issue B -  Switchover time exceeding 1 minute
 
 - **Symptom** :  OpenVPN tries the same Paris server a second time once the 1st connexion attempt has been timeout
 
@@ -309,7 +309,7 @@ This forces OpenVPN to:
 
 --- 
 
-❌ Issue C - HTTP Request fails Tokyo → Paris (`192.168.100.200`, `192.168.1.197`)
+### ❌ Issue C - HTTP Request fails Tokyo → Paris (`192.168.100.200`, `192.168.1.197`)
 
 - **Symptom**:: Ping to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests not.
 
