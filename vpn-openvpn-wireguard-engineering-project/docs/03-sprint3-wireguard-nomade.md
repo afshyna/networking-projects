@@ -54,7 +54,9 @@ The mobile client can therefore access:
 A “nomad client” is an external device (4G/5G, Wi‑Fi public, home network) with no direct access to Paris.
 All access must go through WireGuard.
 
-## Server Configuration
+## 1. Wireguard Configuration
+
+### Server Configuration
 
 - Generate public & private keys :
 ```console
@@ -80,7 +82,7 @@ PublicKey = <CLIENT-PHONE_PUBLIC_KEY>
 AllowedIPs = 10.9.3.200/32
 ```
 
-## Nomad PC Configuration
+### Nomad PC Configuration
 - Generate private/public keys of the PC.
 - Set the wireguard configuration in `/etc/wireguard/wg0-pc-nomad.conf`:
 
@@ -92,8 +94,7 @@ Address = 10.9.3.100/32                      # IP_VPN_PC-NOMADE
 Endpoint = 88.162.141.79:49151               # <PUBLIC_IP>:<LISTENING_PORT>
 AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 ```
-
-##  Smartphone Configuration
+### Smartphone Configuration
 
 - Generate private/public keys of the smartphone
 
@@ -109,7 +110,7 @@ Endpoint = 88.162.141.79:49151               # <PUBLIC_IP>:<LISTENING_PORT>
 AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 ```
 
-##  Routing Configuration
+## 2. Routing Configuration
 
 ### OpenVPN routes to clients
 To join to the `192.168.1.0/24`, `192.168.100.0/24`, `172.20.10.0/28` and `10.9.2.0/24` subnets, PC-nomad must route traffic through its WireGuard VPN tunnel. For doing this, these subnets must be announced to wireguard client via the directive `AllowedIPs=`. It specifies the subnets/host  whose traffic  that you want to route through your VPN tunnel. The rest of the traffic (not specified) will go via your local internet connection.
@@ -123,8 +124,7 @@ Static routes have been added on Tokyo/NY to enable the Nomad client to reach:
 - Aubervilliers
 - Tokyo
 - New York
-
-It will allow remote networks (Tokyo, Aubervilliers) to ‘see’ the WireGuard network `10.9.3.0/24`.
+⇒ It will allow remote networks (Tokyo, Aubervilliers) to ‘see’ the WireGuard network `10.9.3.0/24`.
 
 On Auber, add route for OpenVPN clients to WireGuard network via the directive push in existing OpenVPN configuration:
 ```text
@@ -139,7 +139,7 @@ push "route 10.9.3.0 255.255.255.0"`
 route 10.9.3.0 255.255.255.0
 ```
 
-##  Firewalling & IP Forwarding
+## 3. Firewalling & IP Forwarding
 
 ### Firewall Rule
 Allow incoming WireGuard traffic on Auber :
@@ -165,7 +165,7 @@ Rule applied: `From everywhere on Internet connecting to external port UDP/49151
 ### IP forwarding
 Kernel : Activation of `net.ipv4.ip_forward`.
 
-## Launching WireGuard
+## 4. Launching WireGuard
 
 ### Server (Paris)
 ```console
@@ -190,55 +190,49 @@ wg-quick up <name_wg_file>
 [Ping_OK_Phone → All others subnets](../assets/verifs/sprint3/ping-phone-other-subnets-ok.png)
 
 
-## 6. Validation  / Connectivity 
+## 5. Validation of the Connectivity 
 
-### Ping Tests - Tunnel Connectivity ✅
-- Nomad → Paris (`10.9.3.1`)
-[Ping_OK_Nomade-PC → Paris-Wireguard-VPN](../assets/verifs/sprint3/ping-nomad-pc_paris-wireguard.png)
+---
 
-- Nomad → Paris (`10.9.2.1`)
-[Ping_OK_Nomade PC → Paris OpenVPN](../assets/verifs/sprint3/ping-nomad-pc_auber-openvpn-ok.png)
+## Ping Tests - Tunnel Connectivity ✅
 
-- Nomad → Paris (`10.9.2.2`)
-[Ping_OK_Nomade PC → Paris OpenVPN](../assets/verifs/sprint3/ping-nomad-pc_tokyo-openvpn-ok.png)
+- Nomad → Paris Wireguard server (`10.9.3.1`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_paris-wireguard.png)
+
+- Nomad → Paris OpenVPN server (`10.9.2.1`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-openvpn-ok.png)
+
+- Nomad → Tokyo OpenVPN Client (`10.9.2.2`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_tokyo-openvpn-ok.png)
 
 ### Ping Tests - LAN Access (Paris/Auber) ✅
-- Nomad → `192.168.1.197` → OK (after AllowedIPs update)
-[Ping_OK_Nomade PC → Paris-LAN](../assets/verifs/sprint3/ping-nomad-pc_paris-lan-ok.png)
+- Nomad → Paris private LAN (`192.168.1.197`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_paris-lan-ok.png)
 
-- Nomad → Auber (`192.168.100.210`)
-[Ping_OK_Nomade Auber internal LAN](../assets/verifs/sprint3/ping-nomad-pc_auber-internal-lan-ok.png)
+**Wireshark Analysis** : evidence of UDP encapsulation (UDP/49151)
+[Capture-Wireshark](../assets/wireshark/wireguard-icmp-ping-pc-nomad-paris-lan.png)
 
-- Nomad → Auber (`192.168.1.160`)
-[Ping_OK_Nomade Auber LAN](../assets/verifs/sprint3/ping-nomad-pc_auber-lan-ok.png)
+- Nomad → Auber inter-site LAN (`192.168.100.210`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-internal-lan-ok.png)
 
-- Nomad → Tokyo (`172.20.10.3`)
-[Ping_OK_Nomade Tokyo LAN](../assets/verifs/sprint3/ping-nomad-pc_tokyo-lan-ok.png)
+- Nomad → Auber private LAN (`192.168.1.160`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-lan-ok.png)
 
+- Nomad → Tokyo private LAN (`172.20.10.3`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_tokyo-lan-ok.png)
+
+
+---
 
 ### Traceroute
-- Nomade → Tokyo
 
-Observation :
+- Nomade → Tokyo (`172.20.10.3`) [Traceroute Nomade → Tokyo](../assets/verifs/sprint3/traceroute-nomad-pc-tokyo-lan.png)
 
-Nomad → Paris (`10.9.3.1`) → Auber (`192.168.100.210`) → Tokyo
+Path/Gateways followed : Nomad → Paris (`10.9.3.1`) → Auber (`192.168.100.210`) → Tokyo
 
-[Traceroute Nomade → Tokyo](../assets/verifs/sprint3/traceroute-nomad-pc-tokyo-lan.png)
+⇒ Traffic therefore passes through the central site before reaching the remote branch.
 
-Traffic therefore passes through the central site before reaching the remote branch.
+---
 
-## Wireshark Analysis
-Evidence of UDP encapsulation (UDP/49151).
-[Capture-Wireshark](../assets/wireshark/sprint3/wireguard-icmp-ping-pc-nomad-paris-lan.png)
-
-## Routing table 
-[Routing table PC Nomade](../assets/verifs/sprint3/routing-table-pc-nomad-wireguard.png)
+### Routing table 
+[Routing table PC Nomad](../assets/verifs/sprint3/) <!-- A AJOUTER -->
 [Routing table Paris Server](../assets/verifs/sprint3/routing-table-paris-wireguard.png)
-[Routing table Auber Server](../assets/verifs/sprint3/routing-table-auber.png)
 
 
-
-## 🛠️ Troubleshooting 
+## 🛠️ 7. Troubleshooting 
 
 ---
 
