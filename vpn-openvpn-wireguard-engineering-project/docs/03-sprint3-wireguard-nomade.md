@@ -43,8 +43,8 @@ The mobile client can therefore access:
 - Iphone : `10.9.3.200`
 
 **Physical Networks**:
-- WAN Nomade PC : `176.X.Y.Z`
-- WAN Paris : `88.162.141.79`
+- Public/WAN IP Nomad PC : `A.B.C.D`
+- Public/WAN IP Paris : `88.162.141.79`
 - backup OpenVPN tunnel subnet : `10.9.2.0/24`
 - Paris/Auber LAN: `192.168.1.0/24`
 - Inter-site Auber-Paris networks: `192.168.100.0/24`
@@ -56,14 +56,14 @@ All access must go through WireGuard.
 
 ## Server Configuration
 
-- Generate public & privates keys :
-```bash
+- Generate public & private keys :
+```console
 cd 03-wireguard-nomad/keys
 umask 077
 wg genkey | tee server-paris-privatekey.key | wg pubkey > server-parismont-publickey.key
 ```
 
-- Set the server wireguard configuration in /etc/wireguard/wg0-paris.conf:
+- Set the server wireguard configuration in `/etc/wireguard/wg0-paris.conf`:
 
 ```text
 [Interface]
@@ -72,7 +72,7 @@ ListenPort = <LISTENING_PORT>              # 49151
 PrivateKey = <SERVER_PRIVATE_KEY>
 
 [Peer]
-PublicKey = <CLIENT-NOMADE-PC_PUBLIC_KEY>  # public_key of nomade-pc
+PublicKey = <CLIENT-NOMADE-PC_PUBLIC_KEY>  # public_key of nomad-pc
 AllowedIPs = 10.9.3.100/32
 
 [Peer]
@@ -82,9 +82,9 @@ AllowedIPs = 10.9.3.200/32
 
 ## Nomad PC Configuration
 - Generate private/public keys of the PC.
-- Set the wireguard configuration in /etc/wireguard/wg0-pc-nomade.conf:
+- Set the wireguard configuration in `/etc/wireguard/wg0-pc-nomade.conf`:
 
-```code
+```text
 [Interface]
 Address = <IP_VPN_PC-NOMADE>                 # 10.9.3.100/32 
 
@@ -99,10 +99,10 @@ AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 
 - Generate private/public keys of the smartphone
 
-- Set the wireguard configuration in /etc/wireguard/wg0-phone.conf:
+- Set the wireguard configuration in `/etc/wireguard/wg0-phone.conf`:
 
 ###  Config — wg0-phone.conf
-```text
+```code
 PrivateKey = <PRIVATE_KEY_PHONE>
 PublicKey = <PUBKEY_PARIS>
 AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
@@ -110,7 +110,7 @@ AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 
 ##  Routing Configuration
 
-### Announce OpenVPN routes (clients)
+### OpenVPN routes to clients
 To join to the `192.168.1.0/24`, `192.168.100.0/24`, `172.20.10.0/28` and `10.9.2.0/24` subnets, PC-nomad must route traffic through its WireGuard VPN tunnel. For doing this, these subnets must be announced to wireguard client via the directive `AllowedIPs=`. It specifies the subnets/host  whose traffic  that you want to route through your VPN tunnel. The rest of the traffic (not specified) will go via your local internet connection.
 
 Add internal networks to AllowedIPs:
@@ -126,64 +126,67 @@ Static routes have been added on Tokyo/NY to enable the Nomad client to reach:
 It will allow remote networks (Tokyo, Aubervilliers) to ‘see’ the WireGuard network `10.9.3.0/24`.
 
 On Auber, add route for OpenVPN clients to WireGuard network via the directive push in existing OpenVPN configuration:
-`push "route 10.9.3.0 255.255.255.0"`
+```text
+# Backup OpenVPN configuration
+push "route 10.9.3.0 255.255.255.0"`
+```
 
-
-### Add route on Auber
-- Add route to WireGuard network via OpenVPN route :
-- `route 10.9.3.0 255.255.255.0`
+### Local route on Auber
+- Add route to WireGuard network via OpenVPN route : 
+```text
+# Backup OpenVPN configuration
+route 10.9.3.0 255.255.255.0
+```
 
 ##  Firewalling & IP Forwarding
 
-### Firewall Rules
-Allow WireGuard port:
+### Firewall Rule
+Allow incoming WireGuard traffic on Auber :
 `ufw allow 49151/udp`
 
 ### Iptables Rules (NAT)
 Automatisation PostUp/PostDown :
-- Explication des règles de FORWARD (Autorisation du flux) et MASQUERADE (NAT dynamique).
-- Justification : Pourquoi le NAT est indispensable pour le Full Tunnel (accès Internet via VPN).
-
+- Explication des règles de FORWARD et MASQUERADE.
 ```text
 PostUp   = iptables -A FORWARD -i %i -j ACCEPT ; iptables -A FORWARD -o %i -j ACCEPT ; iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 PostDown = iptables -D FORWARD -i %i -j ACCEPT ; iptables -D FORWARD -o %i -j ACCEPT ; iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 ```
 
-*Why NAT is Mandatory*
+*Why NAT is Mandatory ?*
 - Required for Internet access
 - Required for reaching internal networks
 - Required for multi‑site routing
 
-### Port Forwarding (home router)**
-- Public WAN IP: `88.162.141.79`
-- Rule applied: `From everywhere on Internet connecting to external port UDP/49151 ➔ to 192.168.1.197 on internal port 49151`
+### Port Forwarding (Paris router)**
+
+Rule applied: `From everywhere on Internet connecting to external port UDP/49151 ➔ to 192.168.1.197 on internal port 49151`
 
 ### IP forwarding
 Kernel : Activation of `net.ipv4.ip_forward`.
 
 ## Launching WireGuard
 
-### Server
-```bash
-wg-quick up wg0-paris
+### Server (Paris)
+```console
+wg-quick up <name_wg_file>
 wg show
 ```
-[Interface state of the server](../assets/verifs/wg-show-paris-vpn.png)
+[Server - Wireguard Interface state](../assets/verifs/wg-show-paris-vpn.png)
 
-### PC-nomad Client
-```bash
-wg-quick up wg0-nomad-pc
+### Client nomad-PC
+```console
+wg-quick up <name_wg_file>
 ```
-[Interface state of the client PC](../assets/verifs/wg-show-nomad-pc.png)
+[PC - Wireguard Interface state](../assets/verifs/wg-show-nomad-pc.png)
 
 ### Smartphone Client - launch via QR Code Import
-- Generate QR code using qrencode command
+- Generate QR code using `qrencode` command
 - Scan via WireGuard mobile app
-- Activate interface wg0-iphone
+- Activate interface `wg0-iphone`
 
-[Configuration-Wireguard-Phone](../assets/verifs/configuration-iphone-wireguard.png)
+[Configuration-Wireguard-Phone](../assets/verifs/sprint3/configuration-iphone-wireguard.png)
 
-[Ping_OK_Phone → All others subnets](../assets/verifs/ping-phone-other-subnets-ok.png)
+[Ping_OK_Phone → All others subnets](../assets/verifs/sprint3/ping-phone-other-subnets-ok.png)
 
 
 ## 6. Validation  / Connectivity 
