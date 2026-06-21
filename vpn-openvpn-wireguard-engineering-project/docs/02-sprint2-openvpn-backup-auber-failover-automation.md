@@ -266,21 +266,26 @@ keepalive 5 30
 
 - **Cause**:: The default policy FORWARD for the Linux firewall in Paris is set to DROP. TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris. FORWARD chain policy dropl
 
-- **Solution**: : Allow the traffic forwarding between VPN network & LAN-Auber-Paris network.
+- **Solution**:
+
+1) On auber, allow the traffic forwarding between VPN network & inter-link Auber-Paris subnet. (for http request to 192.168.100.X /24)
 ```console
-iptables -A FORWARD -s 10.9.2.0/24 -d 192.168.0.0/16 -j ACCEPT
-```
-
-**Results**: Client Tokyo → Paris = HTTP requests successfu
-
-
-<!--
 # Outward
 iptables -A FORWARD -i tun0 -o enp0s8 -s 10.9.1.0/24 -d 192.168.100.0/24 -j ACCEPT
 # Return 
-iptables -A FORWARD -i enp0s8 -o tun0 -s 192.168.100.0/24 -d 10.9.1.0/24 -j ACCEPT
+iptables -A FORWARD -i enp0s8 -o tun0  -d 10.9.1.0/24 -s 192.168.100.0/24 -j ACCEPT
+```
 
--->
+2) Allow the traffic forwarding between VPN network & private Paris network.  (for http request to 192.168.1.X /24)
+```console
+# Outward
+iptables -A FORWARD -i tun0 -o enp0s3 -s 10.9.1.0/24 -d 192.168.1.0/24 -j ACCEPT
+# Return 
+iptables -A FORWARD -i enp0s3 -o tun0  -d 10.9.1.0/24 -s 192.168.1.0/24 -j ACCEPT
+```
+
+**Results**: Client Tokyo → Paris = HTTP requests successfum
+
 <!-- Autre troubleshooting possible
 Backup tunnel unreachable
 Wrong route metrics
