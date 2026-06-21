@@ -97,7 +97,7 @@ Traffic coming from the public internet through the edge router (local router at
 
 **Purpose**: Allows remote clients to reach the backup VPN server when Paris is down.
 
-## 5. Automated Failover Script on Backup Server
+## 5. Automated Failover Configuration with the Backup Server
 - Located at `/usr/local/bin/`
 - Executed every 10 seconds via `System Timers`
 
