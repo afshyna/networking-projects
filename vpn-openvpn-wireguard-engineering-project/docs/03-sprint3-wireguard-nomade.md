@@ -190,9 +190,6 @@ wg-quick up <name_wg_file>
 
 [Configuration-Wireguard-Phone](../assets/verifs/sprint3/configuration-phone-wireguard.png)
 
-[Ping_OK_Phone → All others subnets](../assets/verifs/sprint3/ping-phone-other-subnets-ok.png)
-
-
 ## 5. Validation of the Connectivity 
 
 ---
@@ -201,41 +198,42 @@ wg-quick up <name_wg_file>
 
 - Nomad → Paris Wireguard server (`10.9.3.1`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_paris-wireguard.png)
 
-- Nomad → Paris OpenVPN server (`10.9.2.1`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-openvpn-ok.png)
+- Nomad → Auber OpenVPN server (`10.9.2.1`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-openvpn-ok.png)
 
 - Nomad → Tokyo OpenVPN Client (`10.9.2.2`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_tokyo-openvpn-ok.png)
 
+- Auber →  Nomade wireguard client (`10.9.3.100`) = [Ping OK](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
+
+- Paris →  Nomade wireguard client (`10.9.3.100`) = [Ping OK](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
+
+
 ### Ping Tests - LAN Access (Paris/Auber) ✅
-- Nomad → Paris private LAN (`192.168.1.197`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_paris-lan-ok.png)
+
+- Nomad → Paris private LAN IP  (`192.168.1.197`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_paris-lan-ok.png)
 
 **Wireshark Analysis** : evidence of UDP encapsulation (UDP/49151)
 [Capture-Wireshark](../assets/wireshark/wireguard-icmp-ping-pc-nomad-paris-lan.png)
 
-- Nomad → Auber inter-site LAN (`192.168.100.210`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-internal-lan-ok.png)
+- Nomad → Paris inter-site LAN  IP (`192.168.100.200`) = [Ping OK](../assets/verifs/sprint3)
 
-- Nomad → Auber private LAN (`192.168.1.160`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-lan-ok.png)
+- Nomad → Auber private LAN IP (`192.168.1.160`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-lan-ok.png)
 
-- Nomad → Tokyo private LAN (`172.20.10.3`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_tokyo-lan-ok.png)
+- Nomad → Auber inter-site LAN  IP (`192.168.100.210`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-internal-lan-ok.png)
 
+- Nomad → Tokyo private LAN IP (`172.20.10.3`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_tokyo-lan-ok.png)
 
----
-
-### Traceroute
-
-- Nomade → Tokyo (`172.20.10.3`) [Traceroute Nomade → Tokyo](../assets/verifs/sprint3/traceroute-nomad-pc-tokyo-lan.png)
-
-Path/Gateways followed : Nomad → Paris (`10.9.3.1`) → Auber (`192.168.100.210`) → Tokyo
-
-⇒ Traffic therefore passes through the central site before reaching the remote branch.
+- Phone → Paris / Auber / Clients LANs & VPN IP = [Ping_OK](../assets/verifs/sprint3/ping-phone-other-subnets-ok.png)
 
 ---
 
 ### Routing table 
-[Routing table PC Nomad](../assets/verifs/sprint3/) <!-- A AJOUTER -->
+[Routing table PC Nomad](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE--> 
 [Routing table Paris Server](../assets/verifs/sprint3/routing-table-paris-wireguard.png)
+[Routing Table Auber](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
+[Routing Table Clients Tokyo/NY](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE--> 
 
 
-## 🛠️ 7. Troubleshooting 
+## 🛠️ 6. Troubleshooting 
 
 ### Routing issue 1 : 
 - **Symptom**: The tunnel is established, but no pings from wireguard client get through to the Paris  (e.g. `192.168.1.197/24` or `192.168.100.200/24`).
@@ -245,38 +243,71 @@ Path/Gateways followed : Nomad → Paris (`10.9.3.1`) → Auber (`192.168.100.21
 - **Fixs**:
   - Extend the AllowedIPs on the client to include `192.168.0.0/16`.
 
+[Routing Table PC nomade](../assets/verifs/sprint3/) <!-- SCREEN A FAIRE-->
+
+
 ---
 
 ### Routing issue 2 : 
-- **Symptom**: The tunnel is established, but no pings from wireguard client get through to the Auber (e.g. `192.168.1.160/24` or `192.168.100.210/24`).
+- **Symptom**: The tunnel is established, but no pings from wireguard client get through to the Auber (e.g. `192.168.1.160/24`, `192.168.100.210/24` or `10.9.2.1`).
 
 - **Causes**:
       - Incomplete AllowedIPs. WireGuard filters traffic that does not belong to the declared networks at the kernel level. Client wireguard doesn't have a route to these subnets via its wireguard tunnel.
-      - Auber doesn't know the route to the Wireguard network so i can't reply to the ping
+      - Auber doesn't know the route to the Wireguard network so it can't reply to the ping
+      - No IP forwarding actived on the kernel Linux of Paris (normally, already activated in the first sprint). Paris needs to forward wireguard traffic from nomad-pc to Auber.
 
 - **Fixs**:
-  - Extend the AllowedIPs on the client to include `192.168.0.0/16`.
+  - Extend the AllowedIPs on the client to include `192.168.0.0/16` and `10.9.2.0/24`
   - On auber, add a route to the wireguard VPN subnet on the openvpn configuration file.
 ``` console
 ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8 
 ```
----
+- Activate kernel IP forwarding  on Paris
 
-### Routing issue 3:
-- **Symptom**: No pings from wireguard client get through to the OpenVPN backup subnet (e.g. `10.9.2.1/24`, `10.9.2.2/24`).
+[Routing Table PC nomade](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE-->
+[Routing Table Auber](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
 
-- **Cause**: Incomplete  AllowedIPs. WireGuard filters traffic that does not belong to the declared networks at the kernel level.So, client wireguard doesn't have a route to the OpenVPN subnet via its wireguard tunnel.
-
-- **Fix**:
-  - Extend the AllowedIPs on the client to include `10.9.3.0/24`.
 
 ---
 
 ### Routing issue 3:
-- **Symptom**: No pings from wireguard client get through to the Tokyo/NY LAN (e.g. `172.20.10.0/24`).
+- **Symptom**: No pings from wireguard client get through to the Tokyo/NY IP LAN (e.g. `172.20.10.3-9 /24`,  `172.20.10.4-10 /24`).
 
-- **Cause**: Incomplete  AllowedIPs so, client wireguard doesn't have a route to this subnet via its wireguard tunnel.
-
+- **Cause**:
+  - Incomplete  AllowedIPs so, client wireguard doesn't have a route to this subnet via its wireguard tunnel.
+  - Clients doesn't have a route to the Wireguard network.
+ 
 - **Fix**:
   - Extend the AllowedIPs on the client to include `172.20.10.0/24`.
-  - Push the route to the wireguard VPN subnet on the openvpn configuration file, to the the OpenVPN clients
+  - Push the route to the wireguard VPN subnet on the Auber openvpn configuration file, to the the OpenVPN clients
+
+[Routing Table PC nomade](../assets/verifs/sprint3/) <!-- SCREEN A FAIRE--> 
+[Routing Table clients Tokyo/NY](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE--> 
+
+[Ping PC nomade -> Client Tokyo IP](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE-->
+
+[Traceroute Nomad PC → Tokyo](../assets/verifs/sprint3/) <!-- SCREEN A FAIRE-->
+Path/Gateways followed : Nomad → Paris (`10.9.3.1`) → Auber (`192.168.100.210`) → Tokyo
+⇒ Traffic therefore passes through the central site before reaching the remote branch.
+
+---
+
+### Routing issue 4:
+- **Symptom**: No pings from wireguard client get through to the Paris/Auber private LAN `192.168.1.0/24` (e.g `192.168.1.73/24`, `192.168.1.254/24` ).
+
+- **Cause**:
+  - Clients doesn't have a route to the Wireguard network.
+ 
+- **Fix**: Add NAT rules on the Interface] section of wireguard server configuration.
+```text
+# NAT rule added when the VPN starts up
+PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
+
+# NAT rule removed when VPN stops
+PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
+```
+
+[Ping/traceroute PC nomade -> Paris physical PC](../assets/verifs/sprint3/) <!-- SCREEN FAIT--> 
+[Ping/traceroute PC nomade -> Paris gateway](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
+
+[NAT table Paris](../assets/verifs/sprint3/) <!-- SCREEN FAIT--> 
