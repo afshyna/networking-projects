@@ -321,19 +321,26 @@ PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 - **Fixs**
   - Extend the AllowedIPs on the server to include `<private-LAN-pc-nomade>`
   - Add NAT MASQUERADE rules on the wireguard client configuration, to avoid to add a route on each machine of the client LAN.
-    Goal : "For all traffic coming from the Paris private LAN (192.168.1.0/24), the wireguard client replace its source address with the address assigned to the wlan interface wlp6s0 (172.20.10.5).
+    Goal : "For all traffic coming from the the VPN tunnel (10.9.3.0/24), the wireguard client replace its source address with the address assigned to the wlan interface wlp6s0 (172.20.10.5).
 ```text
 # NAT rule added when the client VPN starts up
-PostUp = iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o wlp6s0 -j MASQUERADE
+PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
 
 # NAT rule removed when client VPN stops
-PostDown = iptables -t nat -D POSTROUTING -s 192.168.1.0/24 -o wlp6s0 -j MASQUERADE
+PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
 ```
 
-[Ping/traceroute Paris -> PC nomade IP LAN](../assets/verifs/sprint3/) <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN --> 
+### Routing issue 6:
 
-[Ping/traceroute Paris -> GW PC](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN --> 
+- **Symptom**: No pings from auber server get through to the PC-nomad-IP-LAN.
 
-[Routing Table Paris](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN --> 
+- **Cause**:
+  - No route to the private LAN of the wireguard client
+  - NAT MASQUERADE route missing ?
+  - subnet of this network in AllowedIPs of Paris conf missing ?
 
+- **Fix** :  On auber, add a static route to the private subnet of the client
+``` console
+ip route add 172.20.10.0/28 via 192.168.100.200 dev enp0s8 
+```
 
