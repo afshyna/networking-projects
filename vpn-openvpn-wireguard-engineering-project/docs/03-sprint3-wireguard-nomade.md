@@ -229,7 +229,7 @@ wg show
 [Routing Table Clients Tokyo/NY](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE--> 
 
 
-## 🛠️ 6. Troubleshooting 
+## 🛠️ 6. Troubleshooting - Bonus : VPN Wireguard site-to-site  between LAN's Wireguard client and the LAN private Paris
 
 ### Routing issue 1 : 
 - **Symptom**: The tunnel is established, but no pings from wireguard client get through to the Paris  (e.g. `192.168.1.197/24` or `192.168.100.200/24`).
@@ -272,7 +272,7 @@ ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8
   - Clients doesn't have a route to the Wireguard network.
  
 - **Fix**:
-  - Extend the AllowedIPs on the client to include `172.20.10.0/24`.
+  - Extend the AllowedIPs on the client to include `172.20.10.0/28`.
   - Push the route to the wireguard VPN subnet on the Auber openvpn configuration file, to the the OpenVPN clients
 
 [Routing Table PC nomade](../assets/verifs/sprint3/) <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN --> 
@@ -290,14 +290,16 @@ Path/Gateways followed : Nomad → Paris (`10.9.3.1`) → Auber (`192.168.100.21
 - **Symptom**: No pings from wireguard client get through to the Paris/Auber private LAN `192.168.1.0/24` (e.g `192.168.1.73/24`, `192.168.1.254/24` ).
 
 - **Cause**:
-  - Clients doesn't have a route to the Wireguard network.
- 
-- **Fix**: Add NAT rules on the Interface] section of wireguard server configuration.
+  - Clients doesn't have a route to the Wireguard network / No route to the wireguard VPN tunnel from all other machines on the LAN except the server wireguard.
+
+- **Fix**:  Add NAT MASQUERADE rule on the wireguard client configuration, to avoid to add a route on each machine of the client LAN.
+Goal : "For all traffic coming from the VPN tunnel (10.9.3.0/24), the Paris server replace its source address with the address assigned to the enp0s3 interface (192.168.1.197).
+
 ```text
-# NAT rule added when the VPN starts up
+# NAT rule added when the server VPN starts up
 PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 
-# NAT rule removed when VPN stops
+# NAT rule removed when server VPN stops
 PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 ```
 
@@ -305,3 +307,33 @@ PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 [Ping/traceroute PC nomade -> Paris gateway](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
 
 [NAT table Paris](../assets/verifs/sprint3/) <!-- SCREEN FAIT--> 
+
+
+
+### Routing issue 5:
+
+- **Symptom**: No pings from paris server get through to the PC-nomad & its private LAN `A.B.C.D/2` (e.g `/2`, `/2` ).
+
+- **Cause**:
+  - Incomplete  AllowedIPs (on server configuration), so server wireguard doesn't have a route to this subnet via its wireguard tunnel. It just has a route to the host 10.9.3.100/32 (pc-nomade).
+  - No route  to the Paris private LAN from all other machines on the LAN except the client wireguard.
+
+- **Fixs**
+  - Extend the AllowedIPs on the server to include `A.B.C.D/`
+  - Add NAT MASQUERADE rules on the wireguard client configuration, to avoid to add a route on each machine of the client LAN.
+    Goal : "For all traffic coming from the Paris private LAN (192.168.1.0/24), the wireguard client replace its source address with the address assigned to the wlan interface wlp6s0 (172.20.10.5).
+```text
+# NAT rule added when the client VPN starts up
+PostUp = iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o wlp6s0 -j MASQUERADE
+
+# NAT rule removed when client VPN stops
+PostDown = iptables -t nat -D POSTROUTING -s 192.168.1.0/24 -o wlp6s0 -j MASQUERADE
+```
+
+[Ping/traceroute Paris -> PC nomade IP LAN](../assets/verifs/sprint3/) <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN --> 
+
+[Ping/traceroute Paris -> GW PC](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN --> 
+
+[Routing Table Paris](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN --> 
+
+
