@@ -224,8 +224,8 @@ wg show
 
 ### Routing table 
 [Routing table PC Nomad](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN --> 
-[Routing table Paris Server](../assets/verifs/sprint3/routing-table-paris-wireguard.png)
-[Routing Table Auber](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
+[Routing table Paris Server](../assets/verifs/sprint3/routing-table-paris-wg-vpn.png)
+[Routing Table Auber](../assets/verifs/sprint3/routing-table-auber.png)
 [Routing Table Clients Tokyo/NY](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE--> 
 
 
@@ -260,7 +260,7 @@ ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8
 - Activate kernel IP forwarding  on Paris
 
 [Routing Table PC nomade](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN -->
-[Routing Table Auber](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
+[Routing Table Auber](../assets/verifs/sprint3/routing-table-auber.png)
 
 ---
 
@@ -303,10 +303,10 @@ PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 ```
 
-[Ping/traceroute PC nomade -> Paris physical PC](../assets/verifs/sprint3/) <!-- SCREEN FAIT--> 
-[Ping/traceroute PC nomade -> Paris gateway](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
+[Ping/traceroute PC nomade -> Paris physical PC](../assets/verifs/sprint3/ping-traceroute-pc-paris-physical-pc-windows.png)
+[Ping/traceroute PC nomade -> Paris gateway](../assets/verifs/sprint3/ping-traceroute-pc-paris-gw.png)
 
-[NAT table Paris](../assets/verifs/sprint3/) <!-- SCREEN FAIT--> 
+[NAT table Paris](../assets/verifs/sprint3/nat-table-paris.png)
 
 
 
