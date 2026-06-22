@@ -127,45 +127,56 @@ Rule applied: `From everywhere on Internet connecting to external port UDP/49150
 Kernel : Activation of `net.ipv4.ip_forward`.
 
 ### Iptables Rules (NAT)
-iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
+```text
+# Auber server conf 
+PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
+PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
+```
 
+```text
+# Wireguard Client conf 
+PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
+PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
+```
 
-##  Automatic Failover Configuration with the Backup (Auber) server
+## 4. Automatic Failover
 
-
-### Script 
-Explique la logique de ton script de bascule automatique pour activer le tunnel de secours d'Aubervilliers quand Paris est injoignable.
-
-- Located at `/usr/local/bin/`
-- Executed every 10 seconds via `System Timers`
+Objective :Switch automatically to the backup WireGuard server when Paris becomes unreachable and switch to Paris when primary tunnel becomes available again.
 
 *Full script file is available in the root folder scripts/.*
 
-**Script Purpose**
+### Nomad script  
+File : /usr/local/bin/wg-failover-pc.sh
 
-This script ensures automatic switching between the primary Wireguard VPN (Paris) and the backup Wireguard VPN (Aubervilliers). It continuously checks the status of the primary tunnel (if it is shut or not) and activates or deactivates the backup tunnel accordingly.
+**Logic**:
+Ensuite automatic switching between the primary Wireguard VPN (Paris) and the backup Wireguard VPN (Aubervilliers). It continuously checks the status of the primary tunnel and activates or deactivates the primary and backup tunnel accordingly.
 
-**Script Logic** : 
+### Auber script
+File:/usr/local/bin/wg-failover-auber.sh
 
+**Purpose**:
 The script is based on two tests:
 - Testing the reachability of the primary VPN server (Paris) by pinging the tunnel’s IP address `10.9.3.1`.
-- Checking the status of the backup Wireguard service (Auber) by verifying the presence of UDP port `49150` in netstat.
-    
+- Checking the status of the backup Wireguard service (Auber) by verifying the presence of listening server UDP port `49150` in netstat.
+
+  
 Based on these results, the script decides:
-- to stop the backup VPN if the primary VPN is up
-- to start the backup VPN if the primary VPN is down
+- Start backup server (if not up already) if Paris is down.
+- Stop backup server (if up already) when Paris returns. 
+
 
 ### Automatic execution
+- Automatic execution of scrupts every 10 seconds using `Systemd Timers`
 
-A systemd timer is used for executing of the script automatically (every 10s).
+- **Services Files** : that runs the script once
+      - wg-failover-pc.service
+      - wg-failover-auber.service
 
-1) Creation of two files:
+- **Timers** : trigger the service every 10 seconds
+      - wg-failover-pc.timer
+      - wg-failover-auber.timer
 
-- a file for service, that runs the script once :  `/etc/systemd/system/wireguard-failover.service`
-
-- a file for timer (with the same name) that will trigger the service every 10 seconds :  `/etc/systemd/system/wireguard-failover.timer`
-
-*Both systemd files are available in the folder configs/systemd/.*
+*Both systemd files are available in the folder configs/wireguard/systemd/.*
 
 2) Reload the `systemd`
 ```console
