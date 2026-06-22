@@ -173,14 +173,19 @@ Kernel : Activation of `net.ipv4.ip_forward`.
 ### Server (Paris)
 ```console
 wg-quick up <name_wg_file>
-wg show
 ```
-[Server - Wireguard Interface state](../assets/verifs/sprint3/wg-show-paris-vpn.png)
 
 ### Client nomad-PC
 ```console
 wg-quick up <name_wg_file>      
 ```
+
+- See the wireguard VPN interface state:
+```console
+wg show
+```
+[Server - Wireguard Interface state](../assets/verifs/sprint3/wg-show-paris-vpn.png)
+
 [PC - Wireguard Interface state](../assets/verifs/sprint3/wg-show-nomad-pc.png)
 
 ### Smartphone Client - launch via QR Code Import
@@ -197,37 +202,28 @@ wg-quick up <name_wg_file>
 ## Ping Tests - Tunnel Connectivity ✅
 
 - Nomad → Paris Wireguard server (`10.9.3.1`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_paris-wireguard.png)
-
 - Nomad → Auber OpenVPN server (`10.9.2.1`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-openvpn-ok.png)
-
 - Nomad → Tokyo OpenVPN Client (`10.9.2.2`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_tokyo-openvpn-ok.png)
-
 - Auber →  Nomade wireguard client (`10.9.3.100`) = [Ping OK](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
-
 - Paris →  Nomade wireguard client (`10.9.3.100`) = [Ping OK](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
 
 
 ### Ping Tests - LAN Access (Paris/Auber) ✅
 
 - Nomad → Paris private LAN IP  (`192.168.1.197`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_paris-lan-ok.png)
-
 **Wireshark Analysis** : evidence of UDP encapsulation (UDP/49151)
 [Capture-Wireshark](../assets/wireshark/wireguard-icmp-ping-pc-nomad-paris-lan.png)
 
 - Nomad → Paris inter-site LAN  IP (`192.168.100.200`) = [Ping OK](../assets/verifs/sprint3)
-
 - Nomad → Auber private LAN IP (`192.168.1.160`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-lan-ok.png)
-
 - Nomad → Auber inter-site LAN  IP (`192.168.100.210`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-internal-lan-ok.png)
-
 - Nomad → Tokyo private LAN IP (`172.20.10.3`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_tokyo-lan-ok.png)
-
 - Phone → Paris / Auber / Clients LANs & VPN IP = [Ping_OK](../assets/verifs/sprint3/ping-phone-other-subnets-ok.png)
 
 ---
 
 ### Routing table 
-[Routing table PC Nomad](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE--> 
+[Routing table PC Nomad](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN --> 
 [Routing table Paris Server](../assets/verifs/sprint3/routing-table-paris-wireguard.png)
 [Routing Table Auber](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
 [Routing Table Clients Tokyo/NY](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE--> 
@@ -244,7 +240,6 @@ wg-quick up <name_wg_file>
   - Extend the AllowedIPs on the client to include `192.168.0.0/16`.
 
 [Routing Table PC nomade](../assets/verifs/sprint3/) <!-- SCREEN A FAIRE-->
-
 
 ---
 
@@ -264,9 +259,8 @@ ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8
 ```
 - Activate kernel IP forwarding  on Paris
 
-[Routing Table PC nomade](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE-->
+[Routing Table PC nomade](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN -->
 [Routing Table Auber](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
-
 
 ---
 
@@ -281,10 +275,10 @@ ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8
   - Extend the AllowedIPs on the client to include `172.20.10.0/24`.
   - Push the route to the wireguard VPN subnet on the Auber openvpn configuration file, to the the OpenVPN clients
 
-[Routing Table PC nomade](../assets/verifs/sprint3/) <!-- SCREEN A FAIRE--> 
-[Routing Table clients Tokyo/NY](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE--> 
+[Routing Table PC nomade](../assets/verifs/sprint3/) <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN --> 
+[Routing Table clients Tokyo/NY](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN --> 
 
-[Ping PC nomade -> Client Tokyo IP](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE-->
+[Ping PC nomade -> Client Tokyo IP](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN -->
 
 [Traceroute Nomad PC → Tokyo](../assets/verifs/sprint3/) <!-- SCREEN A FAIRE-->
 Path/Gateways followed : Nomad → Paris (`10.9.3.1`) → Auber (`192.168.100.210`) → Tokyo
