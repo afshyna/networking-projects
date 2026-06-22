@@ -128,7 +128,7 @@ A systemd timer is used for executing of the script automatically (every 10s).
 
 - a file for timer (with the same name) that will trigger the service every 10 seconds :  `/etc/systemd/system/openvpn-failover.timer`
 
-*Both systemd files are available in the folder configs/systemd/.*
+*Both systemd files are available in the folder configs/openvpn/systemd/.*
 
 2) Reload the `systemd`
 ```console
