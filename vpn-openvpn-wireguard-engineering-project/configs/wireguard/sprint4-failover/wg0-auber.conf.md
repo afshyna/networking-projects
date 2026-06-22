@@ -1,3 +1,4 @@
+```config
 [Interface]
 PrivateKey=0L+CfEf3z24Yq0UYerWn0v0gz9ucOp5M1tKotP98/VA=
 Address=10.9.4.1/24
@@ -8,3 +9,4 @@ PostDown = iptables -t nat -D POSTROUTING -s 10.9.4.0/24 -o enp0s3 -j MASQUERADE
 [Peer]
 PublicKey=PGls9AinXfS5IdeNqjo13gQI40lYISgFKdSFN/d7yFM=
 AllowedIPs=10.9.4.100/32,<LAN-client-pc-nomade>
+```
