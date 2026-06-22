@@ -312,14 +312,14 @@ PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 
 ### Routing issue 5:
 
-- **Symptom**: No pings from paris server get through to the PC-nomad & its private LAN `A.B.C.D/2` (e.g `/2`, `/2` ).
+- **Symptom**: No pings from paris server get through to the PC-nomad & its private LAN `<private-LAN-pc-nomade>`
 
 - **Cause**:
   - Incomplete  AllowedIPs (on server configuration), so server wireguard doesn't have a route to this subnet via its wireguard tunnel. It just has a route to the host 10.9.3.100/32 (pc-nomade).
   - No route  to the Paris private LAN from all other machines on the LAN except the client wireguard.
 
 - **Fixs**
-  - Extend the AllowedIPs on the server to include `A.B.C.D/`
+  - Extend the AllowedIPs on the server to include `<private-LAN-pc-nomade>`
   - Add NAT MASQUERADE rules on the wireguard client configuration, to avoid to add a route on each machine of the client LAN.
     Goal : "For all traffic coming from the Paris private LAN (192.168.1.0/24), the wireguard client replace its source address with the address assigned to the wlan interface wlp6s0 (172.20.10.5).
 ```text
