@@ -2,8 +2,9 @@
 
 ##  Sprint Objectives
 - Set up VPN access for enabling a remote user (nomad PC / smartphone) to securely access to internal networks (Paris, Auber, Tokyo, NY).
-- Deploy a modern, lightweight WireGuard VPN for remote users (nomad PC + smartphone).
+- Provide VPN access for remote users such as nomadic PC and a smartphone.
 - Integrate WireGuard into the existing multi‑site OpenVPN architecture.
+- Validate connectivity to all LANs.
 
 ## Why WireGuard?
 
@@ -23,7 +24,7 @@ Compared to OpenVPN:
 | Multiple certificate files | Public/private key |
 
 
-##  Architecture & Topology
+##  Architecture & Topology Overview
 ![Architecture Sprint 3](../diagrams/03-sprint3-vpn-wireguard-nomade-clients-pc-phone_srv-paris-primary.png)
 The Mobile/PC establishes a WireGuard tunnel to:
 - Paris-Montrouge (OpenVPN primary server)
@@ -38,18 +39,18 @@ The mobile client can therefore access:
 ###  Addressing plan 
 **WireGuard Tunnel Network**:
 - WireGuard subnet: `10.9.3.0/24`
-- Paris server: `10.9.3.1` (UDP/49151)
-- Nomad PC: `10.9.3.100`
-- Smartphone : `10.9.3.200`
+    - Paris server: `10.9.3.1` (UDP/49151)
+    - Nomad PC: `10.9.3.100`
+    - Smartphone : `10.9.3.200`
 
 **Physical Networks**:
 - Public/WAN IP Nomad PC : `176.B.C.D`
 - Public/WAN IP Paris : `88.162.141.79`
 - Backup OpenVPN tunnel subnet : `10.9.2.0/24`
 - Paris/Auber LAN: `192.168.1.0/24`
-- Inter-site Auber-Paris networks: `192.168.100.0/24`
+- Inter-site Auber-Paris network: `192.168.100.0/24`
 - Tokyo/NY LAN: `172.20.10.0/28`
-- PC Nomade LAN: `10.81.42.0/24` (IP PC : `10.81.42.102`)
+- PC Nomade LAN: `A.B.C.0/24` (IP PC : `A.B.C.D`)
 
 ### Remote Access Concept
 A “nomad client” is an external device (4G/5G, Wi‑Fi public, home network) with no direct access to Paris.
@@ -145,15 +146,14 @@ route 10.9.3.0 255.255.255.0
 ## 3. Firewalling & IP Forwarding
 
 ### Firewall Rule
-Allow incoming WireGuard traffic on Auber :
+Allow incoming WireGuard traffic on Paris :
 `ufw allow 49151/udp`
 
 ### Iptables Rules (NAT)
-Automatisation PostUp/PostDown :
-- Explication des règles de FORWARD et MASQUERADE.
+Automatisation PostUp/PostDow by adding NAT MASQUERADE rules
 ```text
-PostUp   = iptables -A FORWARD -i %i -j ACCEPT ; iptables -A FORWARD -o %i -j ACCEPT ; iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
-PostDown = iptables -D FORWARD -i %i -j ACCEPT ; iptables -D FORWARD -o %i -j ACCEPT ; iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
+PostUp   = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
+PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 ```
 
 *Why NAT is Mandatory ?*
