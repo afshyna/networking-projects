@@ -1,12 +1,8 @@
 #Location: /etc/systemd/system/wg-failover-pc.service 
 
 [Unit]
-Description=Run Wireguard Failover PC Script every 10 seconds
+Description=Wireguard Failover PC Script - Switch between VPN CLient Paris & the backup Auber VPN according to the Wireguard Paris UDP connexion state active
 
-[Timer]
-OnUnitActiveSec=10s
-OnBootSec=10s
-Unit=wg-failover-pc.service
-
-[Install]
-WantedBy=timers.target
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/wg-failover-pc.sh
