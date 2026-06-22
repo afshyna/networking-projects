@@ -166,8 +166,9 @@ Based on these results, the script decides:
 
 
 ### Automatic execution
-- Automatic execution of scrupts every 10 seconds using `Systemd Timers`
+Automatic execution of scripts every 10 seconds using `Systemd Timers`
 
+**Configuration**
 - **Services Files** : that runs the script once
       - wg-failover-pc.service
       - wg-failover-auber.service
@@ -178,23 +179,19 @@ Based on these results, the script decides:
 
 *Both systemd files are available in the folder configs/wireguard/systemd/.*
 
-2) Reload the `systemd`
+**Launch the automatic execution**
 ```console
 systemctl daemon-reload
+systemctl start wg-failover-{pc|auber}.timer
+systemctl enable --now wireguard-failover-{pc|auber}.timer
 ```
-
-3) start your `timer` or enable it by default
-```console
-systemctl start wireguard-failover.timer
-systemctl enable --now wireguard-failover.timer
-```
-
 
 ### Expected Behavior before the failover
 - All traffic still uses the primary tunnel (Paris), that works initially.
 - Backup tunnel (10.9.4.0/24) is not yet active.
 
-## 6. Paris server failover Simulation & Incident management on VPN servers 
+
+## 5. Failover Simulation of Paris server
 
 To stop the Paris primary server, shutdown the system service: 
 ```console
@@ -220,7 +217,11 @@ As soon as the main tunnel `10.9.3.0/24` is disconnected, the following network 
 After approximately 1 minutes, the failover tunnel is established: a new virtual IP from the `10.9.2.0/24` range is assigned to the tun0 interface.
 -->
 
-## 7. Flow validation & Route verification - Progressive Changes to Routing Tables 
+## 6. Flow validation & Route verification - Progressive Changes to Routing Tables 
+
+### Routing table before the failover : 
+
+
 
 **Server Paris**
 Complete disappearance of dynamic routes linked to the main tunnel (`10.9.3.0/24`).
