@@ -193,7 +193,7 @@ wg show
 - Scan via WireGuard mobile app
 - Activate interface `wg0-phone`
 
-[Configuration-Wireguard-Phone](../assets/verifs/sprint3/configuration-phone-wireguard.png)
+[Wireguard-Activated-Phone](../assets/verifs/sprint3/configuration-phone-wireguard.png)
 
 ## 5. Validation of the Connectivity 
 
