@@ -42,9 +42,8 @@ It demonstrates how legacy Cisco routers implement secure LAN-to-LAN connectivit
 <!-- NAT Management: NAT‑Traversal (NAT‑T) support for encapsulating ESP over UDP/4500 when routers are behind NAT 
     NAT Integration: Policy-based routing and crypto-map application on WAN interfaces
 -->
- 
-<h2> OpenVPN & WireGuard solutions </h2> 
 
+<h2>Project 3 - <a href="https://github.com/afshyna/networking-projects/tree/main/vpn-openvpn-wireguard-engineering-project">  OpenVPN & WireGuard solutions </a> </h2>
 This micro-project focuses on the design and deployment of a resilient VPN infrastructure combining OpenVPN Site-to-Site connectivity and WireGuard Remote-Access VPN services.
 
 The architecture simulates a realistic enterprise environment with multiple branch offices, a primary server site, a disaster recovery site, nomad users, Internet exposure through NAT/PAT, and automated failover mechanisms.
