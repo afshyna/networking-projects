@@ -1,12 +1,12 @@
 <h1> 🏁 Sprint 3 : Remote Access & Site-to-Site VPN with WireGuard from nomad hosts to Paris server </h1>
 
-##  Sprint Objectives
+##  1. Sprint Objectives
 - Set up VPN access for enabling a remote user (nomad PC / smartphone) to securely access to internal networks (Paris, Auber, Tokyo, NY).
 - Provide VPN access for remote users such as nomadic PC and a smartphone.
 - Integrate WireGuard into the existing multi‑site OpenVPN architecture.
 - Validate connectivity to all LANs.
 
-## Why WireGuard?
+## 2. Why WireGuard?
 
 WireGuard was chosen for:
 - its ease of configuration;
@@ -24,7 +24,7 @@ Compared to OpenVPN:
 | Multiple certificate files | Public/private key |
 
 
-##  Architecture & Topology Overview
+##  3. Architecture & Topology Overview
 ![Architecture Sprint 3](../diagrams/03-sprint3-vpn-wireguard-nomade-site-to-site-clients-pc-phone_srv-paris-primary.png)
 The Mobile/PC establishes a WireGuard tunnel to:
 - Paris-Montrouge (OpenVPN primary server)
@@ -36,7 +36,7 @@ The mobile client can therefore access:
 - the networks of the Tokyo and New York offices;
 - the VPN addresses of the various tunnels.
 
-###  Addressing plan 
+###  3.1. Addressing plan 
 **WireGuard Tunnel Network**:
 - WireGuard subnet: `10.9.3.0/24`
     - Paris server: `10.9.3.1` (UDP/49151)
@@ -52,13 +52,13 @@ The mobile client can therefore access:
 - Tokyo/NY LAN: `172.20.10.0/28`
 - PC Nomade LAN: `A.B.C.0/24` (IP PC : `A.B.C.D`)
 
-### Remote Access Concept
+### 3.2. Remote Access Concept
 A “nomad client” is an external device (4G/5G, Wi‑Fi public, home network) with no direct access to Paris.
 All access must go through WireGuard.
 
-## 1. Wireguard Configuration
+## 4. Wireguard Configuration
 
-### Server Configuration
+### 4.1. Server Configuration
 
 - Generate public & private keys :
 ```console
@@ -84,7 +84,7 @@ PublicKey = <CLIENT-PHONE_PUBLIC_KEY>
 AllowedIPs = 10.9.3.200/32
 ```
 
-### Client Nomad PC Configuration
+### 4.2. Client Nomad PC Configuration
 - Generate private/public keys of the PC.
 - Set the wireguard configuration in `/etc/wireguard/wg0-pc-paris.conf`:
 
@@ -98,7 +98,7 @@ PublicKey = <PUBKEY_AUBER>
 Endpoint = 88.162.141.79:49151               # <PUBLIC_IP_PARIS>:<LISTENING_PORT>
 AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 ```
-### Smartphone Configuration
+### 4.3. Smartphone Configuration
 
 - Generate private/public keys of the smartphone
 
@@ -114,15 +114,15 @@ Endpoint = 88.162.141.79:49151               # <PUBLIC_IP>:<LISTENING_PORT>
 AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 ```
 
-## 2. Routing Configuration
+## 5. Routing Configuration
 
-### OpenVPN routes to clients
+### 5.1. OpenVPN routes to clients
 To join to the `192.168.1.0/24`, `192.168.100.0/24`, `172.20.10.0/28` and `10.9.2.0/24` subnets, PC-nomad must route traffic through its WireGuard VPN tunnel. For doing this, these subnets must be announced to wireguard client via the directive `AllowedIPs=`. It specifies the subnets/host  whose traffic  that you want to route through your VPN tunnel. The rest of the traffic (not specified) will go via your local internet connection.
 
 Add internal networks to AllowedIPs:
 `AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28`
 
-### Add routes for Tokyo/NY on Auber
+### 5.2. Add routes for Tokyo/NY on Auber
 Static routes have been added on Tokyo/NY to enable the Nomad client to reach:
 - Paris-Montrouge
 - Aubervilliers
@@ -136,20 +136,20 @@ On Auber, add route for OpenVPN clients to WireGuard network via the directive p
 push "route 10.9.3.0 255.255.255.0"`
 ```
 
-### Local route on Auber
+### 5.3. Local route on Auber
 - Add route to WireGuard network via OpenVPN route : 
 ```text
 # Backup OpenVPN configuration
 route 10.9.3.0 255.255.255.0
 ```
 
-## 3. Firewalling & IP Forwarding
+## 6. Firewalling & IP Forwarding
 
-### Firewall Rule
+### 6.1. Firewall Rule
 Allow incoming WireGuard traffic on Paris :
 `ufw allow 49151/udp`
 
-### Iptables Rules (NAT)
+### 6.2. Iptables Rules (NAT)
 Automatisation PostUp/PostDow by adding NAT MASQUERADE rules
 ```text
 PostUp   = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
@@ -161,21 +161,21 @@ PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 - Required for reaching internal networks
 - Required for multi‑site routing
 
-### Port Forwarding (Paris router)**
+### 6.3. Port Forwarding (Paris router)**
 
 Rule applied: `From everywhere on Internet connecting to external port UDP/49151 ➔ to 192.168.1.197 on internal port 49151`
 
-### IP forwarding
+### 6.4. IP forwarding
 Kernel : Activation of `net.ipv4.ip_forward`.
 
-## 4. Launching WireGuard
+## 7. Launching WireGuard
 
-### Server (Paris)
+### 7.1. Server (Paris)
 ```console
 wg-quick up <name_wg_file>
 ```
 
-### Client nomad-PC
+### 7.2. Client nomad-PC
 ```console
 wg-quick up <name_wg_file>      
 ```
@@ -188,18 +188,18 @@ wg show
 
 [PC - Wireguard Interface state](../assets/verifs/sprint3/wg-show-nomad-pc.png)
 
-### Smartphone Client - launch via QR Code Import
+### 7.3. Smartphone Client - launch via QR Code Import
 - Generate QR code using `qrencode` command
 - Scan via WireGuard mobile app
 - Activate interface `wg0-phone`
 
 [Wireguard-Activated-Phone](../assets/verifs/sprint3/configuration-phone-wireguard.png)
 
-## 5. Validation of the Connectivity 
+## 8. Validation of the Connectivity 
 
 ---
 
-### Ping Tests - Tunnel Connectivity ✅
+### 8.1. Ping Tests - Tunnel Connectivity ✅
 
 - Nomad → Paris Wireguard server (`10.9.3.1`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_paris-wireguard.png)
 - Nomad → Auber OpenVPN server (`10.9.2.1`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-openvpn-ok.png)
@@ -208,7 +208,7 @@ wg show
 - Paris →  Nomade wireguard client (`10.9.3.100`) = [Ping OK](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
 
 
-### Ping Tests - LAN Access (Paris/Auber) ✅
+### 8.2. Ping Tests - LAN Access (Paris/Auber) ✅
 
 - Nomad → Paris private LAN IP  (`192.168.1.197`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_paris-lan-ok.png)
 **Wireshark Analysis** : evidence of UDP encapsulation (UDP/49151)
@@ -222,16 +222,16 @@ wg show
 
 ---
 
-### Routing table 
+### 8.3. Routing table 
 [Routing table PC Nomad](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN --> 
 [Routing table Paris Server](../assets/verifs/sprint3/routing-table-paris-wg-vpn.png)
 [Routing Table Auber](../assets/verifs/sprint3/routing-table-auber.png)
 [Routing Table Clients Tokyo/NY](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE--> 
 
 
-## 🛠️ 6. Troubleshooting - Bonus : VPN Wireguard site-to-site  between LAN's Wireguard client and the LAN private Paris
+## 🛠️ 9. Troubleshooting - Bonus : VPN Wireguard site-to-site  between LAN's Wireguard client and the LAN private Paris
 
-### Routing issue 1 : 
+### 9.1. Routing issue : 
 - **Symptom**: The tunnel is established, but no pings from wireguard client get through to the Paris  (e.g. `192.168.1.197/24` or `192.168.100.200/24`).
 
 - **Cause**: Incomplete AllowedIPs. WireGuard filters traffic that does not belong to the declared networks at the kernel level. Client wireguard doesn't have a route to these subnets via its wireguard tunnel.
@@ -243,7 +243,7 @@ wg show
 
 ---
 
-### Routing issue 2 : 
+### 9.2. Routing issue  : 
 - **Symptom**: The tunnel is established, but no pings from wireguard client get through to the Auber (e.g. `192.168.1.160/24`, `192.168.100.210/24` or `10.9.2.1`).
 
 - **Causes**:
@@ -264,7 +264,7 @@ ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8
 
 ---
 
-### Routing issue 3:
+### 9.3. Routing issue:
 - **Symptom**: No pings from wireguard client get through to the Tokyo/NY IP LAN (e.g. `172.20.10.3-9 /24`,  `172.20.10.4-10 /24`).
 
 - **Cause**:
@@ -286,7 +286,7 @@ Path/Gateways followed : Nomad → Paris (`10.9.3.1`) → Auber (`192.168.100.21
 
 ---
 
-### Routing issue 4:
+### 9.4. Routing issue:
 - **Symptom**: No pings from wireguard client get through to the Paris/Auber private LAN `192.168.1.0/24` (e.g `192.168.1.73/24`, `192.168.1.254/24` ).
 
 - **Cause**:
@@ -310,7 +310,7 @@ PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 
 
 
-### Routing issue 5:
+### 9.5. Routing issue:
 
 - **Symptom**: No pings from paris server get through to the PC-nomad & its private LAN `<private-LAN-pc-nomade>`
 
@@ -330,7 +330,7 @@ PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
 PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
 ```
 
-### Routing issue 6:
+### 9.6. Routing issue :
 
 - **Symptom**: No pings from auber server get through to the PC-nomad-IP-LAN.
 
