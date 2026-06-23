@@ -1,3 +1,4 @@
+```config
 [Interface]
 Address=10.9.4.100/24
 PrivateKey=QK7A/vOMbonV4EDDezE9+e4itF9Q5tM7/j5e+lNmklM=
@@ -7,6 +8,7 @@ PostDown=iptables -t nat -D POSTROUTING -s 10.9.4.0/24 -o wlp6s0 -j MASQUERADE
 
 [Peer]
 PublicKey=d0wDiOvUGaq4nVVpsOroRLCGb0Bcbmfio86Zweu2R20=
-Endpoint=82.X.Y.Z:49150
-AllowedIPs=10.9.4.0/24, 192.168.0.0/16, 10.9.2.0/24
+Endpoint=82.67.214.64:49150
+AllowedIPs=10.9.4.0/24, 192.168.0.0/16, 10.9.2.0/24,172.20.10.0/28
 PersistentKeepalive=25
+```
