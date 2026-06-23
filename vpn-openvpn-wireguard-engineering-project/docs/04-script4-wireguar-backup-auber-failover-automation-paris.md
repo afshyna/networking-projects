@@ -225,7 +225,7 @@ systemctl enable --now wireguard-failover-{pc|auber}.timer
 
 ## 7. Failover Simulation
 1) On lance la connexion au VPN du serveur principal depuis Paris  [Launch Wireguard on Paris](../assets/verifs/sprint4/wg-quick-up-wg0-paris)
-2) On lance la connexion au VPN du serveur principal depuis PC-nomade [Launch Wireguard vers Paris on PC](../assets/verifs/sprint4)            <!-- A SCREEN --> 
+2) On lance la connexion au VPN du serveur principal depuis PC-nomade   
  [Interface Wireguard PC](../assets/verifs/interface-wg0-pc-nomade-connexion-paris)
 4) On shut la connexion du VPN serveur Paris : [Shut Wireguard on Paris](../assets/verifs/sprint4/wg-quick-down-wg0-paris)
 
@@ -305,7 +305,6 @@ Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber se
 ## 9. Validation & Connectivity
 
 ###  Ping Tests - Tunnel Connectivity ✅
-- Nomad → Auber Wireguard server (`10.9.4.1`) = [Ping OK](../assets/verifs/sprint4/)
 - Auber/Paris →  Nomad wireguard client (`10.9.4.100`) = [Ping OK](../assets/verifs/sprint4/ping-paris-auber_vpn-client)
 
 - Nomad → OpenVPN server (`10.9.2.1`) / clients  (`10.9.2.2` & `10.9.2.3`)  = [Ping OK](../assets/verifs/sprint4/ping-pc-nomade_openvpn-IPs)
