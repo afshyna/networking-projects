@@ -3,10 +3,7 @@
 PrivateKey=EHd4AzPJUVZLIiYXrTTyIJNGZOPYafGOmivS/TPZHW0=
 Address=10.9.3.1/24
 ListenPort=49151
-
-# Rules Execution when VPN is launched
 PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE ; ip route del 10.9.4.0/24 via 192.168.100.210 dev enp0s8;ip route del 10.177.104.0/24 via 192.168.100.210 dev enp0s8 metric 10
-
 PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE ; ip route add 10.9.4.0/24 via 192.168.100.210 dev enp0s8;ip route add 10.177.104.0/24 via 192.168.100.210 dev enp0s8 metric 10
 
 [Peer]
