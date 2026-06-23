@@ -44,8 +44,28 @@ It demonstrates how legacy Cisco routers implement secure LAN-to-LAN connectivit
 -->
  
 <h2> OpenVPN & WireGuard solutions </h2> 
-This micro-project is about the design and deployment of VPN SSL tunnels with OpenVPN and multi-sites architecture with failover & deployment of VPN remote-acess with Wireguard for connecting nomade clients to the VPN server.
 
+This micro-project focuses on the design and deployment of a resilient VPN infrastructure combining OpenVPN Site-to-Site connectivity and WireGuard Remote-Access VPN services.
+
+The architecture simulates a realistic enterprise environment with multiple branch offices, a primary server site, a disaster recovery site, nomad users, Internet exposure through NAT/PAT, and automated failover mechanisms.
+
+It demonstrates how secure VPN services can be deployed, monitored, and maintained in production-like conditions while ensuring business continuity during outages.
+
+<strong>Technical Configuration & Architecture:</strong>
+
+- <strong>VPN Technologies:</strong> OpenVPN (SSL/TLS) for Site-to-Site connectivity and WireGuard for Remote-Access VPN
+- <strong>Architecture Type:</strong> Multi-site VPN infrastructure with Primary Site (Paris-Montrouge) and Disaster Recovery Site (Aubervilliers)
+- <strong>Remote Offices:</strong> Tokyo and New York branch networks connected through routed VPN tunnels
+- <strong>Site-to-site:</strong> OpenVPN & WireGuard VPN for LAN-to-LAN communication between server's LAN and client's LAN.
+- <strong>Remote Access:</strong> WireGuard VPN access for nomad users (laptops and smartphones)
+- <strong>Authentication Scheme:</strong> X.509 certificates and TLS authentication for OpenVPN, public/private key cryptography for WireGuard
+- <strong>Routing Design:</strong> Static routing, CCD files, iroute directives, route propagation and inter-LAN communication
+- <strong>High Availability:</strong> Automatic failover between primary and backup VPN servers using multiple remote endpoints, keepalive mechanisms and dynamic route switching
+- <strong>NAT & Internet Exposure:</strong> NAT/PAT, port forwarding and MASQUERADE rules for VPN connectivity behind residential routers
+- <strong>Firewall & Security:</strong> Linux iptables filtering, forwarding policies
+- <strong>Network Services Validation:</strong> ICMP, HTTP and traceroute testing across VPN tunnels
+- <strong>Troubleshooting & Analysis:</strong> Packet-level analysis using Wireshark and tcpdump, routing-table verification, failover testing and incident simulation
+- <strong>Automation:</strong> Bash scripting, system-timers monitoring and dynamic route replacement for network resilience
 
 
 
