@@ -199,7 +199,7 @@ wg show
 
 ---
 
-## Ping Tests - Tunnel Connectivity ✅
+### Ping Tests - Tunnel Connectivity ✅
 
 - Nomad → Paris Wireguard server (`10.9.3.1`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_paris-wireguard.png)
 - Nomad → Auber OpenVPN server (`10.9.2.1`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-openvpn-ok.png)
