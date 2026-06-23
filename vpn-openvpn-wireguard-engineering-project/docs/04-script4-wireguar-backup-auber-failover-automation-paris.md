@@ -1,6 +1,6 @@
 # 🏁 Sprint 4 :  WireGuard Remote Access & site-to-site VPN with Backup Server & Automatic Failover
 
-##  Sprint Objectives
+##  1. Sprint Objectives
 - Add a secondary WireGuard server on Aubervilliers.
 - Ensure network‑level high availability (HA) between Paris and Aubervilliers.
 - Implement automatic network failover mechanisms when the primary VPN server (Paris) becomes unavailable.
@@ -8,15 +8,15 @@
 - Support dual connectivity: Nomad → Paris & Nomad → Auber
 - Validate connectivity to all LANs
 
-##  Infrastructure Overview
+## 2. Infrastructure Overview
 ![Architecture Sprint 4](../diagrams/04-sprint4-failover-vpn-wireguard-srv-paris-switch-client_srv-auber-backup.png)
 
-### Backup Site Role
+### 2.1. Backup Site Role
 - Aubervilliers acts as the secondary VPN hub.
 - Must be reachable by both PC-nomade when Paris is down.
 - LAN IP of Auber : `10.9.4.1/24`
 
-###  Addressing plan 
+### 2.2. Addressing plan 
 
 **WireGuard Tunnel Networks**:
 - Primary WireGuard subnet : `10.9.3.0/24`
@@ -35,9 +35,9 @@
 - Tokyo/NY LAN: `172.20.10.0/28`
 - PC Nomade LAN: `<LAN-PC-nomade>`/24` (IP PC : <IP-LAN-pc-nomade>)
 
-## 1. Wireguard Configuration
+## 3.  Wireguard Configuration
 
-### 1.1. Backup (Auber) Server
+### 3.1. Backup (Auber) Server
 
 - Generate private/public keys
  
@@ -53,7 +53,7 @@ PublicKey = <CLIENT-NOMAD-PC_PUBLIC_KEY>
 AllowedIPs = 10.9.3.100/32, <IP-LAN-pc-nomade>
 ```
 
-### 1.3. Client Nomad PC 
+### 3.2. Client Nomad PC 
 Two interfaces are used:
 - wg0-pc-paris.conf - Primary tunnel
 
@@ -69,9 +69,9 @@ Endpoint = 82.X.Y.Z:49150               # <PUBLIC_IP_AUBER>:<LISTENING_PORT>
 AllowedIPs = 10.9.4.0/24, 10.9.2.0/24, 192.168.0.0/16, 172.20.10.0/28
 ```
 
-## 2. Routing Configuration
+## 4. Routing Configuration
 
-### Nomad PC
+### 4.1. Nomad PC
 WireGuard uses AllowedIPs as routing table.
 ```text
 # wg-pc-paris.conf - This allows access to: Paris LAN, Inter-server LAN, OpenVPN backup tunnel, Tokyo LAN.
@@ -84,11 +84,11 @@ AllowedIPs = 10.9.4.0/24,192.168.0.0/16,172.20.10.0/28,10.9.2.0/24
 ```
 
 
-### Paris routes
+### 4.2. Paris routes
 Paris is not directly connected to the backup WireGuard network.
 
 
-### Auber routes
+### 4.3. Auber routes
 
 Aubern, when it doesn't act as a server wireguard, initially reaches WireGuard clients through Paris via a static IP route  (Sprint 3): 
 ```console
@@ -107,26 +107,26 @@ PostDown = ip route add `<LAN-PC-nomade>` via 192.168.100.210 dev enp0s8 metric 
 ```
 Note : Given that a route to this same network is automatically added when the Auber server reboots, the route injected/delete via the Paris gw, must have a higher metric than the dynamic route, so that the latter remains the preferred route.
 
-### OpenVPN routes
+### 4.4. OpenVPN routes
 
 Tokyo and New York must know the WireGuard network so this route needs to be pushed from  the current active OpenVPN server (Auber):
 ```text
 push "route 10.9.4.0 255.255.255.0"
 ```
 
-## 3. Firewall & NAT
+## 5. Firewall & NAT
 
-### Firewall Rule
+### 5.1. Firewall Rule
 Allow incoming WireGuard traffic on Auber :
 `ufw allow 49150/udp`
 
-### Port Forwarding (Paris router)**
+### 5.2. Port Forwarding (Paris router)**
 Rule applied: `From everywhere on Internet connecting to external port UDP/49150 ➔ to 192.168.1.160 on internal port 49150`
 
-### IP forwarding
+### 5.3. IP forwarding
 Kernel : Activation of `net.ipv4.ip_forward`.
 
-### Iptables Rules (NAT)
+### 5.4. Iptables Rules (NAT)
 ```text
 # Auber server conf 
 PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
@@ -139,13 +139,13 @@ PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
 PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
 ```
 
-## 4. Automatic Failover
+## 6. Automatic Failover
 
 Objective :Switch automatically to the backup WireGuard server when Paris becomes unreachable and switch to Paris when primary tunnel becomes available again.
 
 *Full script file is available in the root folder scripts/.*
 
-### Nomad script  
+### 6.1. Nomad script  
 File : `/usr/local/bin/wg-failover-pc.sh`
 
 **Logic**:
@@ -159,7 +159,7 @@ Based on these results, the script decides:
 - Stop wireguard paris service & start wireguard backup server if Paris is down.
 - Stop wireguard backup service & start wireguard paris server if Auber is up (that happens when Paris server became active again).
  
-### Auber script
+### 6.2. Auber script
 `File:/usr/local/bin/wg-failover-auber.sh`
 
 **Purpose**:
@@ -171,7 +171,7 @@ Based on these results, the script decides:
 - Start backup server (if not up already) if Paris is down.
 - Stop backup server (if up already) when Paris returns. 
 
-### Automatic execution
+### 6.3. Automatic execution
 Automatic execution of scripts every 10 seconds using `Systemd Timers`
 
 **Configuration**
@@ -192,23 +192,23 @@ systemctl start wg-failover-{pc|auber}.timer
 systemctl enable --now wireguard-failover-{pc|auber}.timer
 ```
 
-### Expected Behavior before the failover
+### 6.4. Expected Behavior before the failover
 - All traffic still uses the primary tunnel (Paris), that works initially.
 - Backup tunnel (`10.9.4.0/24`) is not yet active.
 
 
-## 5. Failover Simulation
+## 7. Failover Simulation
 
 To stop the Paris primary server, shutdown the wireguard service: 
 ```console
 wg-quick down wg0-paris      
 ```
 
-## 6. Post-Failure Analysis: System/Network Impacts &  Route verification   
+## 8. Post-Failure Analysis: System/Network Impacts &  Route verification   
 
 As soon as the main tunnel `10.9.3.0/24` is disconnected, the following network and system changes are triggered transparently.
 
-### Paris
+### 8.1. Paris
 - Dynamic routes to the `10.9.3.0/24` & `<LAN-PC-nomade>`  network linked to the main tunnel (`10.9.3.0/24`) disappear.
 - Static backup routes become active. 
 
@@ -225,27 +225,7 @@ Before: [Routing Table Paris Before failover](../assets/verifs/sprint4/)
 ```
 After: [Routing Table Paris After failover](../assets/verifs/sprint4/) 
 
-
-### Nomad PC
-Clients switch to Auber (`10.9.4.1`) via port remote `49150`. The default gateway for the `10.9.3.X` tunnel has been replaced by the IP address of the `10.9.4.X` failover interface. 
-
-```text 
-# Before :  
-192.168.100.0/24 via 10.9.3.1
-192.168.1.0/24 via 10.9.3.1
-172.20.10.0/28 via 10.9.3.1
-``` 
-[Routing Table VPN PC-nomad Before failover](../assets/verifs/sprint4/)
-
-```text
-# After
-192.168.100.0/24 via 10.9.4.1
-192.168.1.0/24 via 10.9.4.1
-172.20.10.0/28 via 10.9.4.1
-```
-[Routing Table VPN PC-nomad After failover](../assets/verifs/sprint4/)
-
-### Auber
+### 8.2. Auber
 - the monitoring script detects the shutdown of paris server and then, launch the Wireguard Auber service.
 - The backup tunnel `10.9.4.0/24` becomes active.
 - Static route to the `<LAN-PC-nomade>` via the gateway Auber-Paris disappears.
@@ -265,7 +245,27 @@ After:
 ```
 [Routing Table Auber After failover](../assets/verifs/sprint4/)
  
-### OpenVPN clients Tokyo/NY
+
+### 8.3. Nomad PC
+Clients switch to Auber (`10.9.4.1`) via port remote `49150`. The default gateway for the `10.9.3.X` tunnel has been replaced by the IP address of the `10.9.4.X` failover interface. 
+
+```text 
+# Before :  
+192.168.100.0/24 via 10.9.3.1
+192.168.1.0/24 via 10.9.3.1
+172.20.10.0/28 via 10.9.3.1
+``` 
+[Routing Table VPN PC-nomad Before failover](../assets/verifs/sprint4/)
+
+```text
+# After
+192.168.100.0/24 via 10.9.4.1
+192.168.1.0/24 via 10.9.4.1
+172.20.10.0/28 via 10.9.4.1
+```
+[Routing Table VPN PC-nomad After failover](../assets/verifs/sprint4/)
+
+### 8.4. OpenVPN clients Tokyo/NY
 Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber server.
 ```text
 # Before: 
@@ -281,9 +281,9 @@ Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber se
 
 **Final result** : After approximately X minutes, the failover tunnel is established.
 
-## 7. Validation & Connectivity
+## 9. Validation & Connectivity
 
-### Ping Tests - Tunnel Connectivity ✅
+### 9.1. Ping Tests - Tunnel Connectivity ✅
 - Nomad → Auber Wireguard server (`10.9.4.1`) = [Ping OK](../assets/verifs/sprint4/)
 - Auber/Paris/Tokyo →  Nomad wireguard client (`10.9.4.100`) = [Ping OK](../assets/verifs/sprint4/)
 
@@ -291,7 +291,7 @@ Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber se
 - Nomad → Tokyo OpenVPN Client (`10.9.2.2`) = [Ping OK](../assets/verifs/sprint4/)
 
 
-### Ping Tests - LAN Access (Paris/Auber) ✅
+### 9.2. Ping Tests - LAN Access (Paris/Auber) ✅
 - Nomad → Auber LAN IP (`192.168.1.160`) = [Ping OK](../assets/verifs/sprint4/)
 - Nomad → Auber inter-site LAN IP (`192.168.100.210`) = [Ping OK](../assets/verifs/sprint4/)
 
