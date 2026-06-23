@@ -25,7 +25,7 @@ Compared to OpenVPN:
 
 
 ##  Architecture & Topology Overview
-![Architecture Sprint 3](../diagrams/03-sprint3-vpn-wireguard-nomade-clients-pc-phone_srv-paris-primary.png)
+![Architecture Sprint 3](../diagrams/03-sprint3-vpn-wireguard-nomade-site-to-site-clients-pc-phone_srv-paris-primary.png)
 The Mobile/PC establishes a WireGuard tunnel to:
 - Paris-Montrouge (OpenVPN primary server)
 - Aubervilliers (OpenVPN backup server)
