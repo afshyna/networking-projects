@@ -1,4 +1,4 @@
-# Site-to-Site VPN via OpenVPN & Remote-Access VPN via Wireguard with Failover Automation
+# Site-to-Site VPN via OpenVPN/Wireguard & Remote-Access VPN via Wireguard with Failover Automation
 
 Micro-project reproducing a realistic enterprise VPN architecture  with primary and backup sites, automatic failover, inter-LAN routing and remote access VPN.
 
@@ -38,9 +38,41 @@ Provide secure access for nomad users (Laptop & Smartphone)
 - Backup WireGuard server
 - Automatic failover
 
-##  Architecture 
+## Network Topology
 
-Simulation réaliste derrière une Box Internet. Gestion du NAT/PAT, redirection de ports asymétriques (32768 -> 1194 et 32769 -> 1195).
+### Sprint 1 – OpenVPN Site-to-Site
+- Paris-Montrouge acts as the main VPN server.
+- Tokyo and New York establish routed VPN tunnels using SSL/TLS certificates.
+
+### Sprint 2 – Backup Site and Failover
+Aubervilliers acts as the disaster recovery site.
+
+Features:
+- Multiple remote statements
+ -Automatic reconnection
+- Dynamic route switching
+- failover script automatically executed via system-timers
+
+### Sprint 3 – WireGuard Remote Access
+Nomad hosts connect to Paris using WireGuard.
+
+Provides:
+- Access to Paris LAN
+- Access to Tokyo LAN
+- Access to New York LAN
+- Inter-site communication through OpenVPN
+
+### Sprint 4 (Bonus) – WireGuard Backup and Failover
+Secondary WireGuard server on Aubervilliers.
+
+Features:
+- Redundant VPN gateway
+- Automatic reconnection
+- Backup routing
+- High availability
+
+
+##  Architecture 
 
 ### Global Architecture
 
@@ -57,14 +89,16 @@ Sprint 2 - Deployment of a Secondary OpenVPN Backup Site & Automated Network Fai
 ![Architecture Sprint 4](diagrams/04-sprint4-failover-vpn-wireguard-srv-paris-switch-client_srv-auber-backup.png)
 
 ## Repository Structure
+```text
 vpn-openvpn-wireguard-engineering-project/
 │
 │
 ├── docs/
 │   ├── 01-sprint1-openvpn-site-to-site-paris.md
 │   ├── 02-sprint2-openvpn-backup-auber-failover-automation.md
-│   ├── 03-sprint3-wireguard-nomade.md
+│   ├── 03-sprint3-wireguard-nomade-site-to-site.md
 │   └── 04-sprint4-wireguard-backup-failover.md
+│   └── pki-certificate-authentication.md
 │
 ├── configs/
 │   ├── openvpn/
@@ -72,30 +106,31 @@ vpn-openvpn-wireguard-engineering-project/
 │   
 │
 ├── scripts/
-│   ├── failover.sh
+│   ├── openvpn-failover.sh
+│   ├── wg-failover-auber
+│   ├── wg-failover-pc.sh
 │
 ├── diagrams/
 │
 ├── assets/
-│   ├── captures-wireshark/
 │   ├── verifs/
+│   ├── captures-wireshark/
 │
 └── README.md
-
+```
 **Brief description of the main folders**
 -  `docs/` : sprints with a README.md file/sprint, which will serve as a recipe book / test report to validate the procedures.
 - `01-sprint1-openvpn-site-to-site-paris.md`
-- `02-sprint2-openvpn-backup-auber-failover-automation.md` : 
+- `03-sprint3-wireguard-nomade-site-to-site.md` 
 - `03-sprint3-wireguard-nomade.md`  
 - `04-script4-wireguar-backup-auber-failover-automation-paris.md`  
 
 - `configs/` : files .conf of OpenVPN and Wireguard + files ccd
 - `diagrams/` : Schemas/topologies
-- `assets/` : Test results (Wireshark, pings, tracerouten ...)
+- `assets/` : Test results (Wireshark, pings, traceroutes ...)
    - `captures-wireshark/` :  Packet analysis captures via Wireshark
    - `verifs/` :  Test capture of e ping/http
 - `scripts/`:  Failover, tests, monitoring
-
 
 
 ## Structure of each Sprint Documentation 
@@ -108,10 +143,8 @@ Each sprint follows the same structure:
 - Results obtained
 - Troubleshooting
 
-
 ## Testing and Acceptance
 Summary of tests performed (ping, traceroute, HTTP via tunnel), location of traces, and how to reproduce them.
-
 
 ##  Troubleshooting 
 Detailed troubleshooting for each sprint is available:
@@ -121,18 +154,25 @@ Detailed troubleshooting for each sprint is available:
 ➡️ [Troubleshooting Sprint 4](docs/04-script4-wireguar-backup-auber-failover-automation-paris.md#10-troubleshooting)
 
 ## Skills Demonstrated
-### Networking
-   - Routing
+
+### Networking 
+- IP forwarding
+- Linux networking
+- **Inter-LAN routing**
    - Static routes
-   - IP forwarding
-   - NAT/PAT
-   - Linux networking
+   - CCD files & iroute statements
+   - Route metrics
+   - Dynamic route replacement
+
+### Security
+- TLS authentication using X.509 certificates
+- Authentication via Public/private keys
+- iptables firewall rules / MASQUERADE NAT / POSTROUTING rules 
+- Port forwarding
 
 ### VPN Technologies
    - OpenVPN
    - WireGuard
-   - TLS/X.509 PKI
-   - High availability
 
 ### Linux Administration
    - systemd
@@ -142,11 +182,11 @@ Detailed troubleshooting for each sprint is available:
    - sysctl
 
 ### Troubleshooting
-   - Wireshark
-   - Packet analysis
+   - ICMP, traceroute, HTTP tests
+   - Wireshark packet captures & analysis
    - Route debugging
    - Service monitoring
-   - Failure simulation
+   - Service Failure simulation
 
 ## Technologies used:
 - OpenVPN (site-to-site) 
