@@ -85,33 +85,56 @@ AllowedIPs = 10.9.4.0/24,192.168.0.0/16,172.20.10.0/28,10.9.2.0/24
 
 
 ### 4.2. Paris routes
-Paris is not directly connected to the backup WireGuard network.
+
+When the primary wireguard server, Paris, is active : 
+- it reaches WireGuard clients & its LAN directly through the tunnel VPN, implemented through `AllowedIPs`
+```text
+AllowedIPs = 10.9.3.100, `<LAN-PC-nomade>`
+```
+- it deletes static routes (10.9.4.0/24 subnet & LAN PC nomadic) via its gateway with Auber, implemented through  `PostUp`:
+```text
+PostUp = ip route add 10.9.4.0/24 via 192.168.100.210 dev enp0s8 ; ip route del `<LAN-PC-nomade>` via 192.168.100.210 dev enp0s8 ; 
+```
+
+When the primary VPN becomes inactive:
+- deletion of dynamic routes (10.9.3.100/24 & LAN PC nomadic) via 10.9.4.0/24, that was implemented through "AllowedIPs" :
+
+- addition of static routes (10.9.4.0/24 subnet & LAN PC nomadic) via its gateway with Auber, implemented through  `PostDown` :
+```text
+PostDown = ip route add 10.9.4.0/24 via 192.168.100.210 dev enp0s8 ; ip route add `<LAN-PC-nomade>` via 192.168.100.210 dev enp0s8 ; 
+```
 
 
 ### 4.3. Auber routes
 
-Aubern, when it doesn't act as a server wireguard, initially reaches WireGuard clients through Paris via a static IP route  (Sprint 3): 
+When Auber wireguard service is inactive : 
+- reaches WireGuard clients through Paris via a static IP route: 
 ```console
 ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8 
 ```
-When backup VPN becomes active:
-- addition of dynamic routes (10.9.4.0/24 subnet & LAN PC nomadic) via 10.9.4.0/24, implemented through "AllowedIPs" :
+- addition of static routes to the LAN PC nomadic via its gateway with Paris, implemented through `PostDown` :
 ```text
-AllowedIPs = 10.9.3.100, `<LAN-PC-nomade>`
+PostDown = ip route add `<LAN-PC-nomade>` via 192.168.100.210 dev enp0s8 metric 10
 ```
 
-- Removal of obsolete static routes, implemented through: PostUp / PostDown. 
+When backup VPN becomes active:
+- addition of dynamic routes (10.9.4.0/24 subnet & LAN PC nomadic) via 10.9.4.0/24, implemented through `AllowedIPs` :
+```text
+AllowedIPs = 10.9.4.100, `<LAN-PC-nomade>`
+```
+
+- Removal of the obsolete static route, implemented through `PostUp` 
 ```text
 PostUp = ip route del `<LAN-PC-nomade>` via 192.168.100.210 dev enp0s8 dev metric 10
-PostDown = ip route add `<LAN-PC-nomade>` via 192.168.100.210 dev enp0s8 metric 10
 ```
 Note : Given that a route to this same network is automatically added when the Auber server reboots, the route injected/delete via the Paris gw, must have a higher metric than the dynamic route, so that the latter remains the preferred route.
 
 ### 4.4. OpenVPN routes
 
-Tokyo and New York must know the WireGuard network so this route needs to be pushed from  the current active OpenVPN server (Auber):
+Tokyo and New York must know the WireGuard network and the remote-PC-LAN  so theses routes need to be pushed from  the current active OpenVPN server (Auber):
 ```text
 push "route 10.9.4.0 255.255.255.0"
+push "route <LAN-PC-nomade> 255.255.255.0"
 ```
 
 ## 5. Firewall & NAT
@@ -196,6 +219,9 @@ systemctl enable --now wireguard-failover-{pc|auber}.timer
 - All traffic still uses the primary tunnel (Paris), that works initially.
 - Backup tunnel (`10.9.4.0/24`) is not yet active.
 
+[Paris Server - Wireguard Interface state](../assets/verifs/sprint4/)
+
+[PC client - Wireguard Interface state](../assets/verifs/sprint4/)
 
 ## 7. Failover Simulation
 
@@ -228,6 +254,9 @@ After: [Routing Table Paris After failover](../assets/verifs/sprint4/)
 ### 8.2. Auber
 - the monitoring script detects the shutdown of paris server and then, launch the Wireguard Auber service.
 - The backup tunnel `10.9.4.0/24` becomes active.
+[Auber Server - Wireguard Interface state](../assets/verifs/sprint4/)
+[PC client - Wireguard Interface state](../assets/verifs/sprint4/)
+
 - Static route to the `<LAN-PC-nomade>` via the gateway Auber-Paris disappears.
 - Dynamic route to the `<LAN-PC-nomade>`  linked to the local tunnel appears.
 
@@ -255,7 +284,7 @@ Clients switch to Auber (`10.9.4.1`) via port remote `49150`. The default gatewa
 192.168.1.0/24 via 10.9.3.1
 172.20.10.0/28 via 10.9.3.1
 ``` 
-[Routing Table VPN PC-nomad Before failover](../assets/verifs/sprint4/)
+[Routing Table PC-nomad Before failover](../assets/verifs/sprint4/)
 
 ```text
 # After
@@ -263,7 +292,7 @@ Clients switch to Auber (`10.9.4.1`) via port remote `49150`. The default gatewa
 192.168.1.0/24 via 10.9.4.1
 172.20.10.0/28 via 10.9.4.1
 ```
-[Routing Table VPN PC-nomad After failover](../assets/verifs/sprint4/)
+[Routing Table PC-nomad After failover](../assets/verifs/sprint4/)
 
 ### 8.4. OpenVPN clients Tokyo/NY
 Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber server.
