@@ -146,24 +146,30 @@ Objective :Switch automatically to the backup WireGuard server when Paris become
 *Full script file is available in the root folder scripts/.*
 
 ### Nomad script  
-File : /usr/local/bin/wg-failover-pc.sh
+File : `/usr/local/bin/wg-failover-pc.sh`
 
 **Logic**:
 Ensuite automatic switching between the primary Wireguard VPN (Paris) and the backup Wireguard VPN (Aubervilliers). It continuously checks the status of the primary tunnel and activates or deactivates the primary and backup tunnel accordingly.
 
+The script is based on two tests:
+- Testing the reachability of the primary VPN server (Paris) by pinging the tunnel’s IP address `10.9.3.1`.
+- Testing the reachability of the backup VPN server (Auber) by pinging the tunnel’s IP address `10.9.4.1`.
+
+Based on these results, the script decides:
+- Stop wireguard paris service & start wireguard backup server if Paris is down.
+- Stop wireguard backup service & start wireguard paris server if Auber is up (that happens when Paris server became active again).
+ 
 ### Auber script
-File:/usr/local/bin/wg-failover-auber.sh
+`File:/usr/local/bin/wg-failover-auber.sh`
 
 **Purpose**:
 The script is based on two tests:
 - Testing the reachability of the primary VPN server (Paris) by pinging the tunnel’s IP address `10.9.3.1`.
 - Checking the status of the backup Wireguard service (Auber) by verifying the presence of listening server UDP port `49150` in netstat.
-
   
 Based on these results, the script decides:
 - Start backup server (if not up already) if Paris is down.
 - Stop backup server (if up already) when Paris returns. 
-
 
 ### Automatic execution
 Automatic execution of scripts every 10 seconds using `Systemd Timers`
@@ -188,40 +194,59 @@ systemctl enable --now wireguard-failover-{pc|auber}.timer
 
 ### Expected Behavior before the failover
 - All traffic still uses the primary tunnel (Paris), that works initially.
-- Backup tunnel (10.9.4.0/24) is not yet active.
+- Backup tunnel (`10.9.4.0/24`) is not yet active.
 
 
-## 5. Failover Simulation of Paris server
+## 5. Failover Simulation
 
-To stop the Paris primary server, shutdown the system service: 
+To stop the Paris primary server, shutdown the wireguard service: 
 ```console
 wg-quick down wg0-paris      
 ```
 
-### Post-Failure Analysis: System and Network Impacts
-As soon as the main tunnel `10.9.3.0/24` is disconnected, the following network and system changes are triggered transparently.
+## 6. Flow validation & Route verification  
 
-**Dynamic Behaviour of the VPN Client (PC nomad)  & Auber Backup Server**
-- Route Loss: The virtual IP addresses associated with the main tunnel (`10.9.3.1` & `10.9.3.2`) are immediately flushed from the local wg0-X interface.
-<!-- 
-- Retry & Failover Algorithm:
-  - The client detects a timeout on port 1194.
-  - the client re-try the connection to the Paris server (port `1194`).
-  - Once again, a timeout is detect.
-[Reconnexion Attempt Tokyo -> Paris & timeout detected](../assets/verifs/sprint2/log-tokyo-attempt-reconnexion-tokyo-paris.png)
-  - The multi-remote implementation of the client configuration file is executed. Now, the client try to connect to the backup auber openvpn server  (Port `1195`) and the connection is establised.
+### Paris
+Primary routes via the VPN tunnel disappear.
+Static backup routes become active. (injected via the `PostDown` directive)
 
-  [Log Tokyo - Connexion Successful Tokyo -> Backup Server](../assets/verifs/sprint2/log-tokyo-attempt-connexion-tokyo-auber-successful.png)
-  [Log Auber - Connexion Successful Tokyo -> Backup Server](../assets/verifs/sprint2/log-auber-attempt-connexion-tokyo-auber-successful.png)
+Before:
+10.9.3.0/24 10.9.3.1
+<LAN-PC-nomade> 10.9.3.1
 
-After approximately 1 minutes, the failover tunnel is established: a new virtual IP from the `10.9.2.0/24` range is assigned to the tun0 interface.
--->
+After:
+10.9.4.0/24 via 192.168.100.200
+<LAN-PC-nomade> via 192.168.100.200
 
-## 6. Flow validation & Route verification - Progressive Changes to Routing Tables 
+### Nomad PC
+Before:
+192.168.0.0/16 via 10.9.3.1
+172.20.10.0/28 via 10.9.3.1
+
+After:
+192.168.0.0/16 via 10.9.4.1
+172.20.10.0/28 via 10.9.4.1
+
+### Auber
+Backup tunnel becomes active.
+Routes toward remote LANs are injected dynamically.
+Before:
+<LAN-PC-nomade> via 192.168.100.210
+
+After:
+<LAN-PC-nomade> via 10.9.4.1
+10.9.4.0/24 via 10.9.4.1
+
+### OpenVPN clients Tokyo/NY
+Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber server.
+Before:
+10.9.3.0/24 via 10.9.2.1
+
+After:
+10.9.4.0/24 via 10.9.2.1
+
 
 ### Routing table before the failover : 
-
-
 
 **Server Paris**
 Complete disappearance of dynamic routes linked to the main tunnel (`10.9.3.0/24`).
@@ -246,6 +271,16 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.3.0/24
 
 [Routing Table Auber Before failover](../assets/verifs/sprint4/)
 [Routing Table Auber After failover](../assets/verifs/sprint4/)
+
+
+### Post-Failure Analysis: System and Network Impacts
+As soon as the main tunnel `10.9.3.0/24` is disconnected, the following network and system changes are triggered transparently.
+
+**Dynamic Behaviour of the VPN Client (PC nomad)  & Auber Backup Server**
+- Route Loss: The virtual IP addresses associated with the main tunnel (`10.9.3.1` & `10.9.3.2`) are immediately flushed from the local wg0-X interface.
+
+After approximately 1 minutes, the failover tunnel is established: a new virtual IP from the `10.9.2.0/24` range is assigned to the tun0 interface.
+
 
 
 ## 8. Validation & Connectivity ✅  
