@@ -114,7 +114,7 @@ vpn-openvpn-wireguard-engineering-project/
 │
 ├── assets/
 │   ├── verifs/
-│   ├── captures-wireshark/
+│   ├── wireshark/
 │
 └── README.md
 ```
@@ -128,7 +128,7 @@ vpn-openvpn-wireguard-engineering-project/
 - `configs/` : files .conf of OpenVPN and Wireguard + files ccd
 - `diagrams/` : Schemas/topologies
 - `assets/` : Test results (Wireshark, pings, traceroutes ...)
-   - `captures-wireshark/` :  Packet analysis captures via Wireshark
+   - `wireshark/` :  Packet analysis captures via Wireshark
    - `verifs/` :  Test capture of e ping/http
 - `scripts/`:  Failover, tests, monitoring
 
