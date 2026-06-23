@@ -310,7 +310,7 @@ Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber se
 
 ### Ping Tests - LAN Access (Paris/Auber) ✅
 - Nomad → Auber  (`192.168.1.160` & `192.168.100.210`) = [Ping OK](../assets/verifs/sprint4/ping-nomad_auber-lan.png)
-- Nomad → Paris (`192.168.1.197` & `192.168.100.200` ) = [Ping OK](../assets/verifs/sprint4/sprint4/ping-nomad_paris-lan.png)
+- Nomad → Paris (`192.168.1.197` & `192.168.100.200` ) = [Ping OK](../assets/verifs/sprint4/ping-nomad_paris-lan.png)
 - Nomad → Tokyo/NY private LAN IP (`172.20.10.9` & `172.20.10.10`) = [Ping OK](../assets/verifs/sprint4/ping-pc-nomadic_clients-openvpn-LAN.png)
 - Paris/Auber →  Nomad wireguard client (`10.177.104.102`) = [Ping OK](../assets/verifs/sprint4/ping-servers-paris-auber_pc-nomade-physical-IP-LAN.png)
 - Tokyo/NY →  Nomad wireguard client (`10.177.104.102`) = [Ping OK](../assets/verifs/sprint4/ping-clients-openvpn_pc-nomade-physical-IP-LAN.png)
