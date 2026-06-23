@@ -226,7 +226,7 @@ systemctl enable --now wireguard-failover-{pc|auber}.timer
 ## 7. Failover Simulation
 1) On lance la connexion au VPN du serveur principal depuis Paris  [Launch Wireguard on Paris](../assets/verifs/sprint4/wg-quick-up-wg0-paris.png)
 2) On lance la connexion au VPN du serveur principal depuis PC-nomade   
- [Interface Wireguard PC](../assets/verifs/interface-wg0-pc-nomade-connexion-paris.png)
+ [Interface Wireguard PC](../assets/verifs/sprint4/interface-wg0-pc-nomade-connexion-paris.png)
 4) On shut la connexion du VPN serveur Paris : [Shut Wireguard on Paris](../assets/verifs/sprint4/wg-quick-down-wg0-paris.png)
 
 ## 8. Post-Failure Analysis: System/Network Impacts &  Route verification   
