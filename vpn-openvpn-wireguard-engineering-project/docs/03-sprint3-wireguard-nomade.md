@@ -229,7 +229,9 @@ wg show
 [Routing Table Clients Tokyo/NY](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE--> 
 
 
-## 🛠️ 9. Troubleshooting - Bonus : VPN Wireguard site-to-site  between LAN's Wireguard client and the LAN private Paris
+## 🛠️ 9. Troubleshooting 
+
+By trying to interconnect every LAN, we have deployed a VPN Wireguard site-to-site between LAN's Wireguard client and the LAN Paris.
 
 ### 9.1. Routing issue : 
 - **Symptom**: The tunnel is established, but no pings from wireguard client get through to the Paris  (e.g. `192.168.1.197/24` or `192.168.100.200/24`).
