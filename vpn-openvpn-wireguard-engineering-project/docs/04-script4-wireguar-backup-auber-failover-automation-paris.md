@@ -308,7 +308,7 @@ Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber se
 ```
 [Routing Table Tokyo After failover](../assets/verifs/sprint4/)
 
-**Final result** : After approximately X minutes, the failover tunnel is established.
+**Final result** : After approximately 30 seconds, the failover tunnel  with Auber is established.
 
 ## 9. Validation & Connectivity
 
