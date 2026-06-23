@@ -273,7 +273,7 @@ After
 
 ### Nomad PC
 Clients switch to Auber (`10.9.4.1`) via port remote `49150`. The default gateway for the `10.9.3.X` tunnel has been replaced by the IP address of the `10.9.4.X` failover interface. 
-[Routing Table PC-nomad Before/After failover](../assets/verifs/sprint4/)
+[Routing Table PC-nomad Before/After failover](../assets/verifs/sprint4/routing-table-pc-nomade-before-after-failover.png)
 
 ```text 
 # Before :  
@@ -294,13 +294,11 @@ Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber se
 # Before: 
 10.9.3.0/24 via 10.9.2.1
 ```
-[Routing Table Tokyo After failover](../assets/verifs/sprint4/)
-
 ```text
 # After: 
 10.9.4.0/24 via 10.9.2.1
 ```
-[Routing Table Tokyo After failover](../assets/verifs/sprint4/)
+[Routing Table Tokyo & NY Before/after failover](../assets/verifs/sprint4/routing-table-tokyo_and_NY_before-after-failover.png)
 
 **Final result** : After approximately 30 seconds, the failover tunnel  with Auber is established.
 
@@ -308,23 +306,18 @@ Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber se
 
 ###  Ping Tests - Tunnel Connectivity ✅
 - Nomad → Auber Wireguard server (`10.9.4.1`) = [Ping OK](../assets/verifs/sprint4/)
-- Auber/Paris/Tokyo →  Nomad wireguard client (`10.9.4.100`) = [Ping OK](../assets/verifs/sprint4/)
+- Auber/Paris →  Nomad wireguard client (`10.9.4.100`) = [Ping OK](../assets/verifs/sprint4/ping-paris-auber_vpn-client)
 
-- Nomad → Auber OpenVPN server (`10.9.2.1`) = [Ping OK](../assets/verifs/sprint4/)
-- Nomad → Tokyo OpenVPN Client (`10.9.2.2`) = [Ping OK](../assets/verifs/sprint4/)
-
+- Nomad → OpenVPN server (`10.9.2.1`) / clients  (`10.9.2.2` & `10.9.2.3`)  = [Ping OK](../assets/verifs/sprint4/ping-pc-nomade_openvpn-IPs)
 
 ### Ping Tests - LAN Access (Paris/Auber) ✅
-- Nomad → Auber LAN IP (`192.168.1.160`) = [Ping OK](../assets/verifs/sprint4/)
-- Nomad → Auber inter-site LAN IP (`192.168.100.210`) = [Ping OK](../assets/verifs/sprint4/)
+- Nomad → Auber  (`192.168.1.160` & `192.168.100.210`) = [Ping OK](../assets/verifs/sprint4/ping-nomad_auber-lan.png)
+- 
+- Nomad → Paris (`192.168.1.197` & `192.168.100.200` ) = [Ping OK](../assets/verifs/sprint4/sprint4/ping-nomad_paris-lan)
 
-- Nomad → Paris LAN IP  (`192.168.1.197`) = [Ping OK](../assets/verifs/sprint3/sprint4/)
-- Nomad → Paris inter-site LAN IP (`192.168.100.200`) = [Ping OK](../assets/verifs/sprint4/)
+- Nomad → Tokyo/NY private LAN IP (`172.20.10.9` & `172.20.10.10`) = [Ping OK](../assets/verifs/sprint4/ping-pc-nomadic_clients-openvpn-LAN.png)
 
-- Nomad → Tokyo private LAN IP (`172.20.10.9`) = [Ping OK](../assets/verifs/sprint4/)
-
-- Auber →  Nomad wireguard client (`10.177.104.102`) = [Ping OK](../assets/verifs/sprint4/)
-- Paris →  Nomad wireguard client (`10.177.104.102`) = [Ping OK](../assets/verifs/sprint4/)
-- Tokyo →  Nomad wireguard client (`10.177.104.102`) = [Ping OK](../assets/verifs/sprint4/)
+- Paris/Auber →  Nomad wireguard client (`10.177.104.102`) = [Ping OK](../assets/verifs/sprint4/ping-servers-paris-auber_pc-nomade-physical-IP-LAN.png)
+- Tokyo/NY →  Nomad wireguard client (`10.177.104.102`) = [Ping OK](../assets/verifs/sprint4/ping-clients-openvpn_pc-nomade-physical-IP-LAN)
 
 
