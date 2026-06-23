@@ -33,7 +33,7 @@
 - Paris & Auber LAN: `192.168.1.0/24`
 - Inter-site Auber-Paris network: `192.168.100.0/24`
 - Tokyo/NY LAN: `172.20.10.0/28`
-- PC Nomade LAN: <LAN-pc-nomade>/24` (IP PC : <IP-LAN-pc-nomade>)
+- PC Nomade LAN: `<LAN-PC-nomade>`/24` (IP PC : <IP-LAN-pc-nomade>)
 
 ## 1. Wireguard Configuration
 
@@ -97,13 +97,13 @@ ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8
 When backup VPN becomes active:
 - addition of dynamic routes (10.9.4.0/24 subnet & LAN PC nomadic) via 10.9.4.0/24, implemented through "AllowedIPs" :
 ```text
-AllowedIPs = 10.9.3.100, <LAN-pc-nomade>
+AllowedIPs = 10.9.3.100, `<LAN-PC-nomade>`
 ```
 
 - Removal of obsolete static routes, implemented through: PostUp / PostDown. 
 ```text
-PostUp = ip route del <LAN-pc-nomade> via 192.168.100.210 dev enp0s8 dev metric 10
-PostDown = ip route add <LAN-pc-nomade> via 192.168.100.210 dev enp0s8 metric 10
+PostUp = ip route del `<LAN-PC-nomade>` via 192.168.100.210 dev enp0s8 dev metric 10
+PostDown = ip route add `<LAN-PC-nomade>` via 192.168.100.210 dev enp0s8 metric 10
 ```
 Note : Given that a route to this same network is automatically added when the Auber server reboots, the route injected/delete via the Paris gw, must have a higher metric than the dynamic route, so that the latter remains the preferred route.
 
@@ -204,92 +204,104 @@ To stop the Paris primary server, shutdown the wireguard service:
 wg-quick down wg0-paris      
 ```
 
-## 6. Flow validation & Route verification  
+## 6. Post-Failure Analysis: System/Network Impacts &  Route verification   
 
-### Paris
-Primary routes via the VPN tunnel disappear.
-Static backup routes become active. (injected via the `PostDown` directive)
-
-Before:
-10.9.3.0/24 10.9.3.1
-<LAN-PC-nomade> 10.9.3.1
-
-After:
-10.9.4.0/24 via 192.168.100.200
-<LAN-PC-nomade> via 192.168.100.200
-
-### Nomad PC
-Before:
-192.168.0.0/16 via 10.9.3.1
-172.20.10.0/28 via 10.9.3.1
-
-After:
-192.168.0.0/16 via 10.9.4.1
-172.20.10.0/28 via 10.9.4.1
-
-### Auber
-Backup tunnel becomes active.
-Routes toward remote LANs are injected dynamically.
-Before:
-<LAN-PC-nomade> via 192.168.100.210
-
-After:
-<LAN-PC-nomade> via 10.9.4.1
-10.9.4.0/24 via 10.9.4.1
-
-### OpenVPN clients Tokyo/NY
-Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber server.
-Before:
-10.9.3.0/24 via 10.9.2.1
-
-After:
-10.9.4.0/24 via 10.9.2.1
-
-
-### Routing table before the failover : 
-
-**Server Paris**
-Complete disappearance of dynamic routes linked to the main tunnel (`10.9.3.0/24`).
-- The `10.9.3.0/24` network and the subnets to the distant LAN of PC () via the Paris VPN tunnel have disappeared.
-
-[Routing Table Paris Before failover](../assets/verifs/sprint4/)
-[Routing Table Paris After failover](../assets/verifs/sprint4/) 
- 
-**VPN Client**
- The default gateway for the `10.9.3.X` tunnel has been replaced by the IP address of the `10.9.4.X` failover interface. Clients switch to Auber (`10.9.4.1`) via port remote `49150`.
-- Before : `192.168.100.0/24 via 10.9.3.1` | `192.168.1.0/24 via 10.9.3.1` | `172.20.10.0/28 via 10.9.3.1`
-- After : `192.168.100.0/24 via 10.9.4.1` | `192.168.1.0/24 via 10.9.4.1`  | `172.20.10.0/28 via 10.9.4.1`
-
-[Routing Table VPN PC-nomad Before failover](../assets/verifs/sprint4/)
-[Routing Table VPN PC-nomad After failover](../assets/verifs/sprint4/)
-
-  
-**Server Aubervilliers**
-- As soon as the primary tunnel is shutdown, the monitoring script (run via `Systemd timers`) detects it and launch the Auber server Wireguard service. The backup tunnel `10.9.4.0/24` became fully active
-- A second route to the private remote LAN (e.g. `172.20.10.0/28`) is dynamically injected to pass through its own VPN tunnel: `172.20.10.0/28 via 10.9.2.1`.
-- The routes to the Auber/Paris LAN subnet (e.g. `192.168.x.y/16`) via its own VPN tunnel are dynamically injected to the VPN clients.
-
-[Routing Table Auber Before failover](../assets/verifs/sprint4/)
-[Routing Table Auber After failover](../assets/verifs/sprint4/)
-
-
-### Post-Failure Analysis: System and Network Impacts
 As soon as the main tunnel `10.9.3.0/24` is disconnected, the following network and system changes are triggered transparently.
 
-**Dynamic Behaviour of the VPN Client (PC nomad)  & Auber Backup Server**
-- Route Loss: The virtual IP addresses associated with the main tunnel (`10.9.3.1` & `10.9.3.2`) are immediately flushed from the local wg0-X interface.
+### Paris
+- Dynamic routes to the `10.9.3.0/24` & `<LAN-PC-nomade>`  network linked to the main tunnel (`10.9.3.0/24`) disappear.
+- Static backup routes become active. 
 
-After approximately 1 minutes, the failover tunnel is established: a new virtual IP from the `10.9.2.0/24` range is assigned to the tun0 interface.
+```text 
+10.9.3.0/24 10.9.3.1
+`<LAN-PC-nomade>` 10.9.3.1
+ ```
+Before: [Routing Table Paris Before failover](../assets/verifs/sprint4/)
 
 
+```text 
+10.9.4.0/24 via 192.168.100.200
+`<LAN-PC-nomade>` via 192.168.100.200
+```
+After: [Routing Table Paris After failover](../assets/verifs/sprint4/) 
 
-## 8. Validation & Connectivity ✅  
-- Ping OK = Tokyo → Aubervilliers (`192.168.1.160`, `192.168.100.210`, `10.9.2.1`) 
-  
-- Ping OK = Tokyo → Paris (`192.168.100.200`,`192.168.100.197` )
 
-- Ping OK = Aubervilliers → Tokyo (`172.20.10.10`, `10.9.2.2`)
+### Nomad PC
+Clients switch to Auber (`10.9.4.1`) via port remote `49150`. The default gateway for the `10.9.3.X` tunnel has been replaced by the IP address of the `10.9.4.X` failover interface. 
 
-- Ping OK  = Paris → Tokyo(`172.20.10.9`, `10.9.2.2`)
+```text 
+# Before :  
+192.168.100.0/24 via 10.9.3.1
+192.168.1.0/24 via 10.9.3.1
+172.20.10.0/28 via 10.9.3.1
+``` 
+[Routing Table VPN PC-nomad Before failover](../assets/verifs/sprint4/)
+
+```text
+# After
+192.168.100.0/24 via 10.9.4.1
+192.168.1.0/24 via 10.9.4.1
+172.20.10.0/28 via 10.9.4.1
+```
+[Routing Table VPN PC-nomad After failover](../assets/verifs/sprint4/)
+
+### Auber
+- the monitoring script detects the shutdown of paris server and then, launch the Wireguard Auber service.
+- The backup tunnel `10.9.4.0/24` becomes active.
+- Static route to the `<LAN-PC-nomade>` via the gateway Auber-Paris disappears.
+- Dynamic route to the `<LAN-PC-nomade>`  linked to the local tunnel appears.
+
+```text
+# Before:  
+<LAN-PC-nomade>` via 192.168.100.210
+```
+[Routing Table Auber Before failover](../assets/verifs/sprint4/)
+
+After:
+```text
+# After:
+<LAN-PC-nomade>` via 10.9.4.1
+10.9.4.0/24 via 10.9.4.1
+```
+[Routing Table Auber After failover](../assets/verifs/sprint4/)
+ 
+### OpenVPN clients Tokyo/NY
+Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber server.
+```text
+# Before: 
+10.9.3.0/24 via 10.9.2.1
+```
+[Routing Table Tokyo After failover](../assets/verifs/sprint4/)
+
+```text
+# After: 
+10.9.4.0/24 via 10.9.2.1
+```
+[Routing Table Tokyo After failover](../assets/verifs/sprint4/)
+
+**Final result** : After approximately X minutes, the failover tunnel is established.
+
+## 7. Validation & Connectivity
+
+### Ping Tests - Tunnel Connectivity ✅
+- Nomad → Auber Wireguard server (`10.9.4.1`) = [Ping OK](../assets/verifs/sprint4/)
+- Auber/Paris/Tokyo →  Nomad wireguard client (`10.9.4.100`) = [Ping OK](../assets/verifs/sprint4/)
+
+- Nomad → Auber OpenVPN server (`10.9.2.1`) = [Ping OK](../assets/verifs/sprint4/)
+- Nomad → Tokyo OpenVPN Client (`10.9.2.2`) = [Ping OK](../assets/verifs/sprint4/)
+
+
+### Ping Tests - LAN Access (Paris/Auber) ✅
+- Nomad → Auber LAN IP (`192.168.1.160`) = [Ping OK](../assets/verifs/sprint4/)
+- Nomad → Auber inter-site LAN IP (`192.168.100.210`) = [Ping OK](../assets/verifs/sprint4/)
+
+- Nomad → Paris LAN IP  (`192.168.1.197`) = [Ping OK](../assets/verifs/sprint3/sprint4/)
+- Nomad → Paris inter-site LAN IP (`192.168.100.200`) = [Ping OK](../assets/verifs/sprint4/)
+
+- Nomad → Tokyo private LAN IP (`172.20.10.9`) = [Ping OK](../assets/verifs/sprint4/)
+
+- Auber →  Nomad wireguard client (`<LAN-PC-nomade>`) = [Ping OK](../assets/verifs/sprint4/)
+- Paris →  Nomad wireguard client (`<LAN-PC-nomade>`) = [Ping OK](../assets/verifs/sprint4/)
+- Tokyo →  Nomad wireguard client (`<LAN-PC-nomade>`) = [Ping OK](../assets/verifs/sprint4/)
 
 
