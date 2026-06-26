@@ -21,7 +21,6 @@ This project is about the design and deployment of an IPsec VPN tunnel to interc
 * **Authentication Scheme:** Initial Pre-Shared Key (PSK) phase, migrated to a robust Public Key Infrastructure (PKI) with X.509 digital certificates (using PKI CA)
 * **NAT Management:** NAT-Traversal (NAT-T) implementation to handle encapsulation over UDP ports 500/4500 through local routers
 * **Packet Filtering & Security:** Advanced Stateful firewalling using Linux Netfilter (`UFW`)
-* **IP Addressing Scheme:** Internet Protocol Version 4 (IPv4) 
 
 <h2>Project 2 - <a href="https://github.com/afshyna/networking-projects/tree/main/vpn-ipsec-site-to-site-CiscoIOS-gns3">IPsec Site-to-Site VPN using Cisco IOS</a></h2>
 
