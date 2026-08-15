@@ -1,4 +1,4 @@
-# Site-to-Site VPN via OpenVPN/Wireguard & Remote-Access VPN via Wireguard with Failover Automation
+# Deployment of an Architecture VPN via OpenVPN & Wireguard with Network Failover Automation
 
 Micro-project reproducing a realistic enterprise VPN architecture  with primary and backup sites, automatic failover, inter-LAN routing and remote access VPN.
 
