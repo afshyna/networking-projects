@@ -1,6 +1,6 @@
 # 🏁 Sprint 2 :  OpenVPN Backup Site Deployment & Automated Network Failover 
 
-## Sprint Objectives
+## Objectives
 - Deploy a secondary OpenVPN backup VPN server (Aubervilliers).
 - Ensure network‑level high availability (HA) between Paris ↔ Tokyo/New York.
 - Implement automatic network failover when the primary VPN server (Paris) becomes unavailable/goes offline.
@@ -224,7 +224,7 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
 [Routing Table Auber After failover](../assets/verifs/sprint2/routing-table-auber-after-failover.png) 
 
 
-## 8. Validation & Connectivity ✅  
+## ✅ 8. Validation & Connectivity  
 - Ping 	OK = Tokyo → Aubervilliers (`192.168.1.160`, `192.168.100.210`, `10.9.2.1`) 
 
   Analysis: Traffic is now routed through the backup VPN tunnel.
