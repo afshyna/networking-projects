@@ -1,12 +1,12 @@
 # 🏁 Sprint 2 :  OpenVPN Backup Site Deployment & Automated Network Failover 
 
-## Objectives
+## 1. Objectives
 - Deploy a secondary OpenVPN backup VPN server (Aubervilliers).
 - Ensure network‑level high availability (HA) between Paris ↔ Tokyo/New York.
 - Implement automatic network failover when the primary VPN server (Paris) becomes unavailable/goes offline.
 - Simulate a failure of the primary site & Incident management on VPN servers
   
-##  Architecture & Topology Overview
+## 2. Architecture & Topology Overview
 
 ![Architecture Sprint 2](../diagrams/02-sprint2-backup-auber-openvpn-failover-automation.png)
 
@@ -253,7 +253,7 @@ In conclusion, the openvpn and routing table state became similar to the one sta
 
 ## 🛠️ 10. Troubleshooting
 
-###📝 Issue A -  Client does not reconnect to Backup VPN when Paris goes down (KeepAlive missing)
+###❌ Issue A -  Client does not reconnect to Backup VPN when Paris goes down (KeepAlive missing)
 
 **Symptom** : When the Paris VPN server is shut down, the OpenVPN client does not automatically reconnect to the second remote server defined in its configuration.
 
@@ -334,14 +334,6 @@ iptables -A FORWARD -i enp0s3 -o tun0  -d 10.9.1.0/24 -s 192.168.1.0/24 -j ACCEP
 ```
 
 **Results**: Client Tokyo → Paris = HTTP requests successfum
-
-<!-- Autre troubleshooting possible
-Backup tunnel unreachable
-Wrong route metrics
-
-### References
-    See Troubleshooting – Missing iroute
-    See Troubleshooting – Return Path Problems
 -->
 
 *Conclusion : My captures traces & the routing  table show how traffic is redirected to the Aubervilliers server (10.9.2.1) when paris server is shutdown to maintain access to resources and HTTP requests, demonstrating the effectiveness of my disaster recovery plan.*
