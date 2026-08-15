@@ -35,7 +35,7 @@
 - Tokyo/NY LAN: `172.20.10.0/28`
 - PC Nomade LAN: `10.177.104.0/24` (IP PC : `10.177.104.102`)
 
-## 3.  Wireguard Configuration
+## 🔧 3.  Wireguard Configuration
 
 ###  Backup (Auber) Server
 
@@ -69,7 +69,7 @@ Endpoint = 82.X.Y.Z:49150               # <PUBLIC_IP_AUBER>:<LISTENING_PORT>
 AllowedIPs = 10.9.4.0/24, 10.9.2.0/24, 192.168.0.0/16, 172.20.10.0/28
 ```
 
-## 4. Routing Configuration
+## 🔀 4. Routing Configuration
 
 ### Nomad PC
 WireGuard uses AllowedIPs as routing table.
@@ -137,7 +137,7 @@ push "route 10.9.4.0 255.255.255.0"
 push "route 10.177.104.102 255.255.255.0"
 ```
 
-## 5. Firewall & NAT
+## 🛡️ 5. Firewall, Port/IP Forwarding & NAT rules
 
 ### Firewall Rule
 Allow incoming WireGuard traffic on Auber :
@@ -149,7 +149,7 @@ Rule applied: `From everywhere on Internet connecting to external port UDP/49150
 ###  IP forwarding
 Kernel : Activation of `net.ipv4.ip_forward`.
 
-### Iptables Rules (NAT)
+### NAT rules (via iptables)
 ```text
 # Auber server conf 
 PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
@@ -162,7 +162,7 @@ PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
 PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
 ```
 
-## 6. Automatic Failover
+## 🤖 6. Automatic Failover
 
 Objective :Switch automatically to the backup WireGuard server when Paris becomes unreachable and switch to Paris when primary tunnel becomes available again.
 
