@@ -24,7 +24,7 @@
 - Primary tunnel: `10.9.1.0/24` (Paris)
 - Backup tunnel: `10.9.2.0/24` (Auber)
 
-## 1. PKI Setup 
+## 🔧 1. PKI Setup 
 In the same way that with the primary server, the authentication solution to use for implementing an OpenVPN tunnel is using X.509 certificates.
 
 The full PKI setup (CA creation, key generation, certificate signing, installation steps) is documented here:
@@ -97,7 +97,7 @@ Traffic coming from the public internet through the edge router (local router at
 
 **Purpose**: Allows remote clients to reach the backup VPN server when Paris is down.
 
-## 5. Automated Failover Configuration with the Backup Server
+## 🤖 5. Automated Failover Configuration with the Backup Server
 - Located at `/usr/local/bin/`
 - Executed every 10 seconds via `System Timers`
 
