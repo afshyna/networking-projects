@@ -1,6 +1,6 @@
 # 🏁 Sprint 4 :  WireGuard Remote Access & site-to-site VPN with Backup Server & Automatic Failover
 
-##  1. Sprint Objectives
+##  1. Objectives
 - Add a secondary WireGuard server on Aubervilliers.
 - Ensure network‑level high availability (HA) between Paris and Aubervilliers.
 - Implement automatic network failover mechanisms when the primary VPN server (Paris) becomes unavailable.
@@ -302,7 +302,7 @@ Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber se
 
 **Final result** : After approximately 30 seconds, the failover tunnel  with Auber is established.
 
-## 9. Validation & Connectivity
+## ✅ 9. Validation & Connectivity 
 
 ###  Ping Tests - Tunnel Connectivity ✅
 - Auber/Paris →  Nomad wireguard client (`10.9.4.100`) = [Ping OK](../assets/verifs/sprint4/ping-paris-auber_vpn-client.png)
@@ -315,6 +315,6 @@ Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber se
 - Paris/Auber →  Nomad wireguard client (`10.177.104.102`) = [Ping OK](../assets/verifs/sprint4/ping-servers-paris-auber_pc-nomade-physical-IP-LAN.png)
 - Tokyo/NY →  Nomad wireguard client (`10.177.104.102`) = [Ping OK](../assets/verifs/sprint4/ping-clients-openvpn_pc-nomade-physical-IP-LAN.png)
 
-## 10. Troubleshooting 
+## 🛠️  10. Troubleshooting 
 
 Issues in this script are similar to issues from the previous script. They are related to routing issues, that can be resolved by adding routes, when a server/client doesn't known how to join a subnet, either on wireguard configuration, openvpn conf or directly in the routing table on console. 
