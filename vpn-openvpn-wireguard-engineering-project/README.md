@@ -17,7 +17,7 @@ Service delivery context for connecting remote offices (Tokyo, New York) to a re
 
 ##  Global Objectives  
 
-### Objective 1. Build Site-to-Site VPNs with OpenVPN**:
+### Objective 1 - Build Site-to-Site VPNs with OpenVPN
 - Connect Tokyo and New York sites to the central infrastructure.
 - Implement a secure connexion using TLS authentication with X.509 certificates.
 - Route traffic between remote LANs.
@@ -25,9 +25,9 @@ Service delivery context for connecting remote offices (Tokyo, New York) to a re
 - Configure IP forwarding and NAT.
 - Simulate WAN access through port forwarding.
 - Implement a disaster recovery site (Aubervilliers).
- -Automate failover when the primary server becomes unavailable.
+- Automate failover when the primary server becomes unavailable.
 
-**Objective 2. Deploy Remote Access VPN with WireGuard**:
+### Objective 2 - Deploy Remote Access & site-to-site VPN with WireGuard
 Provide secure access for nomad users (Laptop & Smartphone)
 
 **Features**:
@@ -38,31 +38,42 @@ Provide secure access for nomad users (Laptop & Smartphone)
 - Backup WireGuard server
 - Automatic failover
 
-## Network Topology
+## Network Topology & Architecture
 
-### Sprint 1 – OpenVPN Site-to-Site
+### Sprint 1 – Deployment of a site-to-site OpenVPN tunnel between the primary server (Paris) and Tokyo/NY clients 
 - Paris-Montrouge acts as the main VPN server.
-- Tokyo and New York establish routed VPN tunnels using SSL/TLS certificates.
+- Tokyo and New York establish routed VPN tunnels with the main server using SSL/TLS for the authentication & encryption of data.
 
-### Sprint 2 – Backup Site and Failover
+![Architecture Sprint 1](diagrams/01-sprint1-openvpn-site-to-site-srv-paris-primary_clients-tokyo-NY.png)
+
+---
+
+### Sprint 2 – Deployment of a secondary OpenVPN backup server (Aubervilliers) with an Automated Network Failover, when incident happens on the primary server 
 Aubervilliers acts as the disaster recovery site.
 
-Features:
+**Features:**
 - Multiple remote statements
- -Automatic reconnection
+- Automatic reconnection
 - Dynamic route switching
 - failover script automatically executed via system-timers
 
-### Sprint 3 – WireGuard Remote Access
-Nomad hosts connect to Paris using WireGuard.
+![Architecture Sprint 2](diagrams/02-sprint2-backup-auber-openvpn-failover-automation.png)
+
+---
+
+### Sprint 3 – Deployment of a WireGuard Remote Access VPN that connects nomad hosts (PC, phone) to the primary server (Paris)
+Primary WireGuard server on Paris.
 
 Provides:
 - Access to Paris LAN
-- Access to Tokyo LAN
-- Access to New York LAN
+- Access to Tokyo/New York LAN
 - Inter-site communication through OpenVPN
 
-### Sprint 4 (Bonus) – WireGuard Backup and Failover
+![Architecture Sprint 3](diagrams/03-sprint3-vpn-wireguard-nomade-site-to-site-clients-pc-phone_srv-paris-primary.png)
+
+---
+
+### Sprint 4 (Bonus) –  Deployment of a Secondary Wireguard VPN Backup that connects nomad host to a backup server (Auber) via an Automated Network Failover when incident happens on the primary server 
 Secondary WireGuard server on Aubervilliers.
 
 Features:
@@ -71,21 +82,6 @@ Features:
 - Backup routing
 - High availability
 
-
-##  Architecture 
-
-### Global Architecture
-
-*Sprint 1 - Deployment of an OpenVPN site-to-site between Paris Server and Tokyo/NY clients*
-![Architecture Sprint 1](diagrams/01-sprint1-openvpn-site-to-site-srv-paris-primary_clients-tokyo-NY.png)
-
-Sprint 2 - Deployment of a Secondary OpenVPN Backup Site & Automated Network Failover*
-![Architecture Sprint 2](diagrams/02-sprint2-backup-auber-openvpn-failover-automation.png)
-
-*Sprint 3 -  Deployment of WireGuard Remote Access VPN for connecting nomade hosts (PC, phone) to the primary site (Server Paris)*
-![Architecture Sprint 3](diagrams/03-sprint3-vpn-wireguard-nomade-site-to-site-clients-pc-phone_srv-paris-primary.png)
-
-*[Bonus] Sprint 4 - Deployment of a Secondary Wireguard VPN Backup (Server Auber) & Automated Network Failover*
 ![Architecture Sprint 4](diagrams/04-sprint4-failover-vpn-wireguard-srv-paris-switch-client_srv-auber-backup.png)
 
 ## Repository Structure
@@ -137,6 +133,7 @@ vpn-openvpn-wireguard-engineering-project/
 Each sprint follows the same structure:
 - Objectives
 - Architecture
+- 
 - Configuration
 - Routing
 - Tests performed
@@ -153,33 +150,43 @@ Detailed troubleshooting for each sprint is available:
 ➡️ [Troubleshooting Sprint 3](docs/03-sprint3-wireguard-nomade.md#%EF%B8%8F-9-troubleshooting)
 ➡️ [Troubleshooting Sprint 4](docs/04-script4-wireguar-backup-auber-failover-automation-paris.md#10-troubleshooting)
 
-## Skills Demonstrated
+## Skills Demonstrated & Technologies used
 
 ### Networking 
 - IP forwarding
-- Linux networking
-- **Inter-LAN routing**
+- Linux networking/routing
+- Inter-LAN routing
    - Static routes
-   - CCD files & iroute statements
+   - CCD files & iroute statements (OpenVPN configuration)
    - Route metrics
    - Dynamic route replacement
 
 ### Security
-- TLS authentication using X.509 certificates
-- Authentication via Public/private keys
-- iptables firewall rules / MASQUERADE NAT / POSTROUTING rules 
-- Port forwarding
+- Authentication via :
+     - public/private keys
+     - X.509/SSL certificates (PKI infrastructure)
+ 
+- firewall rules via iptables :
+     - MASQUERADE NAT
+     - POSTROUTING rules
+ - firewall rules via Windows defender
+
+- Port forwarding (router Freebox)
+- ufw (for allowing incoming OpenVPN/Wireguard/HTTP traffic)
 
 ### VPN Technologies
-   - OpenVPN
-   - WireGuard
+   - OpenVPN  (site-to-site VPN) 
+   - WireGuard (remote access VPN & site-to-site VPN)
+
 
 ### Linux Administration
-   - systemd
    - iptables
-   - cron
    - tcpdump
    - sysctl
+   - systemd
+- Wireshark
+- Bash scripting
+- systemd (service manager)
 
 ### Troubleshooting
    - ICMP, traceroute, HTTP tests
@@ -188,24 +195,12 @@ Detailed troubleshooting for each sprint is available:
    - Service monitoring
    - Service Failure simulation
 
-## Technologies used:
-- OpenVPN (site-to-site) 
-- WireGuard (remote access & site-to-site) 
-- OpenSSL, TLS / X.509 PKI
-- Linux Routing
-- iptables
-- Wireshark
-- Ubuntu Linux
-- Bash scripting
-- systemd
+## Final Achievements
 
-## Achievements / Realizations : </h2>
-
-- Designed and implemented a multi-site VPN infrastructure using OpenVPN and WireGuard.
-- Connected several remote sites (Tokyo, New York, Paris, Aubervilliers) through routed VPN tunnels secured with TLS certificates.
-- Implemented disaster recovery mechanisms and automatic failover.
-- Configured inter-LAN routing, NAT & firewall policies.
-- Automated network recovery using shell scripts and cron.
+- Design and implementation of a VPN infrastructure between multi-site using OpenVPN and WireGuard.
+- Connection of  several remote sites (Tokyo, New York, Paris, Aubervilliers) through routed VPN tunnels secured with SSL/TLS.
+- Configuration of inter-LAN routing, IP forwarding, NAT Masquerade rule & firewall policies.
+- Implementation of disaster recovery mechanisms and automatic failover / automated network recovery using shell scripts and systemd.
+=> Simulation of production incidents and recovery scenarios, ensuring resiliency.
 - Performed packet-level troubleshooting with Wireshark and tcpdump
 - Validated connectivity using ICMP, HTTP and traceroute tests
-- Simulated production incidents and recovery scenarios, ensuring resiliency.
