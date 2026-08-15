@@ -24,14 +24,14 @@
 - Primary tunnel: `10.9.1.0/24` (Paris)
 - Backup tunnel: `10.9.2.0/24` (Auber)
 
-## 🔧 1. PKI Setup 
+## 🔧 3. PKI Setup 
 In the same way that with the primary server, the authentication solution to use for implementing an OpenVPN tunnel is using X.509 certificates.
 
 The full PKI setup (CA creation, key generation, certificate signing, installation steps) is documented here:
 *[Authentication via SSL/TLS certificates](pki-certificate-authentication.md)*
 
 
-## 🔧 2. OpenVPN Configuration
+## 🔧 4. OpenVPN Configuration
 
 *Full configuration files are available in the root folder  `configs/openvpn/` directory.*
 
@@ -51,7 +51,7 @@ Explanation :
 - Clients always try Paris first.
 - If unreachable → automatically switch to Aubervilliers.
 
-## 🔀 3. Routing Configuration & Adjustements
+## 🔀 5. Routing Configuration & Adjustements
 
 ###  Backup Server
 - **Add local route** : Declare a dynamic route to reach the Tokyo/NY LAN network by routing via the VPN tunnel: 
@@ -97,7 +97,7 @@ Traffic coming from the public internet through the edge router (local router at
 
 **Purpose**: Allows remote clients to reach the backup VPN server when Paris is down.
 
-## 🤖 5. Automated Failover Configuration with the Backup Server
+## 🤖 6. Automated Failover Configuration with the Backup Server
 - Located at `/usr/local/bin/`
 - Executed every 10 seconds via `System Timers`
 
@@ -167,7 +167,7 @@ This setup ensures that the VPN failover mechanism reacts quickly and consistent
 - All traffic still uses the primary tunnel (Paris), that works initially.
 - Backup tunnel (10.9.2.0/24) is not yet active.
 
-## 6. Paris server failover Simulation & Incident management on VPN servers 
+## 7. Paris server failover Simulation & Incident management on VPN servers 
 To stop the Paris primary server, shutdown the system service: 
 
 ```console
@@ -192,7 +192,7 @@ As soon as the main tunnel `10.9.1.0/24` is disconnected, the following network 
 After approximately 1 minutes, the failover tunnel is established: a new virtual IP from the `10.9.2.0/24` range is assigned to the tun0 interface.
 
 
-## 7. Flow validation & Route verification - Progressive Changes to Routing Tables 
+## 8. Flow validation & Route verification - Progressive Changes to Routing Tables 
 
 **Server Paris**
 Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24`).
@@ -224,7 +224,7 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
 [Routing Table Auber After failover](../assets/verifs/sprint2/routing-table-auber-after-failover.png) 
 
 
-## ✅ 8. Validation & Connectivity  
+## ✅ 9. Validation & Connectivity  
 - Ping 	OK = Tokyo → Aubervilliers (`192.168.1.160`, `192.168.100.210`, `10.9.2.1`) 
 
   Analysis: Traffic is now routed through the backup VPN tunnel.
