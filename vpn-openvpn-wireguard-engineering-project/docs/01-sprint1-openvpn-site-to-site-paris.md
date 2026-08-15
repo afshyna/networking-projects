@@ -1,6 +1,6 @@
 <h1> 🏁 Sprint 1 - OpenVPN site-to-site with Paris server and Tokyo/NY clients </h1>
 
-## Sprint Objectives
+## Objectives
 - Deploy OpenVPN on  the primary server site (Paris Montrouge) 
 - Connect Tokyo & New York clients to the central site via an unsecured network (Internet)
 - Check routing and inter-site communication
@@ -174,7 +174,7 @@ systemctl start openvpn@client-NY
 
 - Installation of nginx service web on auber site
 
-## 7. Validation  / Connectivity ✅
+## ✅ 7. Validation  / Connectivity 
 
 ### Ping Tests - Tunnel Connectivity 
 
@@ -214,7 +214,7 @@ systemctl start openvpn@client-NY
 
 ---
 
-## 8.Troubleshooting & Fixes
+## 🛠️ 8.Troubleshooting & Fixes 
 
 During the acceptance testing phase, several issues of ping were identified and resolved.
 
