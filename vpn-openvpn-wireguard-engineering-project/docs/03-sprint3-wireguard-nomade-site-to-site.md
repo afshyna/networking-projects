@@ -56,7 +56,7 @@ The mobile client can therefore access:
 A “nomad client” is an external device (4G/5G, Wi‑Fi public, home network) with no direct access to Paris.
 All access must go through WireGuard.
 
-## 4. Wireguard Configuration
+## 🔧 4. Wireguard Configuration
 
 ### 4.1. Server Configuration
 
@@ -114,7 +114,7 @@ Endpoint = 88.162.141.79:49151               # <PUBLIC_IP>:<LISTENING_PORT>
 AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 ```
 
-## 5. Routing Configuration
+## 🔀 5. Routing Configuration
 
 ### 5.1. OpenVPN routes to clients
 To join to the `192.168.1.0/24`, `192.168.100.0/24`, `172.20.10.0/28` and `10.9.2.0/24` subnets, PC-nomad must route traffic through its WireGuard VPN tunnel. For doing this, these subnets must be announced to wireguard client via the directive `AllowedIPs=`. It specifies the subnets/host  whose traffic  that you want to route through your VPN tunnel. The rest of the traffic (not specified) will go via your local internet connection.
@@ -143,16 +143,24 @@ push "route 10.9.3.0 255.255.255.0"`
 route 10.9.3.0 255.255.255.0
 ```
 
-## 6. Firewalling & IP Forwarding
+## 🛡️ 6. Firewall, Port/IP Forwarding & NAT rules
 
 ### 6.1. Firewall Rule
 Allow incoming WireGuard traffic on Paris :
 `ufw allow 49151/udp`
 
-### 6.2. Iptables Rules (NAT)
+
+### 6.2. Port Forwarding (Paris router)**
+
+Rule applied: `From everywhere on Internet connecting to external port UDP/49151 ➔ to 192.168.1.197 on internal port 49151`
+
+### 6.3. IP forwarding
+Kernel : Activation of `net.ipv4.ip_forward`.
+
+### 6.4. Iptables Rules (NAT)
 Automatisation PostUp/PostDow by adding NAT MASQUERADE rules
 ```text
-PostUp   = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
+PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 ```
 
@@ -161,12 +169,6 @@ PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 - Required for reaching internal networks
 - Required for multi‑site routing
 
-### 6.3. Port Forwarding (Paris router)**
-
-Rule applied: `From everywhere on Internet connecting to external port UDP/49151 ➔ to 192.168.1.197 on internal port 49151`
-
-### 6.4. IP forwarding
-Kernel : Activation of `net.ipv4.ip_forward`.
 
 ## 7. Launching WireGuard
 
