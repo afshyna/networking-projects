@@ -251,7 +251,7 @@ The server Paris re-launch its openvpn service.
 
 In conclusion, the openvpn and routing table state became similar to the one state of the initial, before the failover.
 
-## 📝 10. Troubleshooting
+## 🛠️ 10. Troubleshooting
 
 ###📝 Issue A -  Client does not reconnect to Backup VPN when Paris goes down (KeepAlive missing)
 
