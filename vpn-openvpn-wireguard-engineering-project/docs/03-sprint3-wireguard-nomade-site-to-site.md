@@ -1,6 +1,6 @@
 <h1> 🏁 Sprint 3 : Remote Access & Site-to-Site VPN with WireGuard from nomad hosts to Paris server </h1>
 
-##  1. Sprint Objectives
+##  1. Objectives
 - Set up VPN access for enabling a remote user (nomad PC / smartphone) to securely access to internal networks (Paris, Auber, Tokyo, NY).
 - Provide VPN access for remote users such as nomadic PC and a smartphone.
 - Integrate WireGuard into the existing multi‑site OpenVPN architecture.
@@ -195,7 +195,7 @@ wg show
 
 [Wireguard-Activated-Phone](../assets/verifs/sprint3/configuration-phone-wireguard.png)
 
-## 8. Validation of the Connectivity 
+## ✅ 8. Validation of the Connectivity 
 
 ---
 
