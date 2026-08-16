@@ -14,21 +14,21 @@ This repertory is a collection of network architectures &amp; solutions, that sh
 
 This micro-project focuses on the design and deployment of a resilient VPN infrastructure combining OpenVPN site-to-site connectivity and WireGuard remote-access VPN services.
 
-The architecture simulates a realistic enterprise environment with multiple branch offices, a primary server site, a disaster recovery site, nomad users, Internet exposure through NAT/PAT, and automated failover mechanisms.
+The architecture simulates a realistic enterprise environment with multiple branch offices, a primary server site, a disaster recovery site, nomad users, Internet exposure through NAT, and automated failover mechanisms.
 
 It demonstrates how secure VPN services can be deployed, monitored, and maintained in production-like conditions while ensuring business continuity during outages.
 
 <strong>Technical Configuration & Architecture:</strong>
 
-- <strong>VPN Technologies:</strong> OpenVPN (SSL/TLS) for Site-to-Site connectivity and WireGuard for Remote-Access VPN
-- <strong>Architecture Type:</strong> Multi-site VPN infrastructure with Primary Site (Paris-Montrouge) and Disaster Recovery Site (Aubervilliers)
-- <strong>Remote Offices:</strong> Tokyo and New York branch networks connected through routed VPN tunnels
-- <strong>Site-to-site:</strong> OpenVPN & WireGuard VPN for LAN-to-LAN communication between server's LAN and client's LAN.
+- <strong>VPN Technologies:</strong> OpenVPN (SSL/TLS) for Site-to-Site VPN and WireGuard for Remote-Access VPN and Site-to-site VPN
+- <strong>Architecture Type:</strong> VPN infrastructure with a Primary Site/server (Paris-Montrouge) and a Disaster Recovery Site/server (Aubervilliers)
+- <strong>Remote Offices:</strong> VPN clients Tokyo & New York networks connected through routed VPN tunnels
+- <strong>Site-to-site:</strong> Expanding the Scope of the VPN to include LAN-to-LAN communication between server's LAN and clients's LAN.
 - <strong>Remote Access:</strong> WireGuard VPN access for nomad users (laptops and smartphones)
 - <strong>Authentication Scheme:</strong> X.509 certificates and TLS authentication for OpenVPN, public/private key cryptography for WireGuard
-- <strong>Routing Design:</strong> Static routing, CCD files, iroute directives, route propagation and inter-LAN communication
+- <strong>Routing Design:</strong> Static routing, CCD files, iroute directives, route propagation for routing LAN trafic over VPN (for inter-LAN communication)
 - <strong>High Availability:</strong> Automatic failover between primary and backup VPN servers using multiple remote endpoints, keepalive mechanisms and dynamic route switching
-- <strong>NAT & Internet Exposure:</strong> NAT/PAT, port forwarding and MASQUERADE rules for VPN connectivity behind residential routers
+- <strong>NAT & Internet Exposure:</strong> Port/IP forwarding and MASQUERADE rules for VPN connectivity behind residential routers
 - <strong>Firewall & Security:</strong> Linux iptables filtering, forwarding policies
 - <strong>Network Services Validation:</strong> ICMP, HTTP and traceroute testing across VPN tunnels
 - <strong>Troubleshooting & Analysis:</strong> Packet-level analysis using Wireshark and tcpdump, routing-table verification, failover testing and incident simulation
