@@ -85,10 +85,10 @@ Each VPN gateway has been configured to establish the tunnel securely. Below are
 [Router R2 Configuration (Gateway B)](config/R2.txt): Mirror of the R1 configuration with reversed access policies.
 
 
-<h1> Configuration Steps on Cisco IOS </h1>
+<h1> 🔧  Configuration Steps on Cisco IOS </h1>
 
 ---
-<h3>Step 1: Configuring the IKE Phase 1 Policy (ISAKMP) </h3>
+<h3> Step 1: Configuring the IKE Phase 1 Policy (ISAKMP) </h3>
 
 First, enable ISAKMP and configure the global security policy for Phase 1 on the edge routers (R1 and R2)
 
@@ -115,7 +115,7 @@ The `crypto map` links all the elements (ACL, Peer, `transform-set`).
 Applying the `crypto map` to the outgoing interface enables IPsec listening and traffic processing.
 
 
-<h1>  Verification of the IPsec tunnel configuration </h1>
+<h1>  ✅  Verification of the IPsec tunnel configuration </h1>
 
 When PC1 ping PC2, interesting traffic is sent to the IPsec tunnel. 
 
@@ -210,13 +210,16 @@ Each direction of communication has its own independent set of encryption keys
 <h1> Requirements </h1>
 To reproduce this project, you will require to have the following environments :
 
-- **Network simulator tool :** *GNS3* 
+- **Network simulator tool :** *GNS3*
+
 - **Cisco IOS Images** :
     - Images Cisco IOS compatible with IPsec/IKEv1 (e.g., c7200), configured in *GNS3*.
     - Exact name of the IOS image used in this GNS3 project : `c7200-adventerprisek9-mz.124-24.T5.image`
+
 - A functional GNS3 topology including:
   - 3 Cisco routers (R1, R2, R3)
   - 2 end-hosts (PC1, PC2) : Appliances "VPCS" (Virtual PC Simulator) integrated to *GNS3* for realising the ping tests.
+
 - **Networking Tools:** : Wireshark
 
 
