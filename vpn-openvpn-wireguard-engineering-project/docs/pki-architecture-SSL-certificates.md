@@ -19,7 +19,7 @@ A TLS handshake involves many parameters which take part in the negotiation betw
 During a TLS handshake between a client & a server, they exchange data to settle on a cipher suite, which is a combination of security parameters containing several individual cryptographic algorithms, to use for a connection: 
 - **Key Exchange** Algorithm: Establishes the shared secret key used to encrypt the session data without exposing it to eavesdroppers
 - **Authentication** Algorithm: Verifies the identity of the server (and optionally the client) using digital signatures
-- **Bulk Encryption** Cipher: The symmetric algorithm used to encrypt the actual data being sent (e.g., AES-GCM, ChaCha20-Poly1305)
+- **Bulk Encryption** Cipher: The symmetric algorithm used to encrypt the actual data being sent (e.g., AES-256-GCM,  AES-128-GCM)
 - **Hashing/MAC** Algorithm: Ensures data integrity by verifying that messages have not been altered in transit (e.g., SHA-256, SHA-384)
 - Diffie-Hellman (DH) Group Parameters: The specific mathematical curves or prime sizes used during key generation (a minimum of 2048-bit primes for classical DH)
 
