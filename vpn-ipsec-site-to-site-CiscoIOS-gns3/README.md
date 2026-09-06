@@ -1,9 +1,8 @@
 # IPsec VPN Site-to-Site between 2 Cisco routers
-This lab, conducted in the **GNS3** simulation environment, is an  example of deploying a traditional site-to-site IPsec VPN of the “router-to-router” type. 
-**Exemple de sortie pour `show crypto ipsec sa` :**
-
+This lab, conducted in the GNS3 simulation environment, is an  example of deploying a traditional site-to-site IPsec VPN of the “router-to-router” type. 
 
 It represents the network and security architecture that has been extensively and historically proven in traditional enterprise environments using Cisco IOS equipment.
+
 This project illustrates the fundamental mechanisms of IPsec on Cisco IOS.
 
 <h1> Overview & Objectives </h1>
@@ -19,7 +18,8 @@ The IPsec tunnel will protect :
 
 <img src="topology-ipsec-lan-to-lan-CiscoIOS-routers-gns3.png"></img>
 
-**Main Components** :
+
+<h2> Main Components </h2>
 
 - R1 : Gateway VPN of the LAN A
     - Serial 1/0 represent the “OUTSIDE” security zone (simulation of the public Internet connection with R3).
@@ -30,7 +30,7 @@ The IPsec tunnel will protect :
 - R3 : Router that simulate “Internet”  (zone OUTSIDE)
 - PC1 / PC2 : machines internes (zone INSIDE)
 
-**Goal**
+<h2> Goal</h2>
 Enable PC1 (`10.0.0.0/8`) and PC2 (`30.0.0.0/8`) to communicate end-to-end in a transparent and highly secure manner by establishing a ipsec tunnel between the Cisco gateways R1 and R2.
 
 <h1> How IPsec VPN Works  (theorically) </h1>
@@ -38,10 +38,14 @@ Enable PC1 (`10.0.0.0/8`) and PC2 (`30.0.0.0/8`) to communicate end-to-end in a 
 When a connection is initiated (e.g., PC1 pings PC2, `10.0.0.1` → `30.0.0.1`), the IPsec process is activated on the Cisco gateway (e.g, R1):
 
 - **Detection of “Interesting Traffic”**: The router checks whether the packet matches the Crypto ACL.
+
 - **Application of the Crypto Map**: If the traffic matches, the security policy is activated.
+
 - **Encryption & Encapsulation**: The original packet is encrypted using the algorithm suite and then encapsulated in an ESP header before being sent over the WAN.
 
 The process consists of two distinct phases:    
+
+---
 
 <h3> 🔐 Phase 1 — IKE / ISAKMP (Control canal) </h3>
 Establishment of a secure negotiation channel between the two peers (IKE SA).
@@ -54,6 +58,7 @@ Establishment of a secure negotiation channel between the two peers (IKE SA).
 *strongSwan equivalent of IPsec settings:
 `ike=aes256-sha256-modp1024`*
 
+---
 <h3> 🔐 Phase 2 — IPsec / ESP (Data canal) </h3>
 Creation of real data tunnels (CHILD SA / ESP SA) to transport user traffic LAN↔LAN.
 
@@ -68,6 +73,7 @@ Configured elements:
 *strongSwan equivalent of IPsec settings: 
 `esp=aes256-sha256`*
 
+---
 
 <h3> ⚙️ Configuration Details (R1 & R2) </h3>
 
@@ -80,8 +86,12 @@ Each VPN gateway has been configured to establish the tunnel securely. Below are
 
 <h1> Configuration Steps on Cisco IOS </h1>
 
+---
 <h3>Step 1: Configuring the IKE Phase 1 Policy (ISAKMP) </h3>
+
 First, enable ISAKMP and configure the global security policy for Phase 1 on the edge routers (R1 and R2)
+
+---
 
 <h3> Step 2: Configuring IKE Phase 2 (IPsec Parameters) </h3>
 
@@ -97,9 +107,12 @@ The `transform-set` defines the encryption and integrity algorithms applied to t
 
 The `crypto map` links all the elements (ACL, Peer, `transform-set`).
 
+---
+
 <h3> Step 3: Applying the Crypto Map to the external interface (WAN) </h3>
 
 Applying the `crypto map` to the outgoing interface enables IPsec listening and traffic processing.
+
 
 <h1>  Verification of the IPsec tunnel configuration </h1>
 
@@ -108,11 +121,13 @@ When PC1 ping PC2, interesting traffic is sent to the IPsec tunnel.
 - `show crypto isakmp policy` : view all the security policy implemented for the IKE Phase 1 
 
 ![ISAKMP Policy](assets/verifs/show_crypto_isakmp_policy_R1.png)
-  
+
+---
 - `show crypto map` :View the connection between the ACL, the peer's address, and the physical interface where the crypto map is applicated
 
 ![Crypto Map](assets/verifs/show_crypto_map_R1.png)
-  
+
+---  
 - `show crypto isakmp sa` :  Check the status of the control link. The status should show QM_IDLE (Phase 1 active and pending) when traffic is sent to the tunnel.
 
 **Before ping :**  
@@ -121,7 +136,8 @@ When PC1 ping PC2, interesting traffic is sent to the IPsec tunnel.
 **After ping :**  
 ![ISAKMP SA after](assets/verifs/show_crypto_isakmp_sa_R1_after.png)
   
-  
+---
+
 - `show crypto ipsec sa` : View encryption counters, the Phase 2 (ESP) status, and local and remote SPIs
 
 **Before ping :**  
@@ -142,6 +158,8 @@ When capturing traffic on WAN interfaces (Internet transit network), the analysi
 
 <ins> Observation </ins> : The traffic is transmitted in clear text and the gateway (R1) has no encryption settings. Internal private addresses  (`10.0.0.1` / `30.0.0.1`) are exposed to everyone, and the application data (ICMP payload) is visible to any intermediate device located along the transit path (R3). 
 
+---
+
 <h3> After the activation of IPsec  </h3>
 When the second successful ping is sent, the network capture highlights the structural changes to the frame that shows the key Points of ESP Encapsulation:
 The screenshots below show ESP encapsulation in action:
@@ -156,10 +174,14 @@ The screenshots below show ESP encapsulation in action:
 
 *You can find the raw capture files (.pcapng) in the [captures/](captures/) folder for detailed analysis using your own copy of Wireshark.*
 
+---
+
 **Complete Obfuscation**:
   - The real host addresses (`10.0.0.1` and `30.0.0.1`) and the traffic type (ICMP) are encapsulated in the encrypted payload (ESP). So, private addresses are hidden.
   - Only the public VPN endpoints (`101.0.0.253` and `102.0.0.253`) are visible. 
   - Anti-Replay Security:  `show crypto ipsec sa` shows that the `replay detection support` attribute is enabled: A unique sequence number is associated with each ESP header to prevent the injection or malicious re-transmission of captured packets.
+
+---
 
 **Full-Duplex Architecture**:
 The router creates two separate session indexes:
