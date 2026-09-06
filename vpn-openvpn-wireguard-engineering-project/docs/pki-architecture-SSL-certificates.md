@@ -82,7 +82,7 @@ This DH parameter will be used by servers for establishing a secure key exchange
 
 <h2> Step 3 - Install the adequat certificates on the server and client </h2>
 
-On each entity (servers & clients) : 
+On servers and clients : 
 - Install CA certificate (`cacert.pem`), entity certificate (`<entity>.crt`) and private key (`<entity>.key`) on `/etc/openvpn/tls/` </li>
 
 On servers only : 
