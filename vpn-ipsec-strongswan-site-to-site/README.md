@@ -22,6 +22,7 @@ A secure communication channel was required between 2  private networks connecte
 
 Both sites were located behind NAT-enabled Internet gateways, introducing  NAT Traversal (NAT-T) constraints. Since standard ESP packets (IP Protocol 50) often get dropped by NAT devices because they lack port information for the NAT to translate. NAT-Traversal (NAT-T) encapsulates the ESP packets inside UDP port 4500, allowing the NAT device to handle them correctly and maintain the session state.
 
+---
 
 **Main Components** :
 
@@ -50,7 +51,6 @@ This project demonstrates:
 -  strongSwan debugging & verification
 - Wireshark analysis (before/after IPsec)
 
----
 
 <h1> Solution </h1>
 The following technologies and mechanisms were implemented:
@@ -75,7 +75,7 @@ The following technologies and mechanisms were implemented:
     <li>PKI / X.509 certificate authentication</li>
 </ul>
 
----
+
 <h1> ⚙️ Configuration Details (GW-A & GW-B) </h1>
 
 Each VPN gateway has been configured to establish the tunnel securely. Below are the IPsec configuration files associated with each VM Ubuntu (Linux) :
@@ -92,10 +92,9 @@ Each VPN gateway has been configured to establish the tunnel securely. Below are
 
 <h1> 🔧 Implementation of the features  </h1>
 
----
+
 <h2> 🔧 Authentification Setup  </h2>
 
----
 
 <h3> 1. Authentication via PSK   </h3>
 First implementation of IPsec tunnel with pre-shared key (PSK)
@@ -272,9 +271,12 @@ We can also view the routing table to the GW-B LAN directly with
 <h3> Symptom </h3> 
 During testing, hosts from LAN B (`172.20.10.0/28`) like GW-B could not reach local machine in LAN A like `192.168.1.73` or `192.168.1.254` (except  GW-A), even though the IPsec tunnel was fully established and GW-B ping GW-A.
 
+---
 
 <h3> Cause </h3>
 When traffic from the LAN-B reaches the local machine in LAN-A, the machine may not have a route back to the source network/to the original LAN B host.
+
+---
 
 <h3> Solution </h3>
 Add a MASQUERADE Rule on GW‑A by using iptables to perform source NAT (Masquerading), making the traffic appear as if it originates from the gateway itself.
@@ -294,6 +296,8 @@ GW-A private IP:  192.168.1.167
 This ensures that:
 - return traffic from LAN A is correctly routed back to GW‑A
 - GW‑A can then forward it through the IPsec tunnel to LAN B
+
+---
 
 <h3> Verification  </h3>
 
