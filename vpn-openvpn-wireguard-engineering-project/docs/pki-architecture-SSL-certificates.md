@@ -1,4 +1,4 @@
-<h1> Set Up OpenVPN Authentication using X.509 Certificates </h1>
+<h1> Set Up X.509 Certificates for OpenVPN </h1>
 
 <!--
 Pour configurer un tunnel VPN IP SSL, on peut utiliser comme méthode d’authentification les certificats X.509 (SSL/TLS + certificat pour l’authentification et l’échange des clés). Ainsi, dans ce projet, nous allons utiliser des certificats digitales pour l’authentification et l’échange des clés. Nous établirons une session SSH entre les clients et les serveurs chacun avec des certificat numériques.
