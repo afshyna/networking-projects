@@ -20,9 +20,9 @@ Every server and client holds:
 
 - CA Certificate (`cacert.pem`): The root of trust that validates the identity of the peer.
 - Local Certificate (`<entity>.crt`): The unique identity card of the gateway.
-- Private Key (`<entity>.key`): Used to sign authentication challenges.
+- Private Key (`<entity>.key`): Used to sign **authentication** challenges.
 
-Each server hold also the Diffie Hellman parameters (`dh2048.pem`) used for the encryption of the tunnel.  
+Each server hold also the Diffie Hellman parameters (`dh2048.pem`) used for the **encryption** of the tunnel.  
 
 <h2> Step 0.5 - Setting up the OpenSSL environment </h2>
 
