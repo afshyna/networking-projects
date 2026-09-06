@@ -4,11 +4,15 @@
 
 A VPN allows you to create a virtual connection between two different local networks. It creates a logical interconnection between local networks over a shared network (whether public, such as the Internet, or private, such as a corporate intranet or a carrier’s backbone) using a traffic segmentation mechanism or a tunnelling protocol. Encryption is possible but not always used.
 
+---
+
 <h1> Project Objectives </h1>
 
 The project consists of  designing and deploying a secure interconnection between two distinct private LANs (Home and Mobile network behind NAT) while ensuring encrypted LAN-to-LAN communications over the public Internet, through IPsec tunnels.
 
 The infrastructure was deployed in a real-world environment where both VPN gateways were located behind NAT devices and connected through public Internet access (Home LAN ↔ 4G Mobile Network).
+
+---
 
 <h1> Project Scenario & Network Architecture </h1>
 
@@ -48,7 +52,8 @@ This project demonstrates:
 -  strongSwan debugging & verification
 - Wireshark analysis (before/after IPsec)
 
-    
+---
+
 <h1> Solution </h1>
 The following technologies and mechanisms were implemented:
 
@@ -72,7 +77,7 @@ The following technologies and mechanisms were implemented:
     <li>PKI / X.509 certificate authentication</li>
 </ul>
 
-
+---
 <h1> ⚙️ Configuration Details (GW-A & GW-B) </h1>
 
 Each VPN gateway has been configured to establish the tunnel securely. Below are the IPsec configuration files associated with each VM Ubuntu (Linux) :
@@ -85,9 +90,14 @@ Each VPN gateway has been configured to establish the tunnel securely. Below are
 
 [Main Configuration (GW-B)](config/GW-B/ipsec.secrets)
 
+---
+
 <h1> 🔧 Implementation of the features  </h1>
 
+---
 <h2> 🔧 Authentification Setup  </h2>
+
+---
 
 <h3> 1. Authentication via PSK   </h3>
 First implementation of IPsec tunnel with pre-shared key (PSK)
@@ -95,6 +105,8 @@ First implementation of IPsec tunnel with pre-shared key (PSK)
 - definition the authentication method of strongswan with the option `authby=psk`
 - Definition of the PSK value in the `/etc/ipsec.secrets`
     Format : `@IP-local-leftid @IP-local-rightid : PSK "key-value"`
+
+---
 
 <h3> 2. Authentication based on certificates / via PKI </h3>
 
@@ -112,8 +124,11 @@ The path of the local RSA private key of each gateway GW-X (generated in the PKI
 
 `: RSA gwX-key.pem`
 
+---
+
 <h2> 🔧 StrongSwan Configuration - Main configuration file "ipsec.conf"  </h2>
 
+---
 <h3> General Configuration Overview   </h3>
 
 Both gateways (GW-A and GW-B) defines:
@@ -125,6 +140,8 @@ Both gateways (GW-A and GW-B) defines:
     - esp : `aes256gcm16-sha384!` →  ESP with  AES‑GCM + SHA‑384 
 - auto :  `start`  → start the IPsec connection and load the IPsec configuration
 - DPD: `restart` → restart the tunnel if the peer becomes unreachable
+
+---
 
 <h3> GW-A Configuration Overview   </h3>
 
@@ -144,11 +161,15 @@ Both gateways (GW-A and GW-B) defines:
 - Remote LAN: `rightsubnet=192.168.1.0/24`  → the GW-A's LAN network
 - Remote peer IP: `right=82.X.Y.Z`  → the GW-B peer's public IP
 
+---
+
 <h2> 🛡️ Firewall & NAT configuration </h2>
 To allow the IKEv2 tunnel to establish across public Internet connections (behind NAT), we must permit specific traffic through the local firewall and configure port forwarding on the internet routers (box).
 
 - IPsec uses IKEv2 protocol (UDP port 500) for ensuring the management & distributions of the keys during IPsec negociation phase. Consequently, ESP encapsulation in UDP/500 is required
 - The project include a real-world scenario where both gateways are behind NAT. IPsec deals with NAT by using NAT-T (UDP 4500 port). So ESP encapsulation in UDP/4500 is also required.
+
+ ---
  
 <h3> Firewall Rules (UFW) </h3>
 
@@ -158,6 +179,8 @@ ufw allow 500/udp
 ufw allow 4500/udp
 ```
 
+---
+
 <h3> Port Forwarding (NAT-Traversal) </h3>
 Because the gateways are behind a NAT device (Home router), incoming VPN packets ( IKE and NAT‑T packets) from the Internet must be forwarded to the internal IP of the gateway VM.
 Since GW‑A is behind a home NAT, the router must forward IPsec traffic to the Ubuntu gateway. 
@@ -166,6 +189,8 @@ On the router’s admin interface (`192.168.1.254`),  configure a port redirecti
 
 ![Port Forwarding Rule IKE on GW-A Box](config/port-redirection-configuration-home-router-IKE.png)
 ![Port Forwarding Rule NAT-T on GW-A Box](config/port-redirection-configuration-home-router-NAT-T.png)
+
+---
 
 
 <h2> 🔀 Inter-network Routing </h2>
@@ -185,7 +210,11 @@ net.ipv4.ip_forward=1
 # sysctl -p
 ```
 
+---
+
 <h1> ✅  Validation   </h1>
+
+---
 
 <h2> Connectivity of the IPsec tunnel  </h2>
 
@@ -204,6 +233,8 @@ Validate the tunnel using:
 
 ![IPSec tunnel - SA State](assets/verifs/ip_xfrm_policy_gwA.png)
 
+---
+
 <h2> Connectivity Verification by ping between LANs </h2>
 
 - Ping between gateways ✅ 
@@ -217,7 +248,10 @@ Validate the tunnel using:
 
 No connectivity...
 
-- **Routing:** Policy-based IPsec with automatic routing injection in table `220`.
+---
+
+<h2> Verification of the routing table  </h2>
+olicy-based IPsec with automatic routing injection in table `220`.
 
 To verify the routing and the tunnel, we analyze the XFRM policies:
 ```console
@@ -231,6 +265,7 @@ We can also view the routing table to the GW-B LAN directly with
 ```
 ![Routing table to the GW-B LAN (GW-A)](assets/verifs/ip_route+ip_route_get_172.20.10.8_gwA.png)
 
+---
 
 <h2> 🛠️ Troubleshooting </h2>
 
@@ -243,7 +278,6 @@ During testing, hosts from LAN B (`172.20.10.0/28`) like GW-B could not reach lo
 When traffic from the LAN-B reaches the local machine in LAN-A, the machine may not have a route back to the source network/to the original LAN B host.
 
 <h3> Solution </h3>
-
 Add a MASQUERADE Rule on GW‑A by using iptables to perform source NAT (Masquerading), making the traffic appear as if it originates from the gateway itself.
 
 ``` console
@@ -301,6 +335,8 @@ When the reply comes back: (`192.168.1.73` -> `192.168.1.167`), Linux consults i
 
 The tunnel behaves as a full site‑to‑site VPN
 
+---
+
 <h1> Traffic analysis via Wireshark </h1>
 
 Capturing traffic on WAN interface, in a ping from GW-A (`192.168.1.167`) to GW-B (`172.20.10.8`), we observe the encrypted ESP packets crossing the public Internet, with hidden ICMP and IP header. 
@@ -324,6 +360,9 @@ Capturing traffic on WAN interface, in a ping from GW-A (`192.168.1.167`) to GW-
     <li> Network analysis (Wireshark) </li>
 </ul>
 
+---
+
+
 <h1> Requirements </h1>
 To reproduce this project, you will require to have the following environments :
 
@@ -333,6 +372,8 @@ To reproduce this project, you will require to have the following environments :
 - Management access to (at least) one NAT-enabled router
 - Internet connectivity
 - Two distinct LAN networks
+
+---
 
 <h1> 📚 Resources & Useful Links </h1>
 
