@@ -36,7 +36,7 @@
 * **Protocol**: OpenVPN (VPN SSL/TLS) over UDP transport layer.
 * **Security**: Strong authentication via public key infrastructure (X.509 PKI) and asymmetric encryption for key exchange (2048-bit Diffie-Hellman).
 
-## 🔧 4. PKI Setup for authentication & encryption 
+## 🔧 4. PKI Setup for Security
 
 To handle secure key exchange, authentication, and encrypted data tunnels, OpenVPN will use SSL/TLS protocols.
 
