@@ -13,7 +13,7 @@ Pour configurer un tunnel VPN IP SSL, on peut utiliser comme méthode d’authen
 La clé privée d'une entité est gardée secrète et sa clé publique est diffusée publiquement par l'intermédiaire de certificats.  
 L'autorité de certification (CA) sera créer sur le srv-parismont. Les certificats et autres fichiers que nous allons générer par la suite devront être dans le répertoire /etc/ssl/openvpn. Sur ce serveur VPN nous allons générer les certificats et clefs nécessaires pour OpenVPN. 
 -->
-<h2> Review - TLS handshake </h3>
+<h2> Review - SSL/TLS Connection & TLS handshake </h3>
 A TLS handshake involves many parameters which take part in the negotiation between client and server in order to agree on the set of algorithms to use for a connection.
 
 During a TLS handshake between a client & a server, they exchange data to settle on a cipher suite, which is a combination of security parameters containing several individual cryptographic algorithms, to use for a connection: 
