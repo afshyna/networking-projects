@@ -240,9 +240,11 @@ During testing, hosts from LAN B (`172.20.10.0/28`), of which GW-B, could not re
 GW‑A was not performing NAT on traffic coming from LAN B and exiting through its WAN interface (enp0s3).
 Because of this, return traffic from LAN A had no route back to the original LAN B host.
 
-When traffic from the LAN-B reaches the local machine, the machine may not have a route back to the source network. We use iptables to perform source NAT (Masquerading), making the traffic appear as if it originates from the gateway itself.
+When traffic from the LAN-B reaches the local machine, the machine may not have a route back to the source network. 
 
 <h3> Fix: Add a MASQUERADE Rule on GW‑A </h3>
+
+We use iptables to perform source NAT (Masquerading), making the traffic appear as if it originates from the gateway itself.
 
 ``` console
 # iptables -t nat -A POSTROUTING -s 172.20.10.0/28 -o enp0s3 -j MASQUERADE
