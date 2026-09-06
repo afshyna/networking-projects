@@ -28,12 +28,13 @@ The IPsec tunnel will protect :
     - Serial 1/0 represent the “OUTSIDE” security zone (simulation of the public Internet connection with R3).
     - Fa0/0 is connected to the “INSIDE” zone, LAN 2
 - R3 : Router that simulate “Internet”  (zone OUTSIDE)
-- PC1 / PC2 : machines internes (zone INSIDE)
+- PC1 / PC2 : internal machines (zone INSIDE)
 
 <h2> Goal</h2>
+
 Enable PC1 (`10.0.0.0/8`) and PC2 (`30.0.0.0/8`) to communicate end-to-end in a transparent and highly secure manner by establishing a ipsec tunnel between the Cisco gateways R1 and R2.
 
-<h1> How IPsec VPN Works  (theorically) </h1>
+<h1> How IPsec VPN Works  (theoretically) </h1>
 
 When a connection is initiated (e.g., PC1 pings PC2, `10.0.0.1` → `30.0.0.1`), the IPsec process is activated on the Cisco gateway (e.g, R1):
 
@@ -123,7 +124,7 @@ When PC1 ping PC2, interesting traffic is sent to the IPsec tunnel.
 ![ISAKMP Policy](assets/verifs/show_crypto_isakmp_policy_R1.png)
 
 ---
-- `show crypto map` :View the connection between the ACL, the peer's address, and the physical interface where the crypto map is applicated
+- `show crypto map` :View the connection between the ACL, the peer's address, and the physical interface where the crypto map is applied.
 
 ![Crypto Map](assets/verifs/show_crypto_map_R1.png)
 
@@ -150,10 +151,10 @@ When PC1 ping PC2, interesting traffic is sent to the IPsec tunnel.
 
 <h3> Before the activation of IPsec  </h3>
 
-When capturing traffic on PC1-R1 (LAN network) interfaces, the analysis of the ping shows the packet traveling completely transparently. 
+When capturing traffic on PC1-R1 (LAN network) interfaces, the analysis of the ping shows the packet travelling completely transparently. 
 ![ICMP traffic en clair](assets/wireshark/before_ipsec_icmp_pc1-r1-ping_pc1_pc2.png)
 
-When capturing traffic on WAN interfaces (Internet transit network), the analysis of the ping shows the packet traveling completely transparently. 
+When capturing traffic on WAN interfaces (Internet transit network), the analysis of the ping shows the packet travelling completely transparently. 
 ![ICMP traffic en clair](assets/wireshark/before_ipsec_icmp_r1-r3-ping_pc1_pc2.png)
 
 <ins> Observation </ins> : The traffic is transmitted in clear text and the gateway (R1) has no encryption settings. Internal private addresses  (`10.0.0.1` / `30.0.0.1`) are exposed to everyone, and the application data (ICMP payload) is visible to any intermediate device located along the transit path (R3). 
@@ -168,7 +169,7 @@ The screenshots below show ESP encapsulation in action:
 
 ![ICMP traffic en clair](assets/wireshark/after_ipsec_icmp_pc1-r1-ping_pc1_pc2.png)
 
-- When capturing traffic on WAN interfaces (Internet transit network), the analysis of the ping shows an ESP packet traveling with no ICMP packet visible :  The ICMP packet is encapsulated & the original IP header is hidden.
+- When capturing traffic on WAN interfaces (Internet transit network), the analysis of the ping shows an ESP packet travelling with no ICMP packet visible :  The ICMP packet is encapsulated & the original IP header is hidden.
 
 ![ESP traffic encrypted : ICMP traffic hidden](assets/wireshark/after_ipsec_esp_r1-r3-ping_pc1_pc2.png) 
 
@@ -198,7 +199,7 @@ Each direction of communication has its own independent set of encryption keys
 - Visible ESP on R3 (WAN)
 - SAs established in both directions
     
-<h1> Achivements & Proven Skills  </h1>
+<h1> Achievements & Proven Skills  </h1>
 
 - Configuring IPsec on Cisco IOS
 - Understanding the IKE phases (Main Mode + Quick Mode) & ESP encryption
@@ -215,7 +216,7 @@ To reproduce this project, you will require to have the following environments :
     - Exact name of the IOS image used in this GNS3 project : `c7200-adventerprisek9-mz.124-24.T5.image`
 - A functional GNS3 topology including:
   - 3 Cisco routers (R1, R2, R3)
-  - 2 end-hosts (PC1, PC2) : Appliances "VPCS" (Virtual PC Simulator) integrated to *GNS3* for realizing the ping tests.
+  - 2 end-hosts (PC1, PC2) : Appliances "VPCS" (Virtual PC Simulator) integrated to *GNS3* for realising the ping tests.
 - **Networking Tools:** : Wireshark
 
 
