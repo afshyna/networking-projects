@@ -143,9 +143,13 @@ Summary of tests performed (ping, traceroute, HTTP via tunnel), location of trac
 
 ##  Troubleshooting 
 Detailed troubleshooting for each sprint is available:
+
 ➡️ [Troubleshooting Sprint 1](docs/01-sprint1-openvpn-site-to-site-paris.md#%EF%B8%8F-10troubleshooting--fixes)
+
 ➡️ [Troubleshooting Sprint 2](docs/02-sprint2-openvpn-backup-auber-failover-automation.md#%EF%B8%8F-10-troubleshooting)
+
 ➡️ [Troubleshooting Sprint 3](docs/03-sprint3-wireguard-nomade-site-to-site.md#%EF%B8%8F-9-troubleshooting)
+
 ➡️ [Troubleshooting Sprint 4](docs/04-script4-wireguar-backup-auber-failover-automation-paris.md#%EF%B8%8F--10-troubleshooting)
 
 ## Skills Demonstrated & Technologies used
