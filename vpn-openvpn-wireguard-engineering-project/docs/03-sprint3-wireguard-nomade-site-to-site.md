@@ -52,6 +52,8 @@ The mobile client can therefore access:
 - Tokyo/NY LAN: `172.20.10.0/28`
 - PC Nomade LAN: `A.B.C.0/24` (IP PC : `A.B.C.D`)
 
+---
+
 ### 3.2. Remote Access Concept
 A “nomad client” is an external device (4G/5G, Wi‑Fi public, home network) with no direct access to Paris.
 All access must go through WireGuard.
@@ -84,6 +86,8 @@ PublicKey = <CLIENT-PHONE_PUBLIC_KEY>
 AllowedIPs = 10.9.3.200/32
 ```
 
+---
+
 ### 4.2. Client Nomad PC Configuration
 - Generate private/public keys of the PC.
 - Set the wireguard configuration in `/etc/wireguard/wg0-pc-paris.conf`:
@@ -98,6 +102,10 @@ PublicKey = <PUBKEY_AUBER>
 Endpoint = 88.162.141.79:49151               # <PUBLIC_IP_PARIS>:<LISTENING_PORT>
 AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 ```
+
+---
+
+
 ### 4.3. Smartphone Configuration
 
 - Generate private/public keys of the smartphone
@@ -116,11 +124,15 @@ AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28
 
 ## 🔀 5. Routing Configuration
 
+---
+
 ### 5.1. OpenVPN routes to clients
 To join to the `192.168.1.0/24`, `192.168.100.0/24`, `172.20.10.0/28` and `10.9.2.0/24` subnets, PC-nomad must route traffic through its WireGuard VPN tunnel. For doing this, these subnets must be announced to wireguard client via the directive `AllowedIPs=`. It specifies the subnets/host  whose traffic  that you want to route through your VPN tunnel. The rest of the traffic (not specified) will go via your local internet connection.
 
 Add internal networks to AllowedIPs:
 `AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28`
+
+---
 
 ### 5.2. Add routes for Tokyo/NY on Auber
 Static routes have been added on Tokyo/NY to enable the Nomad client to reach:
@@ -136,6 +148,8 @@ On Auber, add route for OpenVPN clients to WireGuard network via the directive p
 push "route 10.9.3.0 255.255.255.0"`
 ```
 
+---
+
 ### 5.3. Local route on Auber
 - Add route to WireGuard network via OpenVPN route : 
 ```text
@@ -149,13 +163,18 @@ route 10.9.3.0 255.255.255.0
 Allow incoming WireGuard traffic on Paris :
 `ufw allow 49151/udp`
 
+---
 
 ### 6.2. Port Forwarding (Paris router)**
 
 Rule applied: `From everywhere on Internet connecting to external port UDP/49151 ➔ to 192.168.1.197 on internal port 49151`
 
+---
+
 ### 6.3. IP forwarding
 Kernel : Activation of `net.ipv4.ip_forward`.
+
+---
 
 ### 6.4. Iptables Rules (NAT)
 Automatisation PostUp/PostDow by adding NAT MASQUERADE rules
@@ -177,6 +196,9 @@ PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 wg-quick up <name_wg_file>
 ```
 
+
+---
+
 ### 7.2. Client nomad-PC
 ```console
 wg-quick up <name_wg_file>      
@@ -189,6 +211,8 @@ wg show
 [Server - Wireguard Interface state](../assets/verifs/sprint3/wg-show-paris-vpn.png)
 
 [PC - Wireguard Interface state](../assets/verifs/sprint3/wg-show-nomad-pc.png)
+
+---
 
 ### 7.3. Smartphone Client - launch via QR Code Import
 - Generate QR code using `qrencode` command
@@ -209,6 +233,7 @@ wg show
 - Auber →  Nomade wireguard client (`10.9.3.100`) = [Ping OK](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
 - Paris →  Nomade wireguard client (`10.9.3.100`) = [Ping OK](../assets/verifs/sprint3/)  <!-- SCREEN FAIT--> 
 
+---
 
 ### 8.2. Ping Tests - LAN Access (Paris/Auber) ✅
 
@@ -234,6 +259,8 @@ wg show
 ## 🛠️ 9. Troubleshooting 
 
 By trying to interconnect every LAN, we have deployed a VPN Wireguard site-to-site between LAN's Wireguard client and the LAN Paris.
+
+---
 
 ### 9.1. Routing issue : 
 - **Symptom**: The tunnel is established, but no pings from wireguard client get through to the Paris  (e.g. `192.168.1.197/24` or `192.168.100.200/24`).
@@ -313,6 +340,7 @@ PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 [NAT table Paris](../assets/verifs/sprint3/nat-table-paris.png)
 
 
+---
 
 ### 9.5. Routing issue:
 
@@ -333,6 +361,8 @@ PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
 # NAT rule removed when client VPN stops
 PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
 ```
+
+---
 
 ### 9.6. Routing issue :
 
