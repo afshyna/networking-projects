@@ -85,9 +85,9 @@ Each VPN gateway has been configured to establish the tunnel securely. Below are
 
 [Main Configuration (GW-B)](config/GW-B/ipsec.secrets)
 
-<h1> Implementation of the features  </h1>
+<h1> 🔧 Implementation of the features  </h1>
 
-<h2> Authentification Method  </h2>
+<h2> 🔧 Authentification Setup  </h2>
 
 <h3> 1. Authentication via PSK   </h3>
 First implementation of IPsec tunnel with pre-shared key (PSK)
@@ -96,7 +96,7 @@ First implementation of IPsec tunnel with pre-shared key (PSK)
 - Definition of the PSK value in the `/etc/ipsec.secrets`
     Format : `@IP-local-leftid @IP-local-rightid : PSK "key-value"`
 
-<h3> 2. PKI / Certificate‑Based Authentication (recommanded & used here) </h3>
+<h3> 2. Authentication based on certificates / via PKI </h3>
 
 The ideal authentication solution to use for implementing IPsec tunnel is using X.509 certificates instead of pSK. This significantly improves security by ensuring that each gateway proves its identity using a chain of trust.
 
@@ -112,7 +112,7 @@ The path of the local RSA private key of each gateway GW-X (generated in the PKI
 
 `: RSA gwX-key.pem`
 
-<h2> StrongSwan Configuration - Main configuration file "ipsec.conf"  </h2>
+<h2> 🔧 StrongSwan Configuration - Main configuration file "ipsec.conf"  </h2>
 
 <h3> General Configuration Overview   </h3>
 
@@ -144,7 +144,7 @@ Both gateways (GW-A and GW-B) defines:
 - Remote LAN: `rightsubnet=192.168.1.0/24`  → the GW-A's LAN network
 - Remote peer IP: `right=82.X.Y.Z`  → the GW-B peer's public IP
 
-<h2> Firewall & NAT configuration </h2>
+<h2> 🛡️ Firewall & NAT configuration </h2>
 To allow the IKEv2 tunnel to establish across public Internet connections (behind NAT), we must permit specific traffic through the local firewall and configure port forwarding on the internet routers (box).
 
 - IPsec uses IKEv2 protocol (UDP port 500) for ensuring the management & distributions of the keys during IPsec negociation phase. Consequently, ESP encapsulation in UDP/500 is required
@@ -168,7 +168,7 @@ On the router’s admin interface (`192.168.1.254`),  configure a port redirecti
 ![Port Forwarding Rule NAT-T on GW-A Box](config/port-redirection-configuration-home-router-NAT-T.png)
 
 
-<h2> Inter-network Routing </h2>
+<h2> 🔀 Inter-network Routing </h2>
 By default, Linux kernels are configured as end-hosts and do not forward packets between interfaces. To function as a VPN Gateway, we must enable IP forwarding and disable ICMP redirects to enhance security and stability. 
 
 This will allow the gateway to route traffic between the local LAN and the IPsec tunnel (`192.168.1.0 /24` and `172.20.10.0 /28`).
@@ -185,7 +185,7 @@ net.ipv4.ip_forward=1
 # sysctl -p
 ```
 
-<h1>  Validation   </h1>
+<h1> ✅  Validation   </h1>
 
 <h2> Connectivity of the IPsec tunnel  </h2>
 
@@ -206,14 +206,14 @@ Validate the tunnel using:
 
 <h2> Connectivity Verification by ping between LANs </h2>
 
-- Ping between gateways
+- Ping between gateways ✅ 
 
 ![Ping OK GW-A vers GW-B](assets/verifs/ping_OK_gwA-gwB.png)
 
 ![Ping OK GW-B vers GW-A](assets/verifs/ping_OK_gwB-gwA.png)
 
 
-- Ping between LAN hosts
+- Ping between LAN hosts ❌ 
 
 No connectivity...
 
@@ -232,31 +232,61 @@ We can also view the routing table to the GW-B LAN directly with
 ![Routing table to the GW-B LAN (GW-A)](assets/verifs/ip_route+ip_route_get_172.20.10.8_gwA.png)
 
 
-<h2>  Troubleshooting </h2>
+<h2> 🛠️ Troubleshooting </h2>
 
-During testing, hosts from LAN B (`172.20.10.0/28`), of which GW-B, could not reach hosts in LAN A (`192.168.1.0/24`), even though the IPsec tunnel was fully established and GW-B ping GW-A.
 
-<h3>  Root Cause </h3>
-GW‑A was not performing NAT on traffic coming from LAN B and exiting through its WAN interface (enp0s3).
-Because of this, return traffic from LAN A had no route back to the original LAN B host.
+<h3> Symptom </h3> 
+During testing, hosts from LAN B (`172.20.10.0/28`) like GW-B could not reach local machine in LAN A like `192.168.1.73` or `192.168.1.254` (except  GW-A), even though the IPsec tunnel was fully established and GW-B ping GW-A.
 
-When traffic from the LAN-B reaches the local machine, the machine may not have a route back to the source network. 
 
-<h3> Fix: Add a MASQUERADE Rule on GW‑A </h3>
+<h3> Cause </h3>
+When traffic from the LAN-B reaches the local machine in LAN-A, the machine may not have a route back to the source network/to the original LAN B host.
 
-We use iptables to perform source NAT (Masquerading), making the traffic appear as if it originates from the gateway itself.
+<h3> Solution </h3>
+
+Add a MASQUERADE Rule on GW‑A by using iptables to perform source NAT (Masquerading), making the traffic appear as if it originates from the gateway itself.
 
 ``` console
 # iptables -t nat -A POSTROUTING -s 172.20.10.0/28 -o enp0s3 -j MASQUERADE
 ```
+
 Meaning : “Any packet coming from LAN B (`172.20.10.0/28`) and leaving GW‑A through enp0s3 will have its source IP replaced by GW‑A’s own IP. (`192.168.1.167`)
+
+```text
+Source: 172.20.10.8
+Destination: 192.168.1.73
+GW-A private IP:  192.168.1.167
+```
 
 This ensures that:
 - return traffic from LAN A is correctly routed back to GW‑A
 - GW‑A can then forward it through the IPsec tunnel to LAN B
 
-<h3> Verification </h3>
-After applying this rule:
+<h3> Verification  </h3>
+
+Before NAT, on GW-A:
+```text
+SRC = 172.20.10.8
+DST = 192.168.1.73
+```
+
+After MASQUERADE:
+```text
+SRC = 192.168.1.167
+DST = 192.168.1.73
+```
+
+To window host on GW-A network (`192.168.1.73`), the packet appears to come from the GW-A.
+
+The router keeps a NAT translation entry:
+```text
+172.20.10.8:<Port>
+↓
+192.168.1.167:<Port>
+```
+
+When the reply comes back: (`192.168.1.73` -> `192.168.1.167`), Linux consults its NAT table and sends it back to `172.20.10.8`.
+
 
 - LAN A → LAN B communication works
 
