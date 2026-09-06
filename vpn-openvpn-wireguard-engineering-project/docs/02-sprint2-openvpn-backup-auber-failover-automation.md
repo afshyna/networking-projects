@@ -25,10 +25,10 @@
 - Backup tunnel: `10.9.2.0/24` (Auber)
 
 ## 🔧 3. PKI Setup 
-In the same way that with the primary server, the authentication solution to use for implementing an OpenVPN tunnel is using X.509 certificates.
+In the same way that with the primary server, to ensure encryption of data in transit in the tunnel VPN between backup server/clients & authentication of Auber server/clients, OpenVPN use SSL/TLS certificates.
 
-The full PKI setup (CA creation, key generation, certificate signing, installation steps) is documented here:
-*[Authentication via SSL/TLS certificates](pki-certificate-authentication.md)*
+The full PKI setup for generating the certificates (CA creation, key generation, certificate signing, installation steps) is documented here:
+*[Authentication via SSL/TLS certificates](pki-architecture-SSL-certificates.md)*
 
 
 ## 🔧 4. OpenVPN Configuration
