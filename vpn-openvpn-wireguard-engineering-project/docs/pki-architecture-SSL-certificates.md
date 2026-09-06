@@ -13,6 +13,15 @@ Pour configurer un tunnel VPN IP SSL, on peut utiliser comme méthode d’authen
 La clé privée d'une entité est gardée secrète et sa clé publique est diffusée publiquement par l'intermédiaire de certificats.  
 L'autorité de certification (CA) sera créer sur le srv-parismont. Les certificats et autres fichiers que nous allons générer par la suite devront être dans le répertoire /etc/ssl/openvpn. Sur ce serveur VPN nous allons générer les certificats et clefs nécessaires pour OpenVPN. 
 -->
+<h2> Review - TLS handshake </h3>
+A TLS handshake involves many parameters which take part in the negotiation between client and server in order to agree on the set of algorithms to use for a connection.
+
+During a TLS handshake between a client & a server, they exchange data to settle on a cipher suite, which is a combination of security parameters containing several individual cryptographic algorithms, to use for a connection: 
+- **Key Exchange** Algorithm: Establishes the shared secret key used to encrypt the session data without exposing it to eavesdroppers
+- **Authentication** Algorithm: Verifies the identity of the server (and optionally the client) using digital signatures
+- **Bulk Encryption** Cipher: The symmetric algorithm used to encrypt the actual data being sent (e.g., AES-GCM, ChaCha20-Poly1305)
+- **Hashing/MAC** Algorithm: Ensures data integrity by verifying that messages have not been altered in transit (e.g., SHA-256, SHA-384)
+- Diffie-Hellman (DH) Group Parameters: The specific mathematical curves or prime sizes used during key generation (a minimum of 2048-bit primes for classical DH)
 
 <h2> PKI Concept : Trust Hierarchy </h2>
 
@@ -23,6 +32,7 @@ Every server and client holds:
 - Private Key (`<entity>.key`): Used to sign **authentication** challenges.
 
 Each server hold also the Diffie Hellman parameters (`dh2048.pem`) used for the **encryption** of the tunnel.  
+
 
 <h2> Step 0.5 - Setting up the OpenSSL environment </h2>
 
