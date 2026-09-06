@@ -75,8 +75,8 @@ openssl ca -out client-NY.crt -in client-NY.csr -config openssl-vpn.cnf</code></
 
 <pre><code>openssl dhparam -out dh2048.pem 2048</code></pre>
 
-The minimum bit must be 2048  sinon openvpn can't be up.
-[Voir troubleshooting à faire dans le projet dans github]
+The minimum bit must be 2048, otherwise if the key size is <2048, the OpenVPN service  won't start. Indeed, modern OpenVPN versions (& many security standards) deprecate and block DH parameter lengths under 2048 bits for security reasons
+<!-- [Voir troubleshooting à faire dans le projet dans github] -->
 
 This DH parameter will be used by servers for establishing a secure key exchange with clients during the SSL/TLS connection.
 
