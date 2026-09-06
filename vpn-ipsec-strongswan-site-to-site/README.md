@@ -4,7 +4,6 @@
 
 A VPN allows you to create a virtual connection between two different local networks. It creates a logical interconnection between local networks over a shared network (whether public, such as the Internet, or private, such as a corporate intranet or a carrier’s backbone) using a traffic segmentation mechanism or a tunnelling protocol. Encryption is possible but not always used.
 
----
 
 <h1> Project Objectives </h1>
 
@@ -12,7 +11,6 @@ The project consists of  designing and deploying a secure interconnection betwee
 
 The infrastructure was deployed in a real-world environment where both VPN gateways were located behind NAT devices and connected through public Internet access (Home LAN ↔ 4G Mobile Network).
 
----
 
 <h1> Project Scenario & Network Architecture </h1>
 
@@ -90,7 +88,7 @@ Each VPN gateway has been configured to establish the tunnel securely. Below are
 
 [Main Configuration (GW-B)](config/GW-B/ipsec.secrets)
 
----
+
 
 <h1> 🔧 Implementation of the features  </h1>
 
@@ -124,11 +122,11 @@ The path of the local RSA private key of each gateway GW-X (generated in the PKI
 
 `: RSA gwX-key.pem`
 
----
 
 <h2> 🔧 StrongSwan Configuration - Main configuration file "ipsec.conf"  </h2>
 
 ---
+
 <h3> General Configuration Overview   </h3>
 
 Both gateways (GW-A and GW-B) defines:
@@ -152,6 +150,8 @@ Both gateways (GW-A and GW-B) defines:
 - Remote LAN: `rightsubnet=172.20.10.0/28` → the GW-B's LAN network
 - Remote peer IP: `right=37.A.B.C`   → the GW-A peer's public IP
 
+---
+
 <h3> GW-B Configuration Overview   </h3>
 
 - Local identity: `leftid=gwB.vpn.local` → must match GW‑B’s certificate CN/SAN.
@@ -161,7 +161,6 @@ Both gateways (GW-A and GW-B) defines:
 - Remote LAN: `rightsubnet=192.168.1.0/24`  → the GW-A's LAN network
 - Remote peer IP: `right=82.X.Y.Z`  → the GW-B peer's public IP
 
----
 
 <h2> 🛡️ Firewall & NAT configuration </h2>
 To allow the IKEv2 tunnel to establish across public Internet connections (behind NAT), we must permit specific traffic through the local firewall and configure port forwarding on the internet routers (box).
@@ -190,8 +189,6 @@ On the router’s admin interface (`192.168.1.254`),  configure a port redirecti
 ![Port Forwarding Rule IKE on GW-A Box](config/port-redirection-configuration-home-router-IKE.png)
 ![Port Forwarding Rule NAT-T on GW-A Box](config/port-redirection-configuration-home-router-NAT-T.png)
 
----
-
 
 <h2> 🔀 Inter-network Routing </h2>
 By default, Linux kernels are configured as end-hosts and do not forward packets between interfaces. To function as a VPN Gateway, we must enable IP forwarding and disable ICMP redirects to enhance security and stability. 
@@ -210,11 +207,9 @@ net.ipv4.ip_forward=1
 # sysctl -p
 ```
 
----
 
 <h1> ✅  Validation   </h1>
 
----
 
 <h2> Connectivity of the IPsec tunnel  </h2>
 
@@ -225,9 +220,13 @@ Validate the tunnel using:
 
 ![IPSec tunnel status (GW-B) ](assets/verifs/ipsec_statusall_gwB.png)
 
+---
+
 - `ip xfrm state`
 
 ![IPSec tunnel - XFRM_framework_](assets/verifs/ip_xfrm_state_gwA.png)
+
+---
 
 - `ip xfrm policy`
 
@@ -243,12 +242,12 @@ Validate the tunnel using:
 
 ![Ping OK GW-B vers GW-A](assets/verifs/ping_OK_gwB-gwA.png)
 
+---
 
 - Ping between LAN hosts ❌ 
 
 No connectivity...
 
----
 
 <h2> Verification of the routing table  </h2>
 olicy-based IPsec with automatic routing injection in table `220`.
@@ -265,7 +264,7 @@ We can also view the routing table to the GW-B LAN directly with
 ```
 ![Routing table to the GW-B LAN (GW-A)](assets/verifs/ip_route+ip_route_get_172.20.10.8_gwA.png)
 
----
+
 
 <h2> 🛠️ Troubleshooting </h2>
 
@@ -335,7 +334,6 @@ When the reply comes back: (`192.168.1.73` -> `192.168.1.167`), Linux consults i
 
 The tunnel behaves as a full site‑to‑site VPN
 
----
 
 <h1> Traffic analysis via Wireshark </h1>
 
@@ -360,9 +358,6 @@ Capturing traffic on WAN interface, in a ping from GW-A (`192.168.1.167`) to GW-
     <li> Network analysis (Wireshark) </li>
 </ul>
 
----
-
-
 <h1> Requirements </h1>
 To reproduce this project, you will require to have the following environments :
 
@@ -373,7 +368,6 @@ To reproduce this project, you will require to have the following environments :
 - Internet connectivity
 - Two distinct LAN networks
 
----
 
 <h1> 📚 Resources & Useful Links </h1>
 
