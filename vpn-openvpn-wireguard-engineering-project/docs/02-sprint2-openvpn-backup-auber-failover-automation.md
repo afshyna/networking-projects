@@ -242,7 +242,7 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
 
   Analysis: LAN Tokyo/NY remains accessible  via the local link between the two servers. 
   [Traceroute Paris → Tokyo ](../assets/verifs/sprint2/traceroute-paris-tokyo.png)
-
+ 
 
 ## 9. When Paris Comes Back
 The server Paris re-launch its openvpn service. 
@@ -253,24 +253,23 @@ In conclusion, the openvpn and routing table state became similar to the one sta
 
 ## 🛠️ 10. Troubleshooting
 
-###❌ Issue A -  Client does not reconnect to Backup VPN when Paris goes down (KeepAlive missing)
+### ❌ Issue A -  Client does not reconnect to Backup VPN when Paris goes down (KeepAlive missing)
 
-**Symptom** : When the Paris VPN server is shut down, the OpenVPN client does not automatically reconnect to the second remote server defined in its configuration.
+- **Symptom** :
+When the Paris VPN server is shut down, the OpenVPN client does not automatically reconnect to the second remote server defined in its configuration.
 
 Even though the client has:
 remote paris.example.com 1194
 remote auber.example.com 1195
 …it stays stuck, waiting indefinitely, and never switches to the backup server.
 
-- **Cause** : The OpenVPN client had no keepalive mechanism configured. Without keepalive (or explicit ping / ping-restart directives), the client does not detect that the server is dead. It simply waits forever for packets that will never arrive.
+- **Cause**
+The OpenVPN client had no keepalive mechanism configured. Without keepalive (or explicit ping / ping-restart directives), the client does not detect that the server is dead. It simply waits forever for packets that will never arrive.
 
-OpenVPN does not assume a connection is down unless:
-- it receives no ping replies for a defined timeout
-- or the TCP/UDP socket explicitly closes
-- or a restart timer triggers
-Since none of these conditions occurred, the client believed the Paris server was still alive. So the client never moves to Auber, even though Paris is down.
+OpenVPN does not assume a connection is down unless it receives no ping replies for a defined timeout or the TCP/UDP socket explicitly closes or a restart timer triggers. Since none of these conditions occurred, the client believed the Paris server was still alive. So the client never moves to Auber, even though Paris is down.
 
-- **Solution**: Add keepalive to the client & server configuration (for maintening the connection & prevent to restart uselessly).
+- **Solution**
+Add keepalive to the client & server configuration (for maintening the connection & prevent to restart uselessly).
 ```text
 keepalive 5 15
 <=> 
@@ -281,7 +280,7 @@ Meaning: it send a ping every 5 seconds and if no reply is received for 30 secon
 This is exactly what enables automatic failover.
 
 - **Result** : 
-- The client reconnects successfully to the backup server. Failover now works as expected.
+The client reconnects successfully to the backup server. Failover now works as expected.
 
 --- 
 
@@ -289,13 +288,16 @@ This is exactly what enables automatic failover.
 
 - **Symptom** :  OpenVPN tries the same Paris server a second time once the 1st connexion attempt has been timeout
 
-**Causes**: 
-- `ping 5` | `ping-restart 30` : it send a ping every 5 seconds and if no reply is received for 30 seconds, it assume the server is down so it restart the connection.
-- Upon restart, OpenVPN starts the remote server list from the beginning (not the next remote).
-- It only moves on to the next server after several consecutive failures
+- **Causes**: 
+
+1) `ping 5` | `ping-restart 30` : it send a ping every 5 seconds and if no reply is received for 30 seconds, it assume the server is down so it restart the connection.
+
+2) Upon restart, OpenVPN starts the remote server list from the beginning (not the next remote).
+
+3) It only moves on to the next server after several consecutive failures
 This is a resilience mechanism: By default, OpenVPN assumes that a server may be temporarily unavailable, so it tries again.
 
-- **Solutions** : To ensure the client switches to Auber as soon as the first timeout occurs, use the directive `connect-retry` et `connect-timeout` in the client openvpn configuration.
+- **Solutions**: To ensure the client switches to Auber as soon as the first timeout occurs, use the directive `connect-retry` et `connect-timeout` in the client openvpn configuration.
 ```text
 connect-timeout 5
 connect-retry 1
@@ -311,9 +313,9 @@ This forces OpenVPN to:
 
 ### ❌ Issue C - HTTP Request fails Tokyo → Paris (`192.168.100.200`, `192.168.1.197`)
 
-- **Symptom**:: Ping to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests not.
+- **Symptom**: Ping to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests not.
 
-- **Cause**:: The default policy FORWARD for the Linux firewall in Paris is set to DROP. TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris. FORWARD chain policy dropl
+- **Cause**:: The default policy FORWARD for the Linux firewall in Paris is set to DROP. TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris. FORWARD chain policy drop
 
 - **Solution**:
 
