@@ -140,6 +140,7 @@ To ensure that the OpenVPN server correctly forwards traffic to the right client
 Contains the return route 10.9.1.0/24 via 192.168.100.200 on interface enp0s8.
     
 ## 🛡️ 7. Firewall & Port/IP Forwarding
+To enable remote offices (Client Tokyo and NY) to initiate a connection to the central server located behind the local router at Auber/Paris, a port forwarding rule and local firewall settings have been configured on Paris site. 
 
 **Firewall ufw**
 - By default, when ufw is activated, all incoming traffic is blocked. So the standard UDP OpenVPN port 1194 was blocked.
@@ -150,17 +151,13 @@ ufw allow 1194/udp
 ```
 
 **Port Forwarding (home router)**
-To enable remote offices (Client Tokyo and NY) to initiate a connection to the central server located behind a home router, a port forwarding rule and local firewall settings have been configured on Paris site. 
-
 - Rule applied: `From everywhere on Internet connecting to external port UDP/1194 ➔ to 192.168.1.197 on internal port 1194`
 
 
 **IP forwarding (Linux)**
-The Linux server is acting as a firewall, router, or NAT device, it will need to be capable of forwarding packets that are meant for other destinations (other than itself). The VPN server needs to route traffic between the VPN clients and your local network or the internet. Without IP forwarding, VPN clients won’t be able to access resources beyond the VPN server itself.
+The Linux server is acting as a router/NAT device, so it will need to be capable of forwarding packets that are meant for other destinations (other than itself). The VPN server needs to route traffic between the VPN clients and your local network or the internet. Without IP forwarding, VPN clients won’t be able to access resources beyond the VPN server itself.
 
 Linux uses the net.ipv4.ip_forward kernel variable to toggle this setting on or off.
-
-
 
 ## 7. Starting OpenVPN services 
 The configuration files are stored in the root folder `configs/openvpn/`. 
@@ -228,14 +225,21 @@ During the acceptance testing phase, several issues of ping were identified and 
 ---
 
 ### ❌ Issue A - Ping fails Tokyo → LAN Paris (192.168.1.197)
-- **Symptom**: The tunnel is working (ping `10.9.1.1` OK), but the server’s physical interface cannot be reached.
+- **Symptom**:
 
-- **Cause**: The routing table on the Tokyo OS is not aware of the subnet behind Paris (`192.168.1.0/24`) and is sending packets to its default internet gateway.
+The tunnel is working (ping `10.9.1.1` OK), but the server’s physical interface cannot be reached.
+
+- **Cause**:
+
+The routing table on the Tokyo OS is not aware of the subnet behind Paris (`192.168.1.0/24`) and is sending packets to its default internet gateway.
  
-- **Solution** : Addition of the route injection directive to the OpenVPN Paris server configuration:
+- **Solution** :
+
+Addition of the route injection directive to the OpenVPN Paris server configuration:
 `push "route 192.168.1.0 255.255.255.0"`
 
-- **Proof & Result** : 
+- **Proof & Result** :
+
 On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
 [Routing Table Tokyo](../assets/verifs/routing-table-NY-before-failover.png) 
 [Routing Table NY](../assets/verifs/routing-table-NY-before-failover.png) 
@@ -246,9 +250,12 @@ On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
 
 ### ❌Issue B - Ping fails Tokyo → Auber (192.168.100.210 / 192.168.1.160)
 
-- **Symptom**: Ping requests from Tokyo to the Aubervilliers inter-site interface fail.
+- **Symptom**:
+
+Ping requests from Tokyo to the Aubervilliers inter-site interface fail.
 
 - **Causes**:
+
 1) Linux kernel IP forwarding was not enabled in Paris.
 2) The OS routing table on the Tokyo is not aware of the subnet behind Paris (`192.168.100.0/24`,  `192.168.1.0/24` ) and is sending packets to its default internet gateway.
 3) Aubervilliers does not know where to route ping responses to the `10.9.1.0/24` VPN network. Its routing table is not aware of this VPN network and is sending packets to its default internet gateway.
@@ -269,7 +276,8 @@ On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
       ip route add 10.9.1.0/24 via 192.168.100.200 dev enp0s8
    ```
 
-- **Proofs & Results** : 
+- **Proofs & Results** :
+
 On Tokyo, a route has been added to the these 2 distant LANs via the tunnel.
 [Routing Table Tokyo](../assets/verifs/routing-table-tokyo-before-failover.png)
 
@@ -285,9 +293,12 @@ On Auber, a route has been added to the VPN network via the internal interface A
 
 ### ❌ Issue C - Ping fails Paris → Tokyo (172.20.10.3)  
 
-- **Symptom**: The Linux kernel in Paris does indeed have the system route (`route 172.20.10.0...`), and wireshark shows the packet entering the tun0 interface, but the packet never reaches the Tokyo VM.
+- **Symptom**:
+
+The Linux kernel in Paris does indeed have the system route (`route 172.20.10.0...`), and wireshark shows the packet entering the tun0 interface, but the packet never reaches the Tokyo VM.
 
 - **Causes** :
+
 1) *Analysis & Key Concept of OpenVPN*: OpenVPN in multi-client mode manages its own software switching architecture. The Linux kernel forwards the packet to OpenVPN via tun0, but the OpenVPN application does not know which encrypted tunnel (which client certificate) the `172.20.10.0/28` subnet is attached to. The lack of software mapping results that OpenVPN silently drop the paquet.
 2) Paris does not know where to route responses to the `172.20.10.0/24` LAN network (not route to this network in its table routing) so it is sending packets to its default internet gateway.
 
@@ -301,6 +312,7 @@ On Auber, a route has been added to the VPN network via the internal interface A
    ```route 172.20.10.0 255.255.255.240```
 
 **Proof & Result** : 
+
 On Paris, a route has been added to the Tokyo LAN via the tunnel.
 [Routing Table Paris](../assets/verifs/sprint1/routing-table-paris-sprint0.png)
 
@@ -309,17 +321,22 @@ On Paris, a route has been added to the Tokyo LAN via the tunnel.
 ---
 
 ### ❌ Issue D - Ping fails Auber → Tokyo  (172.20.10.3) 
-- **Symptom** : From the auber, a ping to a LAN network behind the paris server (e.g. `172.20.10.3/24`) fails.
+- **Symptom** :
+
+From the auber, a ping to a LAN network behind the paris server (e.g. `172.20.10.3/24`) fails.
 
 - **Causes**:
+
 1) Auber doesn't known where to send the ping ; no route to the Tokyo LAN network on Auber.
 2) When paris server receives the ping from auber and see that the destination is not itself, it drops the icmp packet. This is due to the forwarding settings that is disabled by default on Linux kernel. (`net.ipv4.ip_forward=0`). The Paris server is not routing VPN → LAN traffic
 
 - **Solution** :
+
 1) Add a static route to the Tokyo LAN network on Auber, that goes via the interface link Auber-Paris
 2) Activate Linux IP forwarding on the Paris server.
 
 - **Proof**:
+
 On Auber, a route has been added to the Tokyo LAN network via the internal interface Auber-Paris. 
 [Routing Table Auber](../assets/verifs/sprint1/routing-table-auber-sprint0.png)
 
@@ -329,9 +346,12 @@ On Auber, a route has been added to the Tokyo LAN network via the internal inter
 
 ### ❌ Issue E - Communication from LAN-to-LAN fails 
 
-- **Symptoms** :  client can't ping server's LAN machines, such as the router Paris LAN `192.168.1.254` or physical PC (hypervisor) that hosts the Paris's server  `192.168.1.73`. And Paris server can't ping client's LAN machines, such as the gw server LAN `172.20.10.1` or physical PC (hypervisor) that hosts the client's server  `172.20.10.2`.
+- **Symptoms** :
+
+client can't ping server's LAN machines, such as the router Paris LAN `192.168.1.254` or physical PC (hypervisor) that hosts the Paris's server  `192.168.1.73`. And Paris server can't ping client's LAN machines, such as the gw server LAN `172.20.10.1` or physical PC (hypervisor) that hosts the client's server  `172.20.10.2`.
 
 - **Causes** : 
+
 1) The LAN hosts (e.g., `172.20.10.0/28` or `192.168.1.0/24`) do not know how to reach the remote LAN behind the VPN tunnel. Without NAT, each LAN host would need a static route: `route add <remote LAN> via <VPN gateway>`. Since these routes are not configured on every LAN machine (just Auber & Paris), replies never return to the tunnel → communication fails.
 
 2) The Windows firewall blocks incoming ICMP requests from anywhere. Indeed, Inbound ICMP (ping) is blocked by default so other machines on the LAN cannot ping the windows machine. (As a contrary, Outbound ICMP (ping) is allowed by default, this is why Windows PC can ping other machines on the LAN.)
@@ -348,6 +368,7 @@ iptables -t nat -A POSTROUTING -s 10.9.1.0/24 -o enp0s3 -j MASQUERADE
  [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-firewall.png)
 
 - **Proof** :
+
 Tokyo → Windows PC server = [Ping OK](../assets/verifs/sprint1/ping-tokyo-windows-pc-paris.png)
 [Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-tokyo-windows-pc-paris.png)
 
@@ -358,11 +379,17 @@ Paris → Windows PC client = [Ping OK](../assets/verifs/sprint1/ping-paris-wind
 
 ### ❌ Issue F -  Windows PC ↔ Client/Server  Communication Through the VPN Tunnel
 
-- **Symptoms**: Even though the OpenVPN tunnel between Paris and Tokyo is operational and LAN‑to‑LAN communication works at the Linux router level, Windows PCs hosting the OpenVPN client and server cannot ping each other’s LANs. Paris's Windows PC cannot ping `172.20.10.x` (Tokyo LAN) & Tokyo's Windows PC cannot ping `192.168.1.x` (Paris LAN).
+- **Symptoms**:
 
-- **Cause**: Windows hosts do not know how to reach the remote LANs. They don't automatically learn routes to the remote LANs behind the VPN tunnel. Windows does not use the VM as a router unless explicitly configured. When the Windows PC tries to reach the remote LAN, Windows PC → sends packet to default gateway → packet goes to the Internet → never reaches the VM → never enters the VPN tunnelTherefore, the Windows PC must be explicitly told: “To reach the remote LAN, send traffic to the VM’s LAN IP.”
+Even though the OpenVPN tunnel between Paris and Tokyo is operational and LAN‑to‑LAN communication works at the Linux router level, Windows PCs hosting the OpenVPN client and server cannot ping each other’s LANs. Paris's Windows PC cannot ping `172.20.10.x` (Tokyo LAN) & Tokyo's Windows PC cannot ping `192.168.1.x` (Paris LAN).
 
-- **Solution**:  Add Static Routes on Each Windows PC hosting the Tokyo client VM.
+- **Cause**:
+
+Windows hosts do not know how to reach the remote LANs. They don't automatically learn routes to the remote LANs behind the VPN tunnel. Windows does not use the VM as a router unless explicitly configured. When the Windows PC tries to reach the remote LAN, Windows PC → sends packet to default gateway → packet goes to the Internet → never reaches the VM → never enters the VPN tunnelTherefore, the Windows PC must be explicitly told: “To reach the remote LAN, send traffic to the VM’s LAN IP.”
+
+- **Solution**:
+
+Add Static Routes on Each Windows PC hosting the Tokyo client VM.
 
 1) On the Tokyo's Windows PC, add a route to the Paris LAN that has, as gateway the Tokyo client (LAN) IP :
 ```powershell
@@ -387,9 +414,13 @@ Paris → Windows PC client = [Ping OK](../assets/verifs/sprint1/ping-paris-wind
 ### ❌ Issue G -  Windows PC ↔ Windows PC Communication Through the VPN Tunnel
 Even though Windows PCs hosting the client and server can communicate with the distant server and client (respectively), they can't ping each other’s. 
 
-- **Cause** : The Windows firewall was blocking incoming ICMP requests from remote private subnets.
+- **Cause** :
 
-- **Solution** : enable the Inbound firewall rule `File and Printer Sharing (Restrictive) (Echo Request – ICMPv4-In)` for the `Public` Profile in the Windows Defender Firewall app, on both Windows computers.
+The Windows firewall was blocking incoming ICMP requests from remote private subnets.
+
+- **Solution** :
+
+enable the Inbound firewall rule `File and Printer Sharing (Restrictive) (Echo Request – ICMPv4-In)` for the `Public` Profile in the Windows Defender Firewall app, on both Windows computers.
 [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-enabled.png)
 
 - **Proofs & Results** : 
@@ -403,25 +434,34 @@ Windows PC Tokyo → Windows PC Paris (`192.168.1.73`) = [Ping OK & Tracert](../
 
 
 ### ❌ Issue H - HTTP Request fails Tokyo → Paris  (`10.9.1.1`, `192.168.100.200`. `192.168.1.197`)
-- **Symptom**: Ping to the Paris web server work, but HTTP requests not.
+- **Symptom**:
+
+Ping to the Paris web server work, but HTTP requests not.
 
 - **Causes**:
+
 1) the incoming HTTP traffic is blocked by default when ufw is activated.
   
-- **Solutions** : Allow incoming HTTP traffic on Paris
+- **Solutions** :
+
+Allow incoming HTTP traffic on Paris
  ```console
 ufw allow 80/tcp
 ```
 
 - **Results**:
+
 Client Tokyo → Paris  (`10.9.1.1`, `192.168.100.200`. `192.168.1.197` ) = [HTTP request successful](../assets/verifs/sprint1/http-request-tokyo-paris)
 
 ---
 
 ### ❌ Issue I - HTTP Request fails Tokyo → Auber  (`192.168.100.210` & `192.168.1.160`)
-- **Symptom**: Ping to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests not.
+- **Symptom**:
+
+Ping to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests not.
 
 - **Causes**:
+
 1) the incoming HTTP traffic is blocked by default when ufw is activated.
   
 3) The default policy FORWARD for the Linux firewall in Paris is set to `DROP`.  TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris. [FORWARD chain policy dropl](../assets/verifs/sprint1/chain-forward-policy-drop-server-paris.png)
@@ -429,6 +469,7 @@ Client Tokyo → Paris  (`10.9.1.1`, `192.168.100.200`. `192.168.1.197` ) = [HTT
 Note that ICMP packets were passing through UFW exceptions. ICMP is enabled by default in the `ufw-before-input` and `ufw-before-forward` chains
 
 - **Solutions**
+
 1) Allow incoming HTTP traffic on Auber
  ```console
 ufw allow 80/tcp
@@ -451,6 +492,7 @@ iptables -A FORWARD -i enp0s3 -o tun0  -d 10.9.1.0/24 -s 192.168.1.0/24 -j ACCEP
 ```
 
 - **Results**:
+
 Client Tokyo → Auber  (`192.168.100.210`) = [HTTP request successful](../assets/verifs/sprint1/curl-http-request-tokyo_auber.png)
 
 Client Tokyo → Auber  (`192.168.1.160`) = [HTTP request successful](../assets/verifs/sprint1/http-request-tokyo-auber-lan-private)
