@@ -340,6 +340,7 @@ After the first timeout, the clients Tokyo & NY passes to Auber quite rapidly th
 Ping to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests not.
 
 - **Cause**:
+
 The default policy FORWARD for the Linux firewall in Paris is set to DROP. TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris. FORWARD chain policy drop
 
 - **Solution**:
