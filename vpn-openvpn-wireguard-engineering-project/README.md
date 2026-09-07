@@ -131,12 +131,12 @@ vpn-openvpn-wireguard-engineering-project/
 
 ## Structure of each Sprint Documentation 
 Each sprint follows the same structure:
-- Objectives
-- Architecture & Topology overview
-- 🔧 Configuration (VPN, routing, firewall...)
-- 🤖 Automatic failover (Sprint 2 & 4)
-- ✅ Validation / Connectivity / Tests performed /  Results obtained
-- 🛠️ Troubleshooting & Fixes
+- **Objectives**
+- **Architecture & Topology overview**
+- **🔧 Configuration (VPN, routing, firewall...)**
+- **🤖 Automatic failover (Sprint 2 & 4)**
+- **✅ Validation / Connectivity / Tests performed /  Results obtained**
+- **🛠️ Troubleshooting & Fixes**
 
 ## Testing and Acceptance
 Summary of tests performed (ping, traceroute, HTTP via tunnel), location of traces, and how to reproduce them.
