@@ -89,15 +89,27 @@ To ensure that the Aubervilliers backup server can properly handle routing back 
 > 📑 **Architectural Reference:** The mechanics of OpenVPN's internal routing engine, directory bindings, and the critical role of the `iroute` directive are detailed in the primary site's documentation.
 See [Sprint 0: Paris Routing & CCD Configuration](01-sprint1-openvpn-site-to-site-paris.md#iroute-openvpn-internal-routing-table)
 
+## 🛡️ 6. Firewall & Port/IP Forwarding
 
-## 4. Port Forwarding for Backup VPN
-Traffic coming from the public internet through the edge router (local router at Paris) is segregated using port-based forwarding:
-* **Primary VPN Tunnel (Paris):** `82.X.Y.Z:1194 (UDP)` ➔ `192.168.1.197:1194`
-* **Backup VPN Tunnel (Aubervilliers):** `82.X.Y.Z:1195 (UDP)` ➔ `192.168.1.160:1195`
+To enable remote offices (Client Tokyo and NY) to initiate a connection to the backup server located behind the local router at Auber/Paris, a port forwarding rule and local firewall settings have been configured on Auber site. 
 
-**Purpose**: Allows remote clients to reach the backup VPN server when Paris is down.
+**Firewall ufw**
+- By default, when ufw is activated, all incoming traffic to Auber server is blocked. So the standard UDP OpenVPN port 1195 was blocked.
 
-## 🤖 6. Automated Failover Configuration with the Backup Server
+OpenVPN UDP traffic must be allowed in the ufw firewall:
+```console
+ufw allow 1195/udp
+```
+
+**Port Forwarding (home router)**
+- Rule applied: `From everywhere on Internet connecting to external port UDP/1195 ➔ to 192.168.1.160 on internal port 1195`
+
+**IP forwarding (Linux)**
+The Linux server is acting as a router/NAT device, it will need to be capable of forwarding packets that are meant for other destinations (other than itself).
+Linux uses the net.ipv4.ip_forward kernel variable to toggle this setting on or off.
+
+
+## 🤖 7. Automated Failover Configuration with the Backup Server
 - Located at `/usr/local/bin/`
 - Executed every 10 seconds via `System Timers`
 
@@ -167,7 +179,7 @@ This setup ensures that the VPN failover mechanism reacts quickly and consistent
 - All traffic still uses the primary tunnel (Paris), that works initially.
 - Backup tunnel (10.9.2.0/24) is not yet active.
 
-## 7. Paris server failover Simulation & Incident management on VPN servers 
+## 8. Paris server failover Simulation & Incident management on VPN servers 
 To stop the Paris primary server, shutdown the system service: 
 
 ```console
@@ -192,7 +204,7 @@ As soon as the main tunnel `10.9.1.0/24` is disconnected, the following network 
 After approximately 1 minutes, the failover tunnel is established: a new virtual IP from the `10.9.2.0/24` range is assigned to the tun0 interface.
 
 
-## 8. Flow validation & Route verification - Progressive Changes to Routing Tables 
+## 9. Flow validation & Route verification - Progressive Changes to Routing Tables 
 
 **Server Paris**
 Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24`).
@@ -224,7 +236,7 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
 [Routing Table Auber After failover](../assets/verifs/sprint2/routing-table-auber-after-failover.png) 
 
 
-## ✅ 9. Validation & Connectivity  
+## ✅ 10. Validation & Connectivity  
 - Ping 	OK = Tokyo → Aubervilliers (`192.168.1.160`, `192.168.100.210`, `10.9.2.1`) 
 
   Analysis: Traffic is now routed through the backup VPN tunnel.
@@ -244,14 +256,14 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
   [Traceroute Paris → Tokyo ](../assets/verifs/sprint2/traceroute-paris-tokyo.png)
  
 
-## 9. When Paris Comes Back
+## 11. When Paris Comes Back
 The server Paris re-launch its openvpn service. 
 - The monitoring script on Auber detects it and shutdown the Auber server OpenVPN service. The backup tunnel `10.9.2.0/24` is not anymore active so all of the route injected dynamically are deleted from the routing table of Auber & the client. The first route (already injected) is now used.
 - Clients, that have lost the connexion with the backup server, try to reconnect to the primary server. So, after ~1 minute, the connexion is established. 
 
 In conclusion, the openvpn and routing table state became similar to the one state of the initial, before the failover.
 
-## 🛠️ 10. Troubleshooting
+## 🛠️ 12. Troubleshooting
 
 ### ❌ Issue A -  Client does not reconnect to Backup VPN when Paris goes down (KeepAlive missing)
 
