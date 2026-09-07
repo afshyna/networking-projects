@@ -281,7 +281,7 @@ Ping requests from Tokyo to the Aubervilliers inter-site interface fail.
 On Tokyo, a route has been added to the these 2 distant LANs via the tunnel.
 [Routing Table Tokyo](../assets/verifs/routing-table-tokyo-before-failover.png)
 
-A traceroute to the Auber internal LAN confirms also the utilization of the VPN tunnel as gw :
+A traceroute to the Auber internal LAN confirms also the utilisation of the VPN tunnel as gw :
 [Traceroute-tokyo-to-auber-internal-LAN](../assets/verifs/sprint1/traceroute-tokyo-auber-lans.png)
 
 On Auber, a route has been added to the VPN network via the internal interface Auber-Paris.
@@ -385,7 +385,7 @@ Even though the OpenVPN tunnel between Paris and Tokyo is operational and LAN‑
 
 - **Cause**:
 
-Windows hosts do not know how to reach the remote LANs. They don't automatically learn routes to the remote LANs behind the VPN tunnel. Windows does not use the VM as a router unless explicitly configured. When the Windows PC tries to reach the remote LAN, Windows PC → sends packet to default gateway → packet goes to the Internet → never reaches the VM → never enters the VPN tunnelTherefore, the Windows PC must be explicitly told: “To reach the remote LAN, send traffic to the VM’s LAN IP.”
+Windows hosts do not know how to reach the remote LANs. They don't automatically learn routes to the remote LANs behind the VPN tunnel. Windows does not use the VM as a router unless explicitly configured. When the Windows PC tries to reach the remote LAN, Windows PC → sends packet to default gateway → packet goes to the Internet → never reaches the VM → never enters the VPN tunnel. Therefore, the Windows PC must be explicitly told: “To reach the remote LAN, send traffic to the VM’s LAN IP.”
 
 - **Solution**:
 
