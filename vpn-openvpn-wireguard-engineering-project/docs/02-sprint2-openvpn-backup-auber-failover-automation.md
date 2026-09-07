@@ -163,7 +163,7 @@ systemctl status openvpn-failover.timer
 
 This setup ensures that the VPN failover mechanism reacts quickly and consistently to network changes.
 
-### Expected Behavior before the failover
+### Expected Behaviour before the failover
 - All traffic still uses the primary tunnel (Paris), that works initially.
 - Backup tunnel (10.9.2.0/24) is not yet active.
 
@@ -217,7 +217,7 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
   
 **Server Aubervilliers**
 - As soon as the primary tunnel is shutdown, the monitoring script (run via `Systemd timers`) detects it and launch the Auber server OpenVPN service. The backup tunnel `10.9.2.0/24` became fully active
-- A second route to the private remote LAN (e.g. `172.20.10.0/28`) is dynamically injected to pass through its own VPN tunnel: `172.20.10.0/28 via 10.9.2.1`. The initial static route to this LAN  remains in place but it is not used anymore, because the dynamic route has a lower metric (by default, metric = 0) so this is the prioraty route.
+- A second route to the private remote LAN (e.g. `172.20.10.0/28`) is dynamically injected to pass through its own VPN tunnel: `172.20.10.0/28 via 10.9.2.1`. The initial static route to this LAN  remains in place but it is not used anymore, because the dynamic route has a lower metric (by default, metric = 0) so this is the priority route.
 - The routes to the Auber/Paris LAN subnet (e.g. `192.168.x.y/16`) via its own VPN tunnel are dynamically injected to the VPN clients.
 
 [Routing Table Auber Before failover](../assets/verifs/sprint2/routing-table-auber-before-failover.png) 
@@ -263,13 +263,13 @@ remote paris.example.com 1194
 remote auber.example.com 1195
 …it stays stuck, waiting indefinitely, and never switches to the backup server.
 
-- **Cause**
+- **Cause**:
 The OpenVPN client had no keepalive mechanism configured. Without keepalive (or explicit ping / ping-restart directives), the client does not detect that the server is dead. It simply waits forever for packets that will never arrive.
 
 OpenVPN does not assume a connection is down unless it receives no ping replies for a defined timeout or the TCP/UDP socket explicitly closes or a restart timer triggers. Since none of these conditions occurred, the client believed the Paris server was still alive. So the client never moves to Auber, even though Paris is down.
 
-- **Solution**
-Add keepalive to the client & server configuration (for maintening the connection & prevent to restart uselessly).
+- **Solution**:
+Add keepalive to the client & server configuration (for maintaining the connection & prevent to restart uselessly).
 ```text
 keepalive 5 15
 <=> 
@@ -307,7 +307,7 @@ This forces OpenVPN to:
 - wait for a maximum of 5 seconds to connect
 - make only one attempt per server
 
-- **Result**: after the first timeout, the clients Tokyo & NY passes to Auber quite rapidly that before. The waiting delay to redirect from Paris to Auber has been largely reducted, waiting from ~1min to 30s.
+- **Result**: after the first timeout, the clients Tokyo & NY passes to Auber quite rapidly that before. The waiting delay to redirect from Paris to Auber has been largely reduced, waiting from ~1min to 30s.
 
 --- 
 
@@ -315,7 +315,7 @@ This forces OpenVPN to:
 
 - **Symptom**: Ping to the Aubervilliers web server (`192.168.100.210`) work, but HTTP requests not.
 
-- **Cause**:: The default policy FORWARD for the Linux firewall in Paris is set to DROP. TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris. FORWARD chain policy drop
+- **Cause**: The default policy FORWARD for the Linux firewall in Paris is set to DROP. TCP traffic (port 80) routed between the virtual interface tun0 and the physical interface enp0s8 was being dropped by Netfilter FORWARD policy of Paris. FORWARD chain policy drop
 
 - **Solution**:
 
