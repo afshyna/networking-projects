@@ -90,7 +90,7 @@ The minimum bit must be 2048, otherwise if the key size is <2048, the OpenVPN se
 
 This DH parameter will be used by servers for establishing a secure key exchange with clients during the SSL/TLS connection.
 
-<h2> Step 3 - Install the adequat certificates on the server and client </h2>
+<h2> Step 3 - Install certificates on the server and client </h2>
 
 On servers and clients : 
 - Install CA certificate (`cacert.pem`), entity certificate (`<entity>.crt`) and private key (`<entity>.key`) on `/etc/openvpn/tls/` </li>
