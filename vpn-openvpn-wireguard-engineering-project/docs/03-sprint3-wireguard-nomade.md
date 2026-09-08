@@ -398,7 +398,7 @@ PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
 
 ---
 
-### ❌ Issue F - Ping fails Auber  → PC-nomade IP LAN
+### ❌ Issue F - Ping fails Auber  → PC-nomade LAN
 
 - **Symptom**:
 
