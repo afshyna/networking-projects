@@ -1,3 +1,4 @@
+```text
 [Interface]
 PrivateKey = eJdprswdc/RenCUVseoIHjMCHXYpucYx6394ZLdaM14=
 Address = 10.9.3.1/24
@@ -18,3 +19,4 @@ AllowedIPs = 10.9.3.100/32, 10.177.104.0/24
 [Peer]
 PublicKey = nThYuugUcSPpoTjlmwK9LLNXYA9iMl0r0ox8nmUx/Ak=
 AllowedIPs = 10.9.3.200/32
+```
