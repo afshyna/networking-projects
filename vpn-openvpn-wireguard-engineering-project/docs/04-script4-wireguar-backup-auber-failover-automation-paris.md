@@ -1,4 +1,4 @@
-# 🏁 Sprint 4 :  WireGuard Remote Access & site-to-site VPN with Backup Server & Automatic Failover
+# 🏁 Sprint 4 :  WireGuard Remote Access VPN with Backup Server & Automatic Failover
 
 ##  1. Objectives
 - Add a secondary WireGuard server on Aubervilliers.
