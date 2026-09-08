@@ -27,7 +27,7 @@ Service delivery context for connecting remote offices (Tokyo, New York) to a re
 - Implement a disaster recovery site (Aubervilliers).
 - Automate failover when the primary server becomes unavailable.
 
-### Objective 2 - Deploy Remote Access & site-to-site VPN with WireGuard
+### Objective 2 - Deploy Remote Access VPN with WireGuard
 Provide secure access for nomad users (Laptop & Smartphone)
 
 **Features**:
@@ -92,7 +92,7 @@ vpn-openvpn-wireguard-engineering-project/
 ├── docs/
 │   ├── 01-sprint1-openvpn-site-to-site-paris.md
 │   ├── 02-sprint2-openvpn-backup-auber-failover-automation.md
-│   ├── 03-sprint3-wireguard-nomade-site-to-site.md
+│   ├── 03-sprint3-wireguard-nomade.md
 │   └── 04-sprint4-wireguard-backup-failover.md
 │   └── pki-certificate-authentication.md
 │
@@ -117,7 +117,7 @@ vpn-openvpn-wireguard-engineering-project/
 **Brief description of the main folders**
 -  `docs/` : sprints with a README.md file/sprint, which will serve as a recipe book / test report to validate the procedures.
 - `01-sprint1-openvpn-site-to-site-paris.md`
-- `03-sprint3-wireguard-nomade-site-to-site.md` 
+- `03-sprint3-wireguard-nomade.md` 
 - `03-sprint3-wireguard-nomade.md`  
 - `04-script4-wireguar-backup-auber-failover-automation-paris.md`  
 
@@ -148,7 +148,7 @@ Detailed troubleshooting for each sprint is available:
 
 ➡️ [Troubleshooting Sprint 2](docs/02-sprint2-openvpn-backup-auber-failover-automation.md#%EF%B8%8F-10-troubleshooting)
 
-➡️ [Troubleshooting Sprint 3](docs/03-sprint3-wireguard-nomade-site-to-site.md#%EF%B8%8F-9-troubleshooting)
+➡️ [Troubleshooting Sprint 3](docs/03-sprint3-wireguard-nomade.md#%EF%B8%8F-9-troubleshooting)
 
 ➡️ [Troubleshooting Sprint 4](docs/04-script4-wireguar-backup-auber-failover-automation-paris.md#%EF%B8%8F--10-troubleshooting)
 
@@ -178,7 +178,7 @@ Detailed troubleshooting for each sprint is available:
 
 ### VPN Technologies
    - OpenVPN  (site-to-site VPN) 
-   - WireGuard (remote access VPN & site-to-site VPN)
+   - WireGuard (remote access VPN)
 
 ### Linux Administration
    - iptables
