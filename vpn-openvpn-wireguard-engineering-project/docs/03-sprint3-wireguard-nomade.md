@@ -265,7 +265,7 @@ By trying to interconnect every LAN, we have deployed a VPN Wireguard remote acc
 
 ---
 
-### ❌ Issue A - Routing issue : 
+### ❌ Issue A - Ping fails PC-nomade → Paris IP LAN 
 
 - **Symptom**:
 
@@ -283,7 +283,7 @@ Extend the AllowedIPs on the client to include `192.168.0.0/16`.
 
 ---
 
-### ❌ Issue B - Routing issue  : 
+### ❌ Issue B - Ping fails PC-nomade → Auber IP LAN/VPN
 
 - **Symptom**:
 
@@ -312,7 +312,7 @@ ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8
 
 ---
 
-### ❌ Issue C - Routing issue:
+### ❌ Issue C - Ping fails PC-nomade → Tokyo IP LAN
 
 - **Symptom**:
 
@@ -339,11 +339,11 @@ Path/Gateways followed : Nomad → Paris (`10.9.3.1`) → Auber (`192.168.100.21
 
 ---
 
-### ❌ Issue D - Routing issue:
+### ❌ Issue D - Ping fails PC-nomade → Hosts in Paris LAN  (192.168.1.73/24 or 192.168.1.254/24)
 
 - **Symptom**:
 
-No pings from wireguard client get through to the Paris/Auber private LAN `192.168.1.0/24` (e.g `192.168.1.73/24`, `192.168.1.254/24` ).
+No pings from wireguard client get through to the other hosts in Paris/Auber private LAN `192.168.1.0/24` (e.g `192.168.1.73/24`, `192.168.1.254/24` ).
 
 - **Cause**:
 
@@ -370,11 +370,11 @@ PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 
 ---
 
-### ❌ Issue E - Routing issue:
+### ❌ Issue E - Ping fails Paris  → PC-nomade IP LAN 
 
 - **Symptom**:
 
-No pings from paris server get through to the PC-nomad & its private LAN `<private-LAN-pc-nomade>`
+No pings from paris server get through to the PC-nomad & its private LAN `10.177.104.0/24`
 
 - **Causes**:
 
@@ -384,7 +384,7 @@ No pings from paris server get through to the PC-nomad & its private LAN `<priva
 
 - **Solutions**:
 
-1) Extend the AllowedIPs on the server to include `10.177.104.102`
+1) Extend the AllowedIPs on the server to include `10.177.104.0/24`
 
 2) Add NAT MASQUERADE rules on the wireguard client configuration, to avoid to add a route on each machine of the client LAN.
 = "For all traffic coming from the the VPN tunnel (10.9.3.0/24), the wireguard client replace its source address with the address assigned to the wlan interface wlp6s0 (172.20.10.5).
@@ -398,7 +398,7 @@ PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
 
 ---
 
-### ❌ Issue F - Routing issue :
+### ❌ Issue F - Ping fails Auber  → PC-nomade IP LAN
 
 - **Symptom**:
 
@@ -407,12 +407,14 @@ No pings from auber server get through to the PC-nomad-IP-LAN.
 - **Causes**:
 
 1) No route to the private LAN of the wireguard client
+
 2) NAT MASQUERADE route missing ?
+
 3) subnet of this network in AllowedIPs of Paris conf missing ?
 
 - **Solutions** :
 
-On auber, add a static route to the private subnet of the client
+1) On auber, add a static route to the private subnet of the client
 ``` console
 ip route add 172.20.10.0/28 via 192.168.100.200 dev enp0s8 
 ```
