@@ -63,8 +63,6 @@ Explanation :
 route 172.20.10.0 255.255.255.240`
 ```
 
----
-
 - **Push Routes** :Clients (Tokyo/NY) will dynamically receive these routes when connecting to the backup VPN server, in the same way that the primary server.
 ```text
  # openvpn server configuration
