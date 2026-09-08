@@ -140,22 +140,31 @@ Static routes have been added on Tokyo/NY to enable the Nomad client to reach:
 - Aubervilliers
 - Tokyo
 - New York
-⇒ It will allow remote networks (Tokyo, Aubervilliers) to ‘see’ the WireGuard network `10.9.3.0/24`.
+⇒ It will allow remote networks (Tokyo, Aubervilliers) to ‘see’ the WireGuard network `10.9.3.0/24` & Wireguard client LAN `10.177.104.0`
 
-On Auber, add route for OpenVPN clients to WireGuard network via the directive push in existing OpenVPN configuration:
+On Auber, add route for OpenVPN clients to WireGuard network & Wireguard client LAN  via the directive push in existing OpenVPN configuration:
 ```text
 # Backup OpenVPN configuration
 push "route 10.9.3.0 255.255.255.0"`
+push "route 10.177.104.0 255.255.255.0"
 ```
 
 ---
 
 ### 5.3. Local route on Auber
-- Add route to WireGuard network via OpenVPN route : 
+- Add route to WireGuard network via internal network with Paris : 
 ```text
 # Backup OpenVPN configuration
-route 10.9.3.0 255.255.255.0
+route 10.9.3.0 255.255.255.0 192.168.100.200
 ```
+
+---
+
+### 5.4. Static route for Wireguard LAN clients on Auber
+```text
+# ip route  add 10.177.104.0/24 via 192.168.100.200 dev enp0s8
+```
+
 
 ## 🛡️ 6. Firewall, Port/IP Forwarding & NAT rules
 
