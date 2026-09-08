@@ -265,29 +265,43 @@ By trying to interconnect every LAN, we have deployed a VPN Wireguard remote acc
 
 ---
 
-### 9.1. Routing issue : 
-- **Symptom**: The tunnel is established, but no pings from wireguard client get through to the Paris  (e.g. `192.168.1.197/24` or `192.168.100.200/24`).
+### ❌ Issue A - Routing issue : 
 
-- **Cause**: Incomplete AllowedIPs. WireGuard filters traffic that does not belong to the declared networks at the kernel level. Client wireguard doesn't have a route to these subnets via its wireguard tunnel.
+- **Symptom**:
 
-- **Fixs**:
-  - Extend the AllowedIPs on the client to include `192.168.0.0/16`.
+The tunnel is established, but no pings from wireguard client get through to the Paris  (e.g. `192.168.1.197/24` or `192.168.100.200/24`).
+
+- **Cause**:
+
+Incomplete AllowedIPs. WireGuard filters traffic that does not belong to the declared networks at the kernel level. Client wireguard doesn't have a route to these subnets via its wireguard tunnel.
+
+- **Solution**:
+
+Extend the AllowedIPs on the client to include `192.168.0.0/16`.
 
 [Routing Table PC nomade](../assets/verifs/sprint3/) <!-- SCREEN A FAIRE-->
 
 ---
 
-### 9.2. Routing issue  : 
-- **Symptom**: The tunnel is established, but no pings from wireguard client get through to the Auber (e.g. `192.168.1.160/24`, `192.168.100.210/24` or `10.9.2.1`).
+### ❌ Issue B - Routing issue  : 
+
+- **Symptom**:
+
+The tunnel is established, but no pings from wireguard client get through to the Auber (e.g. `192.168.1.160/24`, `192.168.100.210/24` or `10.9.2.1`).
 
 - **Causes**:
-      - Incomplete AllowedIPs. WireGuard filters traffic that does not belong to the declared networks at the kernel level. Client wireguard doesn't have a route to these subnets via its wireguard tunnel.
-      - Auber doesn't know the route to the Wireguard network so it can't reply to the ping
-      - No IP forwarding actived on the kernel Linux of Paris (normally, already activated in the first sprint). Paris needs to forward wireguard traffic from nomad-pc to Auber.
 
-- **Fixs**:
-  - Extend the AllowedIPs on the client to include `192.168.0.0/16` and `10.9.2.0/24`
-  - On auber, add a route to the wireguard VPN subnet on the openvpn configuration file.
+1) Incomplete AllowedIPs. WireGuard filters traffic that does not belong to the declared networks at the kernel level. Client wireguard doesn't have a route to these subnets via its wireguard tunnel.
+
+2) Auber doesn't know the route to the Wireguard network so it can't reply to the ping
+
+3) No IP forwarding actived on the kernel Linux of Paris (normally, already activated in the first sprint). Paris needs to forward wireguard traffic from nomad-pc to Auber.
+
+- **Solutions**:
+
+1) Extend the AllowedIPs on the client to include `192.168.0.0/16` and `10.9.2.0/24`
+
+2) On auber, add a route to the wireguard VPN subnet on the openvpn configuration file.
 ``` console
 ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8 
 ```
@@ -298,16 +312,21 @@ ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8
 
 ---
 
-### 9.3. Routing issue:
-- **Symptom**: No pings from wireguard client get through to the Tokyo/NY IP LAN (e.g. `172.20.10.3-9 /24`,  `172.20.10.4-10 /24`).
+### ❌ Issue C - Routing issue:
 
-- **Cause**:
-  - Incomplete  AllowedIPs so, client wireguard doesn't have a route to this subnet via its wireguard tunnel.
-  - Clients doesn't have a route to the Wireguard network.
+- **Symptom**:
+
+No pings from wireguard client get through to the Tokyo/NY IP LAN (e.g. `172.20.10.3-9 /24`,  `172.20.10.4-10 /24`).
+
+- **Causes**:
+
+1) Incomplete  AllowedIPs so, client wireguard doesn't have a route to this subnet via its wireguard tunnel.
+2) Clients doesn't have a route to the Wireguard network.
  
-- **Fix**:
-  - Extend the AllowedIPs on the client to include `172.20.10.0/28`.
-  - Push the route to the wireguard VPN subnet on the Auber openvpn configuration file, to the the OpenVPN clients
+- **Solutions**:
+
+1) Extend the AllowedIPs on the client to include `172.20.10.0/28`.
+2) Push the route to the wireguard VPN subnet on the Auber openvpn configuration file, to the the OpenVPN clients
 
 [Routing Table PC nomade](../assets/verifs/sprint3/) <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN --> 
 [Routing Table clients Tokyo/NY](../assets/verifs/sprint3/)  <!-- SCREEN A FAIRE AVEC RZO MOBILE NOSHEEN --> 
@@ -320,14 +339,20 @@ Path/Gateways followed : Nomad → Paris (`10.9.3.1`) → Auber (`192.168.100.21
 
 ---
 
-### 9.4. Routing issue:
-- **Symptom**: No pings from wireguard client get through to the Paris/Auber private LAN `192.168.1.0/24` (e.g `192.168.1.73/24`, `192.168.1.254/24` ).
+### ❌ Issue D - Routing issue:
+
+- **Symptom**:
+
+No pings from wireguard client get through to the Paris/Auber private LAN `192.168.1.0/24` (e.g `192.168.1.73/24`, `192.168.1.254/24` ).
 
 - **Cause**:
-  - Clients doesn't have a route to the Wireguard network / No route to the wireguard VPN tunnel from all other machines on the LAN except the server wireguard.
 
-- **Fix**:  Add NAT MASQUERADE rule on the wireguard client configuration, to avoid to add a route on each machine of the client LAN.
-Goal : "For all traffic coming from the VPN tunnel (10.9.3.0/24), the Paris server replace its source address with the address assigned to the enp0s3 interface (192.168.1.197).
+Clients doesn't have a route to the Wireguard network / No route to the wireguard VPN tunnel from all other machines on the LAN except the server wireguard.
+
+- **Solution**:
+
+Add NAT MASQUERADE rule on the wireguard client configuration, to avoid to add a route on each machine of the client LAN.
+= "For all traffic coming from the VPN tunnel (10.9.3.0/24), the Paris server replace its source address with the address assigned to the enp0s3 interface (192.168.1.197).
 
 ```text
 # NAT rule added when the server VPN starts up
@@ -345,18 +370,24 @@ PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o enp0s3 -j MASQUERADE
 
 ---
 
-### 9.5. Routing issue:
+### ❌ Issue E - Routing issue:
 
-- **Symptom**: No pings from paris server get through to the PC-nomad & its private LAN `<private-LAN-pc-nomade>`
+- **Symptom**:
 
-- **Cause**:
-  - Incomplete  AllowedIPs (on server configuration), so server wireguard doesn't have a route to this subnet via its wireguard tunnel. It just has a route to the host 10.9.3.100/32 (pc-nomade).
-  - No route  to the Paris private LAN from all other machines on the LAN except the client wireguard.
+No pings from paris server get through to the PC-nomad & its private LAN `<private-LAN-pc-nomade>`
 
-- **Fixs**
-  - Extend the AllowedIPs on the server to include `<private-LAN-pc-nomade>`
-  - Add NAT MASQUERADE rules on the wireguard client configuration, to avoid to add a route on each machine of the client LAN.
-    Goal : "For all traffic coming from the the VPN tunnel (10.9.3.0/24), the wireguard client replace its source address with the address assigned to the wlan interface wlp6s0 (172.20.10.5).
+- **Causes**:
+
+1) Incomplete  AllowedIPs (on server configuration), so server wireguard doesn't have a route to this subnet via its wireguard tunnel. It just has a route to the host 10.9.3.100/32 (pc-nomade).
+
+2) No route  to the Paris private LAN from all other machines on the LAN except the client wireguard.
+
+- **Solutions**:
+
+1) Extend the AllowedIPs on the server to include `10.177.104.102`
+
+2) Add NAT MASQUERADE rules on the wireguard client configuration, to avoid to add a route on each machine of the client LAN.
+= "For all traffic coming from the the VPN tunnel (10.9.3.0/24), the wireguard client replace its source address with the address assigned to the wlan interface wlp6s0 (172.20.10.5).
 ```text
 # NAT rule added when the client VPN starts up
 PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
@@ -367,16 +398,21 @@ PostDown = iptables -t nat -D POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
 
 ---
 
-### 9.6. Routing issue :
+### ❌ Issue F - Routing issue :
 
-- **Symptom**: No pings from auber server get through to the PC-nomad-IP-LAN.
+- **Symptom**:
 
-- **Cause**:
-  - No route to the private LAN of the wireguard client
-  - NAT MASQUERADE route missing ?
-  - subnet of this network in AllowedIPs of Paris conf missing ?
+No pings from auber server get through to the PC-nomad-IP-LAN.
 
-- **Fix** :  On auber, add a static route to the private subnet of the client
+- **Causes**:
+
+1) No route to the private LAN of the wireguard client
+2) NAT MASQUERADE route missing ?
+3) subnet of this network in AllowedIPs of Paris conf missing ?
+
+- **Solutions** :
+
+On auber, add a static route to the private subnet of the client
 ``` console
 ip route add 172.20.10.0/28 via 192.168.100.200 dev enp0s8 
 ```
