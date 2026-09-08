@@ -411,16 +411,20 @@ Add Static Routes on Each Windows PC hosting the Tokyo client VM.
 
 ---
 
-### ❌ Issue G -  Windows PC ↔ Windows PC Communication Through the VPN Tunnel
+### ❌ Issue G -  Windows PC ↔ Windows PC Communication Through the VPN Tunnel (site-to-site connection)
 Even though Windows PCs hosting the client and server can communicate with the distant server and client (respectively), they can't ping each other’s. 
 
 - **Cause** :
 
-The Windows firewall was blocking incoming ICMP requests from remote private subnets.
+1) Windows hosts do not know how to reach the remote LANs (no route in their routing table). _(See Issue F)_
+
+3) The Windows firewall was blocking incoming ICMP requests from remote private subnets.
 
 - **Solution** :
 
-enable the Inbound firewall rule `File and Printer Sharing (Restrictive) (Echo Request – ICMPv4-In)` for the `Public` Profile in the Windows Defender Firewall app, on both Windows computers.
+1) Add routes to each Windows host to reach the respective remote LANs _(See Issue F)_
+
+3) enable the Inbound firewall rule `File and Printer Sharing (Restrictive) (Echo Request – ICMPv4-In)` for the `Public` Profile in the Windows Defender Firewall app, on both Windows computers.
 [Windows Defender Firewall - Inbound firewall rule](../assets/verifs/sprint1/inbound-rule-enabled.png)
 
 - **Proofs & Results** : 
