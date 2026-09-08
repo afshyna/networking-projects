@@ -14,8 +14,8 @@ if [ $? -eq 0 ]; then					# $?=0 : vpn server auber up, $?=1 : vpn server auber 
 	fi
 # VPN Primary DOWN → launch the Backup VPN (if not already active) 
 else
- 	netstat -lu | grep 49150 > /dev/null
- 	if [ $? -eq 1 ]; then
+ 	netstat -lu | grep 49150 > /dev/null		
+ 	if [ $? -eq 1 ]; then					# si le service wg auber pas actif => on le démarre
 		wg-quick up wg0-auber
 	fi
 fi
