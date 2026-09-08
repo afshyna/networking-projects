@@ -41,6 +41,8 @@ The full PKI setup for generating the certificates (CA creation, key generation,
 - `port 1195` - Auber server listening port
 - `ca`, `cert`, `key`, - `dh`, `tls-server` : TLS authentication
 
+---
+
 ### Clients - Key OpenVPN Directives
 - For Multi‑Server Failover, on clients, after the 1st directive `remote` with Paris server, add a 2nd `remote` for a second VPN connection with the backup server.
 ```remote 82.X.Y.Z 1195```
@@ -51,6 +53,7 @@ Explanation :
 - Clients always try Paris first.
 - If unreachable → automatically switch to Aubervilliers.
 
+
 ## 🔀 5. Routing Configuration & Adjustements
 
 ###  Backup Server
@@ -60,12 +63,15 @@ Explanation :
 route 172.20.10.0 255.255.255.240`
 ```
 
+---
+
 - **Push Routes** :Clients (Tokyo/NY) will dynamically receive these routes when connecting to the backup VPN server, in the same way that the primary server.
 ```text
  # openvpn server configuration
 push "route 192.168.1.0 255.255.255.0"
 push "route 192.168.100.0 255.255.255.0"
 ```
+
 ---
 
 ### Paris Server 
@@ -88,8 +94,10 @@ To ensure that the Aubervilliers backup server can properly handle routing back 
 2. Add iroute entries to map each remote LAN to the correct client.
 3. Add the directive `client-config-dir /etc/openvpn/ccd` in the auber openvpn configuration for enabling iroute.
 
+
 > 📑 **Architectural Reference:** The mechanics of OpenVPN's internal routing engine, directory bindings, and the critical role of the `iroute` directive are detailed in the primary site's documentation.
 See [Sprint 0: Paris Routing & CCD Configuration](01-sprint1-openvpn-site-to-site-paris.md#iroute-openvpn-internal-routing-table)
+
 
 ## 🛡️ 6. Firewall & Port/IP Forwarding
 
@@ -125,6 +133,8 @@ Linux uses the net.ipv4.ip_forward kernel variable to toggle this setting on or 
 
 This script ensures automatic switching between the primary VPN (Paris) and the backup VPN (Aubervilliers). It continuously checks the status of the primary tunnel (if it is shut or not) and activates or deactivates the backup tunnel accordingly.
 
+---
+
 **Script Logic** : 
 
 The script is based on two tests:
@@ -134,6 +144,8 @@ The script is based on two tests:
 Based on these results, the script decides:
 - to stop the backup VPN if the primary VPN is up
 - to start the backup VPN if the primary VPN is down
+
+---
 
 ### Automatic execution
 
@@ -211,8 +223,6 @@ After approximately 1 minutes, the failover tunnel is established: a new virtual
 
 
 ## 9. Flow validation & Route verification - Progressive Changes to Routing Tables 
-
----
 
 **Server Paris**
 Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24`).
