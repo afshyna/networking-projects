@@ -1,4 +1,6 @@
 ```text
+# File : /etc/wireguard/wg0-paris.conf
+
 [Interface]
 PrivateKey = eJdprswdc/RenCUVseoIHjMCHXYpucYx6394ZLdaM14=
 Address = 10.9.3.1/24
