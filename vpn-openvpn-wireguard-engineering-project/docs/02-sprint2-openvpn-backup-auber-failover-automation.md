@@ -66,6 +66,7 @@ route 172.20.10.0 255.255.255.240`
 push "route 192.168.1.0 255.255.255.0"
 push "route 192.168.100.0 255.255.255.0"
 ```
+---
 
 ### Paris Server 
 - Add a second static route to the Tokyo's LAN with a higher metric that the primary route and with a gateway via Auber. This route will be used when the primary VPN is down so the metric needs to be higher, in order to choose the dynamic route already added by the VPN paris.
@@ -77,6 +78,7 @@ ip route add 172.20.10.0/28 via 192.168.100.210 dev enp0s8 metric 100`
 ```console
 ip route add 10.9.2.0/24 via 192.168.100.210 dev enp0s8
 ```
+---
 
 ### iroute via CCD
 OpenVPN must know which client owns which LAN, otherwise packets are dropped.
@@ -100,9 +102,12 @@ OpenVPN UDP traffic must be allowed in the ufw firewall:
 ```console
 ufw allow 1195/udp
 ```
+---
 
 **Port Forwarding (home router)**
 - Rule applied: `From everywhere on Internet connecting to external port UDP/1195 ➔ to 192.168.1.160 on internal port 1195`
+
+---
 
 **IP forwarding (Linux)**
 The Linux server is acting as a router/NAT device, it will need to be capable of forwarding packets that are meant for other destinations (other than itself).
@@ -165,6 +170,7 @@ journalctl -u openvpn-failover.service -f
 systemctl status openvpn-failover.timer
 ```
 
+---
 
 **Why using `systemd timers` ?**
 - High reliability
@@ -206,6 +212,8 @@ After approximately 1 minutes, the failover tunnel is established: a new virtual
 
 ## 9. Flow validation & Route verification - Progressive Changes to Routing Tables 
 
+---
+
 **Server Paris**
 Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24`).
 - The `10.9.1.0/24` network and the subnet `172.20.10.0/28` via the Paris VPN tunnel have disappeared.
@@ -215,7 +223,9 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
 
 [Routing Table Paris Before failover](../assets/verifs/sprint2/routing-table-paris-before-failover.png)
 [Routing Table Paris After failover](../assets/verifs/sprint2/routing-table-paris-after-failover.png) 
- 
+
+---
+
 **VPN Clients**
 
  The default gateway for the `10.9.1.X` tunnel has been replaced by the IP address of the `10.9.2.X` failover interface. Clients switch to Auber (`10.9.2.1`) via port remote `1195`.
@@ -226,7 +236,8 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
 [Routing Table  NY Before failover](../assets/verifs/routing-table-NY-before-failover.png) 
 [Routing Table Tokyo & NY After failover](../assets/verifs/sprint2/routing-table-tokyo&NY-after-failover-connexion-backup-vpn.png) 
 
-  
+---
+
 **Server Aubervilliers**
 - As soon as the primary tunnel is shutdown, the monitoring script (run via `Systemd timers`) detects it and launch the Auber server OpenVPN service. The backup tunnel `10.9.2.0/24` became fully active
 - A second route to the private remote LAN (e.g. `172.20.10.0/28`) is dynamically injected to pass through its own VPN tunnel: `172.20.10.0/28 via 10.9.2.1`. The initial static route to this LAN  remains in place but it is not used anymore, because the dynamic route has a lower metric (by default, metric = 0) so this is the priority route.
@@ -240,15 +251,21 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
 - Ping 	OK = Tokyo → Aubervilliers (`192.168.1.160`, `192.168.100.210`, `10.9.2.1`) 
 
   Analysis: Traffic is now routed through the backup VPN tunnel.
-  
+
+---
+
 - Ping 	OK = Tokyo → Paris (`192.168.100.200`,`192.168.100.197` )
 
   Analysis: Paris remains accessible via the local link between the two servers.
   [Traceroute Tokyo → Paris ](../assets/verifs/sprint2/traceroute-tokyo-paris.png)
 
+---
+
 - Ping 	OK = Aubervilliers → Tokyo (`172.20.10.10`, `10.9.2.2`)
 
   Analysis: LAN Tokyo/NY remains accessible via the backup VPN tunnel between the peers
+
+---
 
 - Ping 	OK  = Paris → Tokyo(`172.20.10.9`, `10.9.2.2`)
 
