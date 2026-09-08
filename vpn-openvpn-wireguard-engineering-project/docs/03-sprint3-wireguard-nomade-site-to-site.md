@@ -79,7 +79,7 @@ PrivateKey = <SERVER_PRIVATE_KEY>
 
 [Peer]
 PublicKey = <CLIENT-NOMAD-PC_PUBLIC_KEY>
-AllowedIPs = 10.9.3.100/32, 10.177.104.102/24
+AllowedIPs = 10.9.3.100/32
 
 [Peer]
 PublicKey = <CLIENT-PHONE_PUBLIC_KEY> 
@@ -133,24 +133,19 @@ Add internal networks to AllowedIPs:
 `AllowedIPs = 10.9.3.0/24, 192.168.0.0/16, 10.9.2.0/24, 172.20.10.0/28`
 
 ---
-### 5.2. Wireguard server route
-To join to the Wireguard LAN PC IP, Paris server wireguard must route traffic through its WireGuard VPN tunnel. To do this, it must specify the LAN IP in the `AllowedIPs` directive in the `[Peer]` section of the PC-nomade in the server wireguard configuration.
-`AllowedIPs = 10.9.3.100/32, 10.177.104.102/32`
 
-
-### 5.3. OpenVPN route for Tokyo/NY clients
+### 5.2. OpenVPN route for Tokyo/NY clients
 Tokyo and New York must know the WireGuard network `10.9.3.0/24`  and the remote-PC-LAN `10.177.104.0` so theses routes need to be pushed from  the current active OpenVPN server (Auber):
 
 On Auber, add route for OpenVPN clients to WireGuard network & Wireguard client LAN  via the directive push in existing OpenVPN configuration:
 ```text
 # Backup OpenVPN configuration
 push "route 10.9.3.0 255.255.255.0"`
-push "route 10.177.104.0 255.255.255.0"
 ```
 
 ---
 
-### 5.4. Auber routes
+### 5.3. Auber routes
 - Add route to WireGuard network via internal network with Paris : 
 ```text
 # Backup OpenVPN configuration
