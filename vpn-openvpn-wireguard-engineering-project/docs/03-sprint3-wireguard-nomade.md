@@ -238,7 +238,7 @@ wg show
 
 ---
 
-### 8.2. Ping Tests - LAN Access (Paris/Auber LAN & Tokyo/NY LAN) ✅
+### 8.2. Ping Tests - Access to Paris/Auber LAN & Tokyo/NY LAN ✅
 
 - Nomad → Paris private LAN IP  (`192.168.1.197`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_paris-lan-ok.png)
 **Wireshark Analysis** : evidence of UDP encapsulation (UDP/49151)
