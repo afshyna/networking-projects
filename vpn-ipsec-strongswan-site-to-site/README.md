@@ -267,19 +267,32 @@ We can also view the routing table to the GW-B LAN directly with
 
 <h2> 🛠️ Troubleshooting </h2>
 
+<h3>  ❌ Issue A - Communication from LAN-B to LAN-A fails </h3>
 
-<h3> Symptom </h3> 
-During testing, hosts from LAN B (`172.20.10.0/28`) like GW-B could not reach local machine in LAN A like `192.168.1.73` or `192.168.1.254` (except  GW-A), even though the IPsec tunnel was fully established and GW-B ping GW-A.
+**- Symptom**
 
----
-
-<h3> Cause </h3>
-When traffic from the LAN-B reaches the local machine in LAN-A, the machine may not have a route back to the source network/to the original LAN B host.
+During testing, hosts from LAN B (`172.20.10.0/28`) like the laptop (`172.20.10.2`) could not reach local machine in LAN A like `192.168.1.73` or `192.168.1.254`, even though the IPsec tunnel was fully established between GW-B & GW-A.
 
 ---
 
-<h3> Solution </h3>
-Add a MASQUERADE Rule on GW‑A by using iptables to perform source NAT (Masquerading), making the traffic appear as if it originates from the gateway itself.
+**- Cause**
+
+1) the source host in LAN-B doesn't have a route the source network/to the LAN-A host.
+
+2) the destination host in LAN-A may not have a route back to the source network/to the original LAN B host.
+
+---
+
+**- Solution**
+
+1) On the laptop in LAN-B, add a Windows route to the LAN-A network that goes through via the gateway GW-B: 
+
+``` console
+# route add 192.168.1.0 mask 255.255.255.0 172.20.10.8
+```
+
+
+2) Add a NAT MASQUERADE rule on GW‑A by using iptables to perform source NAT (Masquerading), making the traffic appear as if it originates from the gateway itself.
 
 ``` console
 # iptables -t nat -A POSTROUTING -s 172.20.10.0/28 -o enp0s3 -j MASQUERADE
@@ -299,7 +312,7 @@ This ensures that:
 
 ---
 
-<h3> Verification  </h3>
+- **Verification**
 
 Before NAT, on GW-A:
 ```text
@@ -335,8 +348,29 @@ When the reply comes back: (`192.168.1.73` -> `192.168.1.167`), Linux consults i
 
 ![Ping OK GW-B to the home router of LAN-A](assets/verifs/ping_OK_gwB-to-home-router-LAN-A.png)
 
+=> The tunnel behaves as a full site‑to‑site VPN
 
-The tunnel behaves as a full site‑to‑site VPN
+<h3>  ❌ Issue B - Communication from LAN-Ato LAN-B fails </h3>
+
+**- Symptom**
+
+During testing, hosts from LAN A (`192.168.1.73`) like my desktop computer  could not reach local machine in LAN B like the laptop (`172.20.10.2`)  even though the IPsec tunnel was fully established between GW-B & GW-A.
+
+---
+
+**- Cause**
+
+1) the source host in LAN-A doesn't have a route the source network/to the LAN-B host.
+
+---
+
+**- Solution**
+
+1) On the laptop in LAN-A, add a Windows route to the LAN-B network that goes through via the gateway GW-A: 
+
+``` console
+# route add 172.20.10.0 mask 255.255.255.240 192.168.1.167
+```
 
 
 <h1> Traffic analysis via Wireshark </h1>
