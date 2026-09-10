@@ -49,7 +49,7 @@ The mobile client can therefore access:
 - Backup OpenVPN tunnel subnet : `10.9.2.0/24`
 - Paris/Auber LAN: `192.168.1.0/24`
 - Inter-site Auber-Paris network: `192.168.100.0/24`
-- Tokyo/NY LAN: `172.20.10.0/28`
+- Tokyo/NY LAN: `172.20.10.0/28` (Note : in this sprint, the LAN IP of Tokyo/NY has been set to `172.20.10.3` & `172.20.10.4` due to the DHCP IP assignment that has been changed)
 - PC Nomade LAN: `10.177.104.0/24` (IP PC : `10.177.104.102`)
 
 ---
@@ -245,7 +245,7 @@ wg show
 - Nomad → Paris inter-site LAN  IP (`192.168.100.200`) = [Ping OK](../assets/verifs/sprint3/ping-pc-paris-lan-internal)
 - Nomad → Auber private LAN IP (`192.168.1.160`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-lan-ok.png)
 - Nomad → Auber inter-site LAN  IP (`192.168.100.210`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-internal-lan-ok.png)
-- Nomad → Tokyo private LAN IP (`172.20.10.9`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_tokyo-lan-ok.png)
+- Nomad → Tokyo private LAN IP (`172.20.10.3`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_tokyo-lan-ok.png)
 - Phone → Paris / Auber / Clients LANs & VPN IP = [Ping_OK](../assets/verifs/sprint3/ping-phone-other-subnets-ok.png)
 
 ---
@@ -314,7 +314,7 @@ ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8
 
 - **Symptom**:
 
-No pings from wireguard client get through to the Tokyo/NY IP LAN (`172.20.10.9 /24` & `172.20.10.10 /24`).
+No pings from wireguard client get through to the Tokyo IP LAN (`172.20.10.3 /24`)
 
 - **Causes**:
 
@@ -329,7 +329,7 @@ No pings from wireguard client get through to the Tokyo/NY IP LAN (`172.20.10.9 
 [Routing Table PC nomade](../assets/verifs/sprint3/routing-table-before-failover-pc-nomade-wireguard-connexion-up-vers-paris.png)
 [Routing Table clients Tokyo](../assets/verifs/sprint3/routing-table-tokyo_sprint3.png)
 
-[Ping PC nomade -> Client Tokyo IP](../assets/verifs/sprint3/ping-pc-vers-clients-openvpn.png)  
+[Ping PC nomade -> Client Tokyo IP](../assets/verifs/sprint3/ping-nomad-pc_tokyo-lan-ok.png)
 
 [Traceroute Nomad PC → Tokyo](../assets/verifs/sprint3/traceroute-nomad-pc-tokyo-lan.png) 
 Path/Gateways followed : Nomad → Paris (`10.9.3.1`) → Auber (`192.168.100.210`) → Tokyo
