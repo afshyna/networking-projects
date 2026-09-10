@@ -7,7 +7,7 @@
 
 ## 2. Architecture & Topology overview
 
-![Architecture Sprint 1](../diagrams/01-sprint1-openvpn-srv_paris-primary-clients-tokyo-NY)
+![Architecture Sprint 1](../diagrams/01-sprint1-openvpn-srv_paris-primary-clients-tokyo-NY.png)
 
 ### Addressing Architecture
   * **Public/WAN IP Paris / Auber** : `82.X.Y.Z`
