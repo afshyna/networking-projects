@@ -327,11 +327,11 @@ No pings from wireguard client get through to the Tokyo/NY IP LAN (`172.20.10.9 
 2) Push the route to the wireguard VPN subnet on the Auber openvpn configuration file, to the the OpenVPN clients
 
 [Routing Table PC nomade](../assets/verifs/sprint3/routing-table-before-failover-pc-nomade-wireguard-connexion-up-vers-paris.png)
-[Routing Table clients Tokyo](../assets/verifs/sprint3/routing-table-tokyo_sprint3)
+[Routing Table clients Tokyo](../assets/verifs/sprint3/routing-table-tokyo_sprint3.png)
 
-[Ping PC nomade -> Client Tokyo IP](../assets/verifs/sprint3/ping-pc-vers-clients-openvpn)  
+[Ping PC nomade -> Client Tokyo IP](../assets/verifs/sprint3/ping-pc-vers-clients-openvpn.png)  
 
-[Traceroute Nomad PC → Tokyo](../assets/verifs/sprint3/traceroute-nomad-pc-tokyo-lan) 
+[Traceroute Nomad PC → Tokyo](../assets/verifs/sprint3/traceroute-nomad-pc-tokyo-lan.png) 
 Path/Gateways followed : Nomad → Paris (`10.9.3.1`) → Auber (`192.168.100.210`) → Tokyo
 ⇒ Traffic therefore passes through the central site before reaching the remote branch.
 
