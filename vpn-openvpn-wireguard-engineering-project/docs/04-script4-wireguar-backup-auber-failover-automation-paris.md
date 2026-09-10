@@ -9,7 +9,7 @@
 - Validate connectivity to all LANs
 
 ## 2. Infrastructure Overview
-![Architecture Sprint 4](../diagrams/04-sprint4-failover-vpn-wireguard-srv-paris-switch-client_srv-auber-backup.png)
+![Architecture Sprint 4](../diagrams/04-sprint4-failover-wireguard-srv_paris-to-srv_auber_backup.png)
 
 ### Backup Site Role
 - Aubervilliers acts as the secondary VPN hub.
