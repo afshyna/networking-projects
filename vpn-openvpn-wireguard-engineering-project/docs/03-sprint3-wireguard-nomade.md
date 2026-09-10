@@ -254,7 +254,7 @@ wg show
 [Routing table PC Nomad](../assets/verifs/sprint3/routing-table-before-failover-pc-nomade-wireguard-connexion-up-vers-paris.png) 
 [Routing table Paris Server](../assets/verifs/sprint3/routing-table-paris-wg-vpn.png)
 [Routing Table Auber](../assets/verifs/sprint3/routing-table-auber.png)
-[Routing Table Clients Tokyo/NY](../assets/verifs/sprint3/routing-table-tokyo_sprint3)  
+[Routing Table Clients Tokyo/NY](../assets/verifs/sprint3/routing-table-tokyo_sprint3.png)  
 
 
 ## 🛠️ 9. Troubleshooting 
