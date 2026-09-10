@@ -25,7 +25,7 @@ Compared to OpenVPN:
 
 
 ##  3. Architecture & Topology Overview
-![Architecture Sprint 3](../diagrams/03-sprint3-vpn-wireguard-nomade-site-to-site-clients-pc-phone_srv-paris-primary.png)
+![Architecture Sprint 3](../diagrams/03-sprint3-wireguard-client-laptop-phone_srv_paris-primary.png)
 The Mobile/PC establishes a WireGuard tunnel to:
 - Paris-Montrouge (OpenVPN primary server)
 - Aubervilliers (OpenVPN backup server)
@@ -247,7 +247,7 @@ wg show
 - Nomad → Paris inter-site LAN  IP (`192.168.100.200`) = [Ping OK](../assets/verifs/sprint3)
 - Nomad → Auber private LAN IP (`192.168.1.160`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-lan-ok.png)
 - Nomad → Auber inter-site LAN  IP (`192.168.100.210`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-internal-lan-ok.png)
-- Nomad → Tokyo private LAN IP (`172.20.10.3`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_tokyo-lan-ok.png)
+- Nomad → Tokyo private LAN IP (`172.20.10.9`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_tokyo-lan-ok.png)
 - Phone → Paris / Auber / Clients LANs & VPN IP = [Ping_OK](../assets/verifs/sprint3/ping-phone-other-subnets-ok.png)
 
 ---
@@ -316,7 +316,7 @@ ip route add 10.9.3.0/24 via 192.168.100.200 dev enp0s8
 
 - **Symptom**:
 
-No pings from wireguard client get through to the Tokyo/NY IP LAN (e.g. `172.20.10.3-9 /24`,  `172.20.10.4-10 /24`).
+No pings from wireguard client get through to the Tokyo/NY IP LAN (`172.20.10.9 /24` & `172.20.10.10 /24`).
 
 - **Causes**:
 
@@ -387,7 +387,8 @@ No pings from paris server get through to the PC-nomad & its private LAN `10.177
 1) Extend the AllowedIPs on the server to include `10.177.104.0/24`
 
 2) Add NAT MASQUERADE rules on the wireguard client configuration, to avoid to add a route on each machine of the client LAN.
-= "For all traffic coming from the the VPN tunnel (10.9.3.0/24), the wireguard client replace its source address with the address assigned to the wlan interface wlp6s0 (172.20.10.5).
+= "For all traffic coming from the the VPN tunnel (10.9.3.0/24), the wireguard client replace its source address with the address assigned to the WLAN interface wlp6s0 (`10.177.104.102/24`)
+
 ```text
 # NAT rule added when the client VPN starts up
 PostUp = iptables -t nat -A POSTROUTING -s 10.9.3.0/24 -o wlp6s0 -j MASQUERADE
