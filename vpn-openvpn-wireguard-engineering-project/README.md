@@ -69,7 +69,7 @@ Provides:
 - Access to Tokyo/New York LAN
 - Inter-site communication through OpenVPN
 
-![Architecture Sprint 3](diagrams/03-sprint3-vpn-wireguard-nomade-site-to-site-clients-pc-phone_srv-paris-primary.png)
+![Architecture Sprint 3](diagrams/03-sprint3-wireguard-client-laptop-phone_srv_paris-primary.png)
 
 ---
 
@@ -82,7 +82,7 @@ Features:
 - Backup routing
 - High availability
 
-![Architecture Sprint 4](diagrams/04-sprint4-failover-vpn-wireguard-srv-paris-switch-client_srv-auber-backup.png)
+![Architecture Sprint 4](diagrams/04-sprint4-failover-wireguard-srv_paris-to-srv_auber_backup.png)
 
 ## Repository Structure
 ```text
