@@ -44,7 +44,7 @@ Provide secure access for nomad users (Laptop & Smartphone)
 - Paris-Montrouge acts as the main VPN server.
 - Tokyo and New York establish routed VPN tunnels with the main server using SSL/TLS for the authentication & encryption of data.
 
-![Architecture Sprint 1](diagrams/01-sprint1-openvpn-site-to-site-srv_paris_primary_clients-tokyo-NY)
+![Architecture Sprint 1](diagrams/01-sprint1-openvpn-srv_paris-primary-client-tokyo-NY)
 
 ---
 
