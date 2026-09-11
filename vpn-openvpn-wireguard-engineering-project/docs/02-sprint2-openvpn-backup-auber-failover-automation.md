@@ -8,7 +8,7 @@
   
 ## 2. Architecture & Topology Overview
 
-![Architecture Sprint 2](../diagrams/02-sprint2-failover-openvpn-srv_paris-to-srv_auber_backup)
+![Architecture Sprint 2](../diagrams/02-sprint2-automatic-failover-openvpn-srv_paris-to-srv_auber_backup.png)
 
 ### Backup Site Role (Aubervilliers)
 - Aubervilliers acts as the secondary VPN hub.
