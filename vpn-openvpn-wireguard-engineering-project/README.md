@@ -44,7 +44,7 @@ Provide secure access for nomad users (Laptop & Smartphone)
 - Paris-Montrouge acts as the main VPN server.
 - Tokyo and New York establish routed VPN tunnels with the main server using SSL/TLS for the authentication & encryption of data.
 
-![Architecture Sprint 1](diagrams/01-sprint1-openvpn-srv_paris-primary-clients-tokyo-and-NY.png)
+![Architecture Sprint 1](diagrams/01-sprint1-openvpn-srv_paris-primary-clients-tokyo-NY.png)
 
 ---
 
@@ -57,7 +57,7 @@ Aubervilliers acts as the disaster recovery site.
 - Dynamic route switching
 - failover script automatically executed via system-timers
 
-![Architecture Sprint 2](diagrams/02-sprint2-failover-openvpn-srv_paris-to-srv_auber_backup.png)
+![Architecture Sprint 2](diagrams/02-sprint2-automatic-failover-openvpn-srv_paris-to-srv_auber_backup.png)
 
 ---
 
