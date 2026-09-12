@@ -1,7 +1,7 @@
 ```text
 #########################################
-## OPENVPN SERVER CONFIGURATION
-## SERVER PARIS-MONTROUGE --> TOKYO/NY
+## OPENVPN SERVER CONFIGURATION (/etc/openvpn/server-paris.conf)
+## SERVER PARIS-MONTROUGE --> TOKYO/NY 
 #########################################
 
 dev tun
