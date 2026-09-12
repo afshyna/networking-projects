@@ -175,7 +175,7 @@ systemctl enable --now openvpn-failover.timer
 journalctl -u openvpn-failover.service -f
 ```
 
-- Show real‑time logs every time the timer triggers the service:  [Result](../assets/verifs/sprint2/Systemctl-status-openvpn-failover.timer-state-auber)
+- Show real‑time logs every time the timer triggers the service:  [Result](../assets/verifs/sprint2/Systemctl-status-openvpn-failover.timer-state-auber.png)
 ```console
 systemctl status openvpn-failover.timer
 ```
