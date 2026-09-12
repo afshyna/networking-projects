@@ -241,8 +241,8 @@ Addition of the route injection directive to the OpenVPN Paris server configurat
 - **Proof & Result** :
 
 On Tokyo and NY, a route has been added to the Paris LAN via the tunnel.
-[Routing Table Tokyo](../assets/verifs/routing-table-NY-before-failover.png) 
-[Routing Table NY](../assets/verifs/routing-table-NY-before-failover.png) 
+[Routing Table Tokyo](../assets/verifs/sprint1/routing-table-tokyo-before-failover.png) 
+[Routing Table NY](../assets/verifs/sprint1/routing-table-NY-before-failover.png) 
 
 *See [Ping Tests - LAN Access (Paris/Auber)](#ping-tests---lan-access-parisauber-).*
 
