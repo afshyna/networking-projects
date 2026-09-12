@@ -1,3 +1,6 @@
+```text
+## File : /etc/openvpn/ccd/client-tokyo
+
 iroute 172.20.10.0 255.255.255.240
 
 # PRIMARY SERVER PARIS - Fixed IP VPN assigned to client-tokyo
@@ -5,3 +8,4 @@ ifconfig-push 10.9.1.2 255.255.255.0
 
 # BACKUP SERVER AUBER - Fixed IP VPN assigned to client-tokyo
 ifconfig-push 10.9.2.2 255.255.255.0
+```
