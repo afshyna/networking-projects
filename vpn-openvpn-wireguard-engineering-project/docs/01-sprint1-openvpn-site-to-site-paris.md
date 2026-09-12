@@ -183,7 +183,8 @@ systemctl start openvpn@client-NY
 ### Ping Tests - Tunnel Connectivity 
 
 - Tokyo → VPN Server Paris (IP `10.9.1.1`) = [Ping OK](../assets/verifs/sprint1/ping-tokyo-paris-vpn.png)
-[Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-tokyo-paris-vpn.png) <!-- A SCREEN -->
+[Capture-Wireshark](../assets/wireshark/openvpn-icmp-ping-tokyo-paris-vpn.png) 
+
 
 **Wireshark Captures - Analysis**
 *Here is a summary of the process that happen : 
@@ -455,7 +456,7 @@ ufw allow 80/tcp
 
 - **Results**:
 
-Client Tokyo → Paris  (`10.9.1.1`, `192.168.100.200`. `192.168.1.197` ) = [HTTP request successful](../assets/verifs/sprint1/http-request-tokyo-paris)
+Client Tokyo → Paris  (`10.9.1.1`, `192.168.100.200`. `192.168.1.197` ) = [HTTP request successful](../assets/verifs/sprint1/http-request-tokyo-paris.png)
 
 ---
 
@@ -499,4 +500,4 @@ iptables -A FORWARD -i enp0s3 -o tun0  -d 10.9.1.0/24 -s 192.168.1.0/24 -j ACCEP
 
 Client Tokyo → Auber  (`192.168.100.210`) = [HTTP request successful](../assets/verifs/sprint1/curl-http-request-tokyo_auber.png)
 
-Client Tokyo → Auber  (`192.168.1.160`) = [HTTP request successful](../assets/verifs/sprint1/http-request-tokyo-auber-lan-private)
+Client Tokyo → Auber  (`192.168.1.160`) = [HTTP request successful](../assets/verifs/sprint1/http-request-tokyo-auber-lan-private.png)
