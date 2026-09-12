@@ -84,9 +84,11 @@ Each VPN gateway has been configured to establish the tunnel securely. Below are
 
 [Secret configuration (GW-A)](config/GW-A/ipsec.secrets)
 
-[Secret Configuration (GW-B)](config/GW-B/ipsec.conf)
+---
+[Main Configuration (GW-B)](config/GW-B/ipsec.conf)
 
-[Main Configuration (GW-B)](config/GW-B/ipsec.secrets)
+[Secret Configuration (GW-B)](config/GW-B/ipsec.secrets)
+
 
 
 
