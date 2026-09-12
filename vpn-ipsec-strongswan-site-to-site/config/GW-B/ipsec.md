@@ -1,4 +1,6 @@
 ```text
+## file : /etc/ipsec.d/ipsec.conf
+
 config setup
 	charondebug="ike 1, knl 1, cfg 1"
 	uniqueids=yes
