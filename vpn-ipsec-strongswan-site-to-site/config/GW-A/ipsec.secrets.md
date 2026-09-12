@@ -1,2 +1,4 @@
+```text
 # RSA private key for the GW-A certificate (location : /etc/ipsec.d/private)
 : RSA gwA-key.pem
+```
