@@ -1,8 +1,8 @@
 ```text
 
 #########################################
-## BACKUP OPENVPN SERVER CONFIGURATION
-## SERVER AUBERVILLIERS --> TOKYO/NY
+## BACKUP OPENVPN SERVER CONFIGURATION (/etc/openvpn/server-auber.conf)
+## SERVER AUBERVILLIERS --> TOKYO/NY 
 #########################################
 
 dev tun
