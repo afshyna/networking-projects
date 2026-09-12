@@ -1,3 +1,4 @@
+```text
 ################################
 # TOKYO CLIENT OPENVPN  CONFIGURATION
 ################################
@@ -51,3 +52,4 @@ ping-restart 30
 # 1 max attempt/server
 connect-timeout 5
 connect-retry 1
+```
