@@ -1,6 +1,6 @@
 ```text
 ################################
-# TOKYO CLIENT OPENVPN  CONFIGURATION
+# TOKYO CLIENT OPENVPN  CONFIGURATION (/etc/openvpn/client-tokyo.conf)
 ################################
 
 client
