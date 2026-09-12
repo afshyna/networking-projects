@@ -20,7 +20,7 @@ It demonstrates how secure VPN services can be deployed, monitored, and maintain
 
 <strong>Technical Configuration & Architecture:</strong>
 
-- <strong>VPN Technologies:</strong> OpenVPN (SSL/TLS) for Site-to-Site VPN and WireGuard for Remote-Access VPN and Site-to-site VPN
+- <strong>VPN Technologies:</strong> OpenVPN (SSL/TLS) for Site-to-Site VPN and WireGuard for Remote-Access VPN.
 - <strong>Architecture Type:</strong> VPN infrastructure with a Primary Site/server (Paris-Montrouge) and a Disaster Recovery Site/server (Aubervilliers)
 - <strong>Remote Offices:</strong> VPN clients Tokyo & New York networks connected through routed VPN tunnels
 - <strong>Site-to-site:</strong> Expanding the Scope of the VPN to include LAN-to-LAN communication between server's LAN and clients's LAN.
