@@ -1,3 +1,5 @@
+```text
+
 #########################################
 ## BACKUP OPENVPN SERVER CONFIGURATION
 ## SERVER AUBERVILLIERS --> TOKYO/NY
@@ -62,4 +64,5 @@ push "route 10.177.104.0 255.255.255.0"
 push "route 10.9.4.0 255.255.255.0"
 
 route 10.9.3.0 255.255.255.0 192.168.100.200
+```text
 
