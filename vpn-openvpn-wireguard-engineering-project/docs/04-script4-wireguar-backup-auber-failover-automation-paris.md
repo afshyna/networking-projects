@@ -225,9 +225,11 @@ systemctl enable --now wireguard-failover-{pc|auber}.timer
 
 ## 7. Failover Simulation
 1) On lance la connexion au VPN du serveur principal depuis Paris  [Launch Wireguard on Paris](../assets/verifs/sprint4/wg-quick-up-wg0-paris.png)
+      
 2) On lance la connexion au VPN du serveur principal depuis PC-nomade   
  [Interface Wireguard PC](../assets/verifs/sprint4/interface-wg0-pc-nomade-connexion-paris.png)
-4) On shut la connexion du VPN serveur Paris : [Shut Wireguard on Paris](../assets/verifs/sprint4/wg-quick-down-wg0-paris.png)
+
+3) On shut la connexion du VPN serveur Paris : [Shut Wireguard on Paris](../assets/verifs/sprint4/wg-quick-down-wg0-paris.png)
 
 ## 8. Post-Failure Analysis: System/Network Impacts &  Route verification   
 
@@ -254,11 +256,14 @@ After
 ### Auber
 - the monitoring script detects the shutdown of paris server and then, launch the Wireguard Auber service.
 - The backup tunnel `10.9.4.0/24` becomes active.
+
 [Auber Server - Wireguard Interface state](../assets/verifs/sprint4/wg-show-auber.png)
+
 [PC client - Wireguard Interface state](../assets/verifs/sprint4/wg-show-pc-auber.png)
 
 - Static route to the `10.177.104.102` via the gateway Auber-Paris disappears.
 - Dynamic route to the `10.177.104.102`  linked to the local tunnel appears.
+- 
 [Routing Table Auber Before/After failover](../assets/verifs/sprint4/routing-table-auber-before-after-failover.png)
 
 ```text
@@ -273,6 +278,7 @@ After
 
 ### Nomad PC
 Clients switch to Auber (`10.9.4.1`) via port remote `49150`. The default gateway for the `10.9.3.X` tunnel has been replaced by the IP address of the `10.9.4.X` failover interface. 
+
 [Routing Table PC-nomad Before/After failover](../assets/verifs/sprint4/routing-table-pc-nomade-before-after-failover.png)
 
 ```text 
@@ -298,6 +304,7 @@ Route toward Wireguard tunnel subnet is injected dynamically by OpenVPN Auber se
 # After: 
 10.9.4.0/24 via 10.9.2.1
 ```
+
 [Routing Table Tokyo & NY Before/after failover](../assets/verifs/sprint4/routing-table-tokyo_and_NY_before-after-failover.png)
 
 **Final result** : After approximately 30 seconds, the failover tunnel  with Auber is established.
