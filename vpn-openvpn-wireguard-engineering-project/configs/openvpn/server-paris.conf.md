@@ -1,3 +1,4 @@
+```text
 #########################################
 ## OPENVPN SERVER CONFIGURATION
 ## SERVER PARIS-MONTROUGE --> TOKYO/NY
@@ -57,3 +58,4 @@ route 172.20.10.0 255.255.255.240
 # Routes injected to VPN clients, which go through the primary VPN tunnel
 push "route 192.168.1.0 255.255.255.0"
 push "route 192.168.100.0 255.255.255.0"
+```
