@@ -251,7 +251,8 @@ No connectivity...
 
 
 <h2> Verification of the routing table  </h2>
-olicy-based IPsec with automatic routing injection in table `220`.
+
+Policy-based IPsec with automatic routing injection in table `220`.
 
 To verify the routing and the tunnel, we analyze the XFRM policies:
 ```console
@@ -392,7 +393,7 @@ Capturing traffic on WAN interface, in a ping from GW-A (`192.168.1.167`) to GW-
         <li>ESP, that provide data confidentiality, integrity and origin authentication  </li>
         <li>NAT Traversal (NAT-T) </li>
     </ul>
-    <li>Setting up PKI & X.509 certificats</li>
+    <li>Setting up PKI & X.509 certificates</li>
     <li>Setting up firewalls & routing rules </li>
     <li> IPsec diagnostics </li>
     <li> Network analysis (Wireshark) </li>
