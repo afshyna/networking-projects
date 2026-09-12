@@ -1,6 +1,7 @@
+```text
 config setup
-        charondebug="ike 1, knl 1, cfg 1"
-        uniqueids=yes
+	charondebug="ike 1, knl 1, cfg 1"
+	uniqueids=yes
    
 conn gwB-to-gwA
 	auto=start
@@ -15,18 +16,19 @@ conn gwB-to-gwA
 	leftsubnet=172.20.10.0/28
 	leftcert=gwB-cert.pem
   
-        # --- GW-A (distant) ---
-        right=<IP-public-GW-A>  
+	# --- GW-A (distant) ---
+	right=<IP-public-GW-A>  
 	rightid=gwA.vpn.local
 	rightsubnet=192.168.1.0/24
     
 	# --- IKEv2 + Cipher suites ---
 	ike=aes256gcm16-sha384-ecp384!
 	esp=aes256gcm16-sha384!
-        keyexchange=ikev2
+	keyexchange=ikev2
     
-        # --- Policy ---
-        dpddelay=30s
-        dpdtimeout=120s
-        dpdaction=restart
+	# --- Policy ---
+	dpddelay=30s
+	dpdtimeout=120s
+	dpdaction=restart
 	keyingtries=%forever
+```
