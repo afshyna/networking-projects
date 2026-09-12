@@ -1,6 +1,6 @@
 ```text
 ################
-# NY CLIENT OPENVPN  CONFIGURATION
+# NY CLIENT OPENVPN  CONFIGURATION (/etc/openvpn/client-NY.conf)
 ################ 
 
 client
