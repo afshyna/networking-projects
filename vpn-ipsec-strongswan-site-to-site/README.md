@@ -80,14 +80,14 @@ The following technologies and mechanisms were implemented:
 
 Each VPN gateway has been configured to establish the tunnel securely. Below are the IPsec configuration files associated with each VM Ubuntu (Linux) :
 
-[Main Configuration (GW-A)](config/GW-A/ipsec.conf)
+[Main Configuration (GW-A)](config/GW-A/ipsec.conf.md)
 
-[Secret configuration (GW-A)](config/GW-A/ipsec.secrets)
+[Secret configuration (GW-A)](config/GW-A/ipsec.secrets.md)
 
 ---
-[Main Configuration (GW-B)](config/GW-B/ipsec.conf)
+[Main Configuration (GW-B)](config/GW-B/ipsec.conf.md)
 
-[Secret Configuration (GW-B)](config/GW-B/ipsec.secrets)
+[Secret Configuration (GW-B)](config/GW-B/ipsec.secrets.md)
 
 
 
