@@ -240,9 +240,9 @@ Complete disappearance of dynamic routes linked to the main tunnel (`10.9.1.0/24
 - Before : `192.168.100.0/24 via 10.9.1.1` | `192.168.1.0/24 via 10.9.1.1`
 - After : `192.168.100.0/24 via 10.9.2.1` | `192.168.1.0/24 via 10.9.2.1`
 
-[Routing Table Tokyo Before failover](../assets/verifs/routing-table-tokyo-before-failover.png)
-[Routing Table  NY Before failover](../assets/verifs/routing-table-NY-before-failover.png) 
-[Routing Table Tokyo & NY After failover](../assets/verifs/sprint2/routing-table-tokyo&NY-after-failover-connexion-backup-vpn.png) 
+[Routing Table Tokyo Before failover](../assets/verifs/sprint1/routing-table-tokyo-before-failover.png)
+[Routing Table  NY Before failover](../assets/verifs/sprint1/routing-table-NY-before-failover.png) 
+[Routing Table Tokyo & NY After failover](../assets/verifs/sprint2/routing-table-tokyo-NY-after-failover-connexion-backup-vpn.png) 
 
 ---
 
