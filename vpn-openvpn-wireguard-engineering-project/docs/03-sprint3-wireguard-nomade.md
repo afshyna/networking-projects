@@ -242,7 +242,7 @@ wg show
 **Wireshark Analysis** : evidence of UDP encapsulation (UDP/49151)
 [Capture-Wireshark](../assets/wireshark/wireguard-icmp-ping-pc-nomad-paris-lan.png)
 
-- Nomad → Paris inter-site LAN  IP (`192.168.100.200`) = [Ping OK](../assets/verifs/sprint3/ping-pc-paris-lan-internal)
+- Nomad → Paris inter-site LAN  IP (`192.168.100.200`) = [Ping OK](../assets/verifs/sprint3/ping-pc-paris-lan-internal.png)
 - Nomad → Auber private LAN IP (`192.168.1.160`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-lan-ok.png)
 - Nomad → Auber inter-site LAN  IP (`192.168.100.210`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_auber-internal-lan-ok.png)
 - Nomad → Tokyo private LAN IP (`172.20.10.3`) = [Ping OK](../assets/verifs/sprint3/ping-nomad-pc_tokyo-lan-ok.png)
