@@ -261,7 +261,6 @@ Ping between LAN hosts <=> connexion site to site OK ✅
 ![Ping OK pc Windows LAN B to PC Windows LAN A](assets/verifs/ping-pc-windows-LAN_B-to-pc-windows-LAN_A.png)
 
 
-
 <h2> Verification of the routing table  </h2>
 
 Policy-based IPsec with automatic routing injection in table `220`.
@@ -278,6 +277,38 @@ We can also view the routing table to the GW-B LAN directly with
 ```
 ![Routing table to the GW-B LAN (GW-A)](assets/verifs/ip_route+ip_route_get_172.20.10.8_gwA.png)
 
+<h1> Traffic analysis via Wireshark </h1>
+
+Capturing traffic on WAN interface, in a ping from GW-A (`192.168.1.167`) to GW-B (`172.20.10.8`), we observe the encrypted ESP packets crossing the public Internet, with hidden ICMP and IP header. 
+
+![ESP Encapsulation (depuis GW-A WAN interface)](assets/wireshark/esp-packet-ping-GW-A-GW-B-interface_from_GWB.png)
+
+![ESP Encapsulation (depuis GW-B WAN interface)](assets/wireshark/esp-packet-ping-GW-B-GW-A.png)
+
+<h1> Achivements & Proven skills  </h1>
+<ul>
+    <li> Configuring  a VPN site-to-site IPsec using strongSwan</li>
+    <li> Understanding the IPsec features</li>
+    <ul> 
+        <li>IKEv2 phases  (Main Mode + Quick Mode), that manages peer authentication (verifying the identity of the gateways using certificates) </li>
+        <li>ESP, that provide data confidentiality, integrity and origin authentication  </li>
+        <li>NAT Traversal (NAT-T) </li>
+    </ul>
+    <li>Setting up PKI & X.509 certificates</li>
+    <li>Setting up firewalls & routing rules </li>
+    <li> IPsec diagnostics </li>
+    <li> Network analysis (Wireshark) </li>
+</ul>
+
+<h1> Requirements </h1>
+To reproduce this project, you will require to have the following environments :
+
+- **OS:** Ubuntu 22.04 LTS (VMs on VirtualBox), connected to the local LAN via the bridge mode (network mode)
+- **VPN Software:** strongSwan
+- **Networking Tools:** `iproute2`, `iptables`, `tcpdump`, Wireshark
+- Management access to (at least) one NAT-enabled router
+- Internet connectivity
+- Two distinct LAN networks
 
 
 <h2> 🛠️ Troubleshooting </h2>
@@ -386,40 +417,6 @@ During testing, hosts from LAN A (`192.168.1.73`) like my desktop computer  coul
 ``` console
 # route add 172.20.10.0 mask 255.255.255.240 192.168.1.167
 ```
-
-
-<h1> Traffic analysis via Wireshark </h1>
-
-Capturing traffic on WAN interface, in a ping from GW-A (`192.168.1.167`) to GW-B (`172.20.10.8`), we observe the encrypted ESP packets crossing the public Internet, with hidden ICMP and IP header. 
-
-![ESP Encapsulation (depuis GW-A WAN interface)](assets/wireshark/esp-packet-ping-GW-A-GW-B.png)
-
-![ESP Encapsulation (depuis GW-B WAN interface)](assets/wireshark/esp-packet-ping-GW-B-GW-A.png)
-
-<h1> Achivements & Proven skills  </h1>
-<ul>
-    <li> Configuring  a VPN site-to-site IPsec using strongSwan</li>
-    <li> Understanding the IPsec features</li>
-    <ul> 
-        <li>IKEv2 phases  (Main Mode + Quick Mode), that manages peer authentication (verifying the identity of the gateways using certificates) </li>
-        <li>ESP, that provide data confidentiality, integrity and origin authentication  </li>
-        <li>NAT Traversal (NAT-T) </li>
-    </ul>
-    <li>Setting up PKI & X.509 certificates</li>
-    <li>Setting up firewalls & routing rules </li>
-    <li> IPsec diagnostics </li>
-    <li> Network analysis (Wireshark) </li>
-</ul>
-
-<h1> Requirements </h1>
-To reproduce this project, you will require to have the following environments :
-
-- **OS:** Ubuntu 22.04 LTS (VMs on VirtualBox), connected to the local LAN via the bridge mode (network mode)
-- **VPN Software:** strongSwan
-- **Networking Tools:** `iproute2`, `iptables`, `tcpdump`, Wireshark
-- Management access to (at least) one NAT-enabled router
-- Internet connectivity
-- Two distinct LAN networks
 
 
 <h1> 📚 Resources & Useful Links </h1>
