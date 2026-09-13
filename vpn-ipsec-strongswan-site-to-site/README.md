@@ -281,9 +281,9 @@ We can also view the routing table to the GW-B LAN directly with
 
 Capturing traffic on WAN interface, in a ping from GW-A (`192.168.1.167`) to GW-B (`172.20.10.8`), we observe the encrypted ESP packets crossing the public Internet, with hidden ICMP and IP header. 
 
-![ESP Encapsulation (depuis GW-A WAN interface)](assets/wireshark/esp-packet-ping-GW-A-GW-B-interface_from_GWB.png)
+![ESP Encapsulation (depuis GW-B WAN interface)](assets/wireshark/esp-packet-ping-GW-A-GW-B-interface_from_GWB.png)
 
-![ESP Encapsulation (depuis GW-B WAN interface)](assets/wireshark/esp-packet-ping-GW-B-GW-A.png)
+![ESP Encapsulation (depuis GW-A WAN interface)](assets/wireshark/esp-packet-ping-GW-A-GW-B.png)
 
 <h1> Achivements & Proven skills  </h1>
 <ul>
