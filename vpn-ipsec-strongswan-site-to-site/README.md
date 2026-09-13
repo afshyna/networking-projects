@@ -252,13 +252,18 @@ Validate the tunnel using:
 
 Ping between LAN hosts <=> connexion site to site OK ✅ 
 
+- Ping PC Windows LAN B to PC Windows LAN A✅ 
+![Ping OK pc Windows LAN B to PC Windows LAN A](assets/verifs/ping-pc-windows-LAN_B-to-pc-windows-LAN_A.png)
+
+
+- Ping PC Windows LAN A to PC Windows LAN B✅ 
+![Ping OK pc Windows LAN B to PC Windows LAN A](assets/verifs/ping-pc-windows-LAN_A-to-pc-windows-LAN_B.png)
+
 
 - Ping PC Windows LAN A to Router LAN B  ✅ 
 ![Ping OK PC Windows LAN A vers Router LAN B](assets/verifs/ping-pc-windows-LAN_A-to-router-LAN_B.png)
 
 
-- Ping PC Windows LAN B to PC Windows LAN A✅ 
-![Ping OK pc Windows LAN B to PC Windows LAN A](assets/verifs/ping-pc-windows-LAN_B-to-pc-windows-LAN_A.png)
 
 
 <h2> Verification of the routing table  </h2>
