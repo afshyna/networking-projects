@@ -225,13 +225,18 @@ Validate the tunnel using:
 
 - `ip xfrm state`
 
-![IPSec tunnel - XFRM_framework_](assets/verifs/ip_xfrm_state_gwA.png)
+![IPSec tunnel - XFRM_framework_GW-B](assets/verifs/ip-xfrm-state-gwA-cmd.png)
+
+![IPSec tunnel - XFRM_framework GW-B_](assets/verifs/ip-xfrm-state-gwB-cmd.png)
+
 
 ---
 
 - `ip xfrm policy`
 
-![IPSec tunnel - SA State](assets/verifs/ip_xfrm_policy_gwA.png)
+![IPSec tunnel - SA State GW-A](assets/verifs/ip-xfrm-policy-gwA-cmd.png)
+
+![IPSec tunnel - SA State GW-B](assets/verifs/ip-xfrm-policy-gwB-cmd.png)
 
 ---
 
