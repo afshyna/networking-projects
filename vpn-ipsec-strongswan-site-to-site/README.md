@@ -217,9 +217,9 @@ net.ipv4.ip_forward=1
 Validate the tunnel using:
 - `ipsec statusall`
 
-![IPSec tunnel status (GW-A)](assets/verifs/ipsec_statusall_gwA.png)
+![IPSec tunnel status (GW-A)](assets/verifs/ipsec-statusall-gwA-gwB.png)
 
-![IPSec tunnel status (GW-B) ](assets/verifs/ipsec_statusall_gwB.png)
+![IPSec tunnel status (GW-B) ](assets/verifs/ipsec-statusall-gwB-gwA.png)
 
 ---
 
@@ -387,9 +387,9 @@ During testing, hosts from LAN A (`192.168.1.73`) like my desktop computer  coul
 
 Capturing traffic on WAN interface, in a ping from GW-A (`192.168.1.167`) to GW-B (`172.20.10.8`), we observe the encrypted ESP packets crossing the public Internet, with hidden ICMP and IP header. 
 
-![ESP Encapsulation (depuis GW-A WAN interface)](assets/wireshark/ipsec_esp_ping-gwA-to-gwB_captured_on_gwA-wan.png)
+![ESP Encapsulation (depuis GW-A WAN interface)](assets/wireshark/esp-packet-ping-GW-A-GW-B.png)
 
-![ESP Encapsulation (depuis GW-B WAN interface)](assets/wireshark//ipsec_esp_ping-gwA-to-gwB_captured_on_gwB-wan.png)
+![ESP Encapsulation (depuis GW-B WAN interface)](assets/wireshark/esp-packet-ping-GW-B-GW-A.png)
 
 <h1> Achivements & Proven skills  </h1>
 <ul>
