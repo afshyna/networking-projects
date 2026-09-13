@@ -217,9 +217,9 @@ net.ipv4.ip_forward=1
 Validate the tunnel using:
 - `ipsec statusall`
 
-![IPSec tunnel status (GW-A)](assets/verifs/ipsec-statusall-gwA-gwB.png)
+![IPSec tunnel status (GW-A)](assets/verifs/ipsec-statusall-gwA-gwB-cmd.png)
 
-![IPSec tunnel status (GW-B) ](assets/verifs/ipsec-statusall-gwB-gwA.png)
+![IPSec tunnel status (GW-B) ](assets/verifs/ipsec-statusall-gwB-gwA-cmd.png)
 
 ---
 
