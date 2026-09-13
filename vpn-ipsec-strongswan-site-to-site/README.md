@@ -245,9 +245,12 @@ Validate the tunnel using:
 
 ---
 
-- Ping between LAN hosts ❌ 
+- Ping between LAN hosts <=> connexion site to site OK ✅ 
 
-No connectivity...
+![Ping OK PC Windows LAN A vers Router LAN B](assets/verifs/ping-pc-windows-LAN_A-to-router-LAN_B.png)
+
+![Ping OK pc Windows LAN B to PC Windows LAN A](assets/verifs/ping-pc-windows-LAN_B-to-pc-windows-LAN_A.png)
+
 
 
 <h2> Verification of the routing table  </h2>
